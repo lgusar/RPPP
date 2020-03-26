@@ -1,0 +1,6 @@
+MASTER		DETAIL						član ekipe
+osoba		simptomi, putovanja, lokacija			Marko
+institucija	osoba, oprema					Petra
+pregled		terapija, osoba					Lovre
+organizacija	statistika, lokacija, preporuke			Goran
+stožer		preporuke, sastanci, mjere			Magda
