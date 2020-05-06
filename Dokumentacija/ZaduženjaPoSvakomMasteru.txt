@@ -1,0 +1,8 @@
+Raspored master-detaila po osobama:
+	Magda Milički : Osoba (zaražena osoba, njeni kontakti i njeno trenutno stanje)
+	Lovre Gusar : Pregled (terapija, anamneza, simptomi)
+	Marko Maglić : Institucije i njihove preporuke (također oprema unutar institucija)
+	Goran Horvat : Stožeri i njihove preporuke
+	Petra Kos : Putovanja osobe (sva posjećena mjesta) i također statistiku 
+
+			
