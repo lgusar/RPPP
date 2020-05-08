@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="PutovanjeModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="DRZAVA">
+          <Key>
+            <PropertyRef Name="sifra_drzave" />
+          </Key>
+          <Property Name="sifra_drzave" Type="nchar" MaxLength="10" Nullable="false" />
+          <Property Name="ime_drzave" Type="nchar" MaxLength="80" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LOKACIJA">
+          <Key>
+            <PropertyRef Name="sifra_grada" />
+          </Key>
+          <Property Name="sifra_grada" Type="int" Nullable="false" />
+          <Property Name="sifra_drzave" Type="nchar" MaxLength="10" Nullable="false" />
+          <Property Name="ime_grada" Type="nchar" MaxLength="25" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PUTOVANJE">
+          <Key>
+            <PropertyRef Name="sifra_putovanja" />
+          </Key>
+          <Property Name="sifra_putovanja" Type="int" Nullable="false" />
+          <Property Name="identifikacijski_broj" Type="nchar" MaxLength="15" Nullable="false" />
+          <Property Name="datum_polaska" Type="date" Nullable="false" />
+          <Property Name="datum_vracanja" Type="date" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'RPPP09.dbo.PUTOVANJE_LOKACIJA' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="PUTOVANJE_LOKACIJA">
+          <Key>
+            <PropertyRef Name="sifra_grada" />
+            <PropertyRef Name="sifra_putovanja" />
+          </Key>
+          <Property Name="sifra_grada" Type="int" Nullable="false" />
+          <Property Name="sifra_putovanja" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_LOKACIJA_DRZAVA">
+          <End Role="DRZAVA" Type="Self.DRZAVA" Multiplicity="1" />
+          <End Role="LOKACIJA" Type="Self.LOKACIJA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DRZAVA">
+              <PropertyRef Name="sifra_drzave" />
+            </Principal>
+            <Dependent Role="LOKACIJA">
+              <PropertyRef Name="sifra_drzave" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SE_ODRZALO_NA_LOKACIJA">
+          <End Role="LOKACIJA" Type="Self.LOKACIJA" Multiplicity="1" />
+          <End Role="PUTOVANJE_LOKACIJA" Type="Self.PUTOVANJE_LOKACIJA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LOKACIJA">
+              <PropertyRef Name="sifra_grada" />
+            </Principal>
+            <Dependent Role="PUTOVANJE_LOKACIJA">
+              <PropertyRef Name="sifra_grada" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SE_ODRZALO_NA_PUTOVANJE">
+          <End Role="PUTOVANJE" Type="Self.PUTOVANJE" Multiplicity="1" />
+          <End Role="PUTOVANJE_LOKACIJA" Type="Self.PUTOVANJE_LOKACIJA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="PUTOVANJE">
+              <PropertyRef Name="sifra_putovanja" />
+            </Principal>
+            <Dependent Role="PUTOVANJE_LOKACIJA">
+              <PropertyRef Name="sifra_putovanja" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PutovanjeModelStoreContainer">
+          <EntitySet Name="DRZAVA" EntityType="Self.DRZAVA" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LOKACIJA" EntityType="Self.LOKACIJA" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PUTOVANJE" EntityType="Self.PUTOVANJE" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PUTOVANJE_LOKACIJA" EntityType="Self.PUTOVANJE_LOKACIJA" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [PUTOVANJE_LOKACIJA].[sifra_grada] AS [sifra_grada], 
+    [PUTOVANJE_LOKACIJA].[sifra_putovanja] AS [sifra_putovanja]
+    FROM [dbo].[PUTOVANJE_LOKACIJA] AS [PUTOVANJE_LOKACIJA]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_LOKACIJA_DRZAVA" Association="Self.FK_LOKACIJA_DRZAVA">
+            <End Role="DRZAVA" EntitySet="DRZAVA" />
+            <End Role="LOKACIJA" EntitySet="LOKACIJA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SE_ODRZALO_NA_LOKACIJA" Association="Self.FK_SE_ODRZALO_NA_LOKACIJA">
+            <End Role="LOKACIJA" EntitySet="LOKACIJA" />
+            <End Role="PUTOVANJE_LOKACIJA" EntitySet="PUTOVANJE_LOKACIJA" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SE_ODRZALO_NA_PUTOVANJE" Association="Self.FK_SE_ODRZALO_NA_PUTOVANJE">
+            <End Role="PUTOVANJE" EntitySet="PUTOVANJE" />
+            <End Role="PUTOVANJE_LOKACIJA" EntitySet="PUTOVANJE_LOKACIJA" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PutovanjeModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="DRZAVA">
+          <Key>
+            <PropertyRef Name="sifra_drzave" />
+          </Key>
+          <Property Name="sifra_drzave" Type="String" MaxLength="10" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="ime_drzave" Type="String" MaxLength="80" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="LOKACIJA" Relationship="Self.FK_LOKACIJA_DRZAVA" FromRole="DRZAVA" ToRole="LOKACIJA" />
+        </EntityType>
+        <EntityType Name="LOKACIJA">
+          <Key>
+            <PropertyRef Name="sifra_grada" />
+          </Key>
+          <Property Name="sifra_grada" Type="Int32" Nullable="false" />
+          <Property Name="sifra_drzave" Type="String" MaxLength="10" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="ime_grada" Type="String" MaxLength="25" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="DRZAVA" Relationship="Self.FK_LOKACIJA_DRZAVA" FromRole="LOKACIJA" ToRole="DRZAVA" />
+          <NavigationProperty Name="PUTOVANJE" Relationship="Self.PUTOVANJE_LOKACIJA" FromRole="LOKACIJA" ToRole="PUTOVANJE" />
+        </EntityType>
+        <EntityType Name="PUTOVANJE">
+          <Key>
+            <PropertyRef Name="sifra_putovanja" />
+          </Key>
+          <Property Name="sifra_putovanja" Type="Int32" Nullable="false" />
+          <Property Name="identifikacijski_broj" Type="String" MaxLength="15" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="datum_polaska" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="datum_vracanja" Type="DateTime" Nullable="false" Precision="0" />
+          <NavigationProperty Name="LOKACIJA" Relationship="Self.PUTOVANJE_LOKACIJA" FromRole="PUTOVANJE" ToRole="LOKACIJA" />
+        </EntityType>
+        <Association Name="FK_LOKACIJA_DRZAVA">
+          <End Role="DRZAVA" Type="Self.DRZAVA" Multiplicity="1" />
+          <End Role="LOKACIJA" Type="Self.LOKACIJA" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DRZAVA">
+              <PropertyRef Name="sifra_drzave" />
+            </Principal>
+            <Dependent Role="LOKACIJA">
+              <PropertyRef Name="sifra_drzave" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="PUTOVANJE_LOKACIJA">
+          <End Role="LOKACIJA" Type="Self.LOKACIJA" Multiplicity="*" />
+          <End Role="PUTOVANJE" Type="Self.PUTOVANJE" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="RPPP09Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="DRZAVA" EntityType="Self.DRZAVA" />
+          <EntitySet Name="LOKACIJA" EntityType="Self.LOKACIJA" />
+          <EntitySet Name="PUTOVANJE" EntityType="Self.PUTOVANJE" />
+          <AssociationSet Name="FK_LOKACIJA_DRZAVA" Association="Self.FK_LOKACIJA_DRZAVA">
+            <End Role="DRZAVA" EntitySet="DRZAVA" />
+            <End Role="LOKACIJA" EntitySet="LOKACIJA" />
+          </AssociationSet>
+          <AssociationSet Name="PUTOVANJE_LOKACIJA" Association="Self.PUTOVANJE_LOKACIJA">
+            <End Role="LOKACIJA" EntitySet="LOKACIJA" />
+            <End Role="PUTOVANJE" EntitySet="PUTOVANJE" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PutovanjeModelStoreContainer" CdmEntityContainer="RPPP09Entities">
+          <EntitySetMapping Name="DRZAVA">
+            <EntityTypeMapping TypeName="PutovanjeModel.DRZAVA">
+              <MappingFragment StoreEntitySet="DRZAVA">
+                <ScalarProperty Name="sifra_drzave" ColumnName="sifra_drzave" />
+                <ScalarProperty Name="ime_drzave" ColumnName="ime_drzave" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LOKACIJA">
+            <EntityTypeMapping TypeName="PutovanjeModel.LOKACIJA">
+              <MappingFragment StoreEntitySet="LOKACIJA">
+                <ScalarProperty Name="sifra_grada" ColumnName="sifra_grada" />
+                <ScalarProperty Name="sifra_drzave" ColumnName="sifra_drzave" />
+                <ScalarProperty Name="ime_grada" ColumnName="ime_grada" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PUTOVANJE">
+            <EntityTypeMapping TypeName="PutovanjeModel.PUTOVANJE">
+              <MappingFragment StoreEntitySet="PUTOVANJE">
+                <ScalarProperty Name="sifra_putovanja" ColumnName="sifra_putovanja" />
+                <ScalarProperty Name="identifikacijski_broj" ColumnName="identifikacijski_broj" />
+                <ScalarProperty Name="datum_polaska" ColumnName="datum_polaska" />
+                <ScalarProperty Name="datum_vracanja" ColumnName="datum_vracanja" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <AssociationSetMapping Name="PUTOVANJE_LOKACIJA" TypeName="PutovanjeModel.PUTOVANJE_LOKACIJA" StoreEntitySet="PUTOVANJE_LOKACIJA">
+            <EndProperty Name="LOKACIJA">
+              <ScalarProperty Name="sifra_grada" ColumnName="sifra_grada" />
+            </EndProperty>
+            <EndProperty Name="PUTOVANJE">
+              <ScalarProperty Name="sifra_putovanja" ColumnName="sifra_putovanja" />
+            </EndProperty>
+          </AssociationSetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
