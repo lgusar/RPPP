@@ -1,0 +1,57 @@
+﻿@model IEnumerable<WebApplication1.Models.OSOBA>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.prezime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.adresa)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.dat_rod)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.zanimanje)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.prezime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.adresa)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.dat_rod)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.zanimanje)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.identifikacijski_broj }) |
+            @Html.ActionLink("Details", "Details", new { id=item.identifikacijski_broj }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.identifikacijski_broj })
+        </td>
+    </tr>
+}
+
+</table>

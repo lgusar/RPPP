@@ -132,6 +132,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\OSOBAsController.cs" />
     <Compile Include="Controllers\PUTOVANJEsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -141,6 +142,24 @@
     </Compile>
     <Compile Include="Models\LOKACIJA.cs">
       <DependentUpon>Putovanje.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Osoba.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Osoba.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OSOBA.cs">
+      <DependentUpon>Osoba.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Osoba.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Osoba.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Osoba1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Osoba.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Putovanje.Context.cs">
       <AutoGen>True</AutoGen>
@@ -172,6 +191,16 @@
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Models\Osoba.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Osoba.edmx</DependentUpon>
+      <LastGenOutput>Osoba.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\Osoba.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Osoba.edmx</DependentUpon>
+      <LastGenOutput>Osoba1.cs</LastGenOutput>
+    </Content>
     <Content Include="Models\Putovanje.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>Putovanje.edmx</DependentUpon>
@@ -211,6 +240,13 @@
     </EntityDeploy>
     <Content Include="Models\Putovanje.edmx.diagram">
       <DependentUpon>Putovanje.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\Osoba.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Osoba.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\Osoba.edmx.diagram">
+      <DependentUpon>Osoba.edmx</DependentUpon>
     </Content>
     <None Include="Scripts\jquery-3.5.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.5.1.js" />
@@ -323,6 +359,11 @@
     <Content Include="Views\PUTOVANJEs\Details.cshtml" />
     <Content Include="Views\PUTOVANJEs\Edit.cshtml" />
     <Content Include="Views\PUTOVANJEs\Index.cshtml" />
+    <Content Include="Views\OSOBAs\Create.cshtml" />
+    <Content Include="Views\OSOBAs\Delete.cshtml" />
+    <Content Include="Views\OSOBAs\Details.cshtml" />
+    <Content Include="Views\OSOBAs\Edit.cshtml" />
+    <Content Include="Views\OSOBAs\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
