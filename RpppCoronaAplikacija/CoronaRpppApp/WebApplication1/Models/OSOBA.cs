@@ -11,9 +11,11 @@ namespace WebApplication1.Models
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.ComponentModel.DataAnnotations;
+
     public partial class OSOBA
     {
+        [Required]
         public string identifikacijski_broj { get; set; }
         public string ime { get; set; }
         public string prezime { get; set; }
