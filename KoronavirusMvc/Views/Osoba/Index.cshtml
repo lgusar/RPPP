@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Osoba>
+﻿@model KoronavirusMvc.ViewModels.OsobeViewModel
 
     @{
     ViewData["Title"] = "Popis osoba";
@@ -7,16 +7,41 @@
     <table class="table table-sm table-striped table-hover" id="tableosobe">
         <thead>
             <tr>
-                <th>Identifikacijski broj</th>
-                <th>Ime</th>
-                <th>Prezime</th>
-                <th>Adresa</th>
-                <th>Datum rođenja</th>
-                <th>Zanimanje</th>
+                <th>
+                    <a asp-route-sort="1"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==1 ? !Model.PagingInfo.Ascending : true)"
+                       >Identifikacijski broj</a>
+                </th>
+                <th>
+                    <a asp-route-sort="2"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Ime</a>
+                </th>
+                <th>
+                    <a asp-route-sort="3"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==3 ? !Model.PagingInfo.Ascending : true)">Prezime</a>
+                </th>
+                <th>
+                    <a asp-route-sort="4"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==4 ? !Model.PagingInfo.Ascending : true)">Adresa</a>
+                </th>
+                <th>
+                    <a asp-route-sort="5"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==5 ? !Model.PagingInfo.Ascending : true)">Datum rođenja</a>
+                </th>
+                <th>
+                    <a asp-route-sort="6"
+                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-ascending="@( Model.PagingInfo.Sort ==6 ? !Model.PagingInfo.Ascending : true)">Zanimanje</a>
+                </th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var osoba in Model)
+            @foreach (var osoba in Model.Osobe)
         {
             <tr>
                 <td class="text-left">@osoba.IdentifikacijskiBroj</td>
@@ -31,32 +56,9 @@
     </table>
 
     @section styles{
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/js/jquery.bootstrap4.min.css" />
+
         }
 
     @section scripts{
-        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-        <script src="https://cdn.datatables.net/1.10.20/js/jquery.bootstrap4.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('#tableosobe').DataTable({
-                    language: {
-                        search: "Pretraga",
-                        info: "_START_ -  _END_  (ukupno _TOTAL_)",
-                        lengthMenu: "Prikaži  _MENU_  zapisa",
-                        paginate: {
-                            first: "Prva ",
-                            previous: "Prethodna ",
-                            next: " Sljedeća ",
-                            last: "Posljednja "
-                        },
-                        emptyTable: "Nema podataka za prikaz",
-                        info: "_START_ - _END_ od ukupno _TOTAL_ zapisa",
-                        infoEmpty: "Nema podataka za prikaz",
-                        infoFiltered: "(filtrirano od ukupno _MAX_ zapisa)",
-                    }
-                });
-            });
-        </script>
     }
 
