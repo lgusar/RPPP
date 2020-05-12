@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Simptom>
+
+@{
+    ViewData["Title"] = "Popis simptoma";
+}
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Šifra simptoma</th>
+            <th>Ime simptoma</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var simptom in Model)
+        {
+            <tr>
+                <td class="text-left">@simptom.SifraSimptoma</td>
+                <td class="text-left">@simptom.Opis</td>
+            </tr>
+        }
+    </tbody>
+</table>

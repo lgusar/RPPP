@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Pregled>
+
+@{ 
+    ViewData["Title"] = "Popis pregleda";
+}
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Šifra pregleda</th>
+            <th>Datum</th>
+            <th>Anamneza</th>
+            <th>Dijagnoza</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pregled in Model)
+        {
+            <tr>
+                <td class="text-left">@pregled.SifraPregleda</td>
+                <td class="text-left">@pregled.Datum</td>
+                <td class="text-left">@pregled.Anamneza</td>
+                <td class="text-left">@pregled.Dijagnoza</td>
+            </tr>
+        }
+    </tbody>
+</table>
