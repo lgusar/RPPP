@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ViewComponents\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
