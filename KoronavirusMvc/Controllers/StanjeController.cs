@@ -55,6 +55,70 @@ namespace KoronavirusMvc.Controllers
                 return View(stanje);
             }
         }
+
+        [HttpGet]
+        public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var stanje = ctx.Stanje.Find(id);
+            if (stanje == null)
+            {
+                return NotFound($"Ne postoji stanje sa šifrom {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                return View(stanje);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Stanje stanje = await ctx.Stanje.FindAsync(id);
+                if (stanje == null)
+                {
+                    return NotFound($"Ne postoji stanje sa šifrom {id}");
+                }
+
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Stanje>(stanje, "", s => s.NazivStanja);
+                if (ok)
+                {
+                    try
+                    {
+                        
+                        TempData[Constants.Message] = $"Podaci stanja {stanje.NazivStanja} uspješno ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await ctx.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(stanje);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o stanju nije moguće povezati s forme");
+                    return View(stanje);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraStanja, int page = 1, int sort = 1, bool ascending = true)
