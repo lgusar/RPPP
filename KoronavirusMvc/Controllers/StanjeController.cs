@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,41 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
 
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Stanje stanje)
+        {
+            if (ModelState.IsValid)
+            {
+
+                try
+                {
+                    ctx.Add(stanje);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno dodano.";
+                    TempData[Constants.ErrorOccurred] = false;
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    return View(stanje);
+                }
+            }
+            else
+            {
+                return View(stanje);
+            }
+        }
+
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
