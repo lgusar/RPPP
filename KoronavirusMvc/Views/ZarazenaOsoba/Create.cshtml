@@ -1,0 +1,27 @@
+﻿@model ZarazenaOsoba
+
+@{
+    ViewData["Title"] = "Create";
+}
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="IdentifikacijskiBroj"></label>
+        <input asp-for="IdentifikacijskiBroj" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="DatZaraze"></label>
+        <input asp-for="DatZaraze" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="SifraStanja"></label>
+        <input asp-for="SifraStanja" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-secondary" type="submit">Odustani</button>
+    </div>
+</form>
+
