@@ -33,6 +33,7 @@
                    asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">
                     Dijagnoza</a>
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -43,6 +44,27 @@
                 <td class="text-left">@pregled.Datum</td>
                 <td class="text-left">@pregled.Anamneza</td>
                 <td class="text-left">@pregled.Dijagnoza</td>
+                <td class="btn-group">
+                    <a asp-action="Edit"
+                          asp-route-id="@pregled.SifraPregleda"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending"
+                          class="btn btn-sm" title="Ažuriraj"
+                    >
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="post"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraPregleda" value="@pregled.SifraPregleda" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

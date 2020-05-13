@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
@@ -19,7 +20,35 @@ namespace KoronavirusMvc.Controllers
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
-        } 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string SifraPregleda, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var pregled = ctx.Pregled.Find(Int32.Parse(SifraPregleda));
+            if (pregled == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    ctx.Remove(pregled);
+                    ctx.SaveChanges();
+
+                    TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno obrisan.";
+                    TempData[Constants.ErrorOccured] = false;
+                }
+                catch(Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja pregleda." + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccured] = true;
+                }
+                return RedirectToAction(nameof(Index), new {page, sort, ascending});
+            }
+        }
 
         [HttpGet]
         public IActionResult Create()
@@ -50,6 +79,27 @@ namespace KoronavirusMvc.Controllers
             }
             else
             {
+                return View(pregled);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var pregled = ctx.Pregled
+                             .AsNoTracking()
+                             .Where(p => p.SifraPregleda == id)
+                             .FirstOrDefault();
+
+            if (pregled == null)
+            {
+                return NotFound($"Ne postoji pregled s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
                 return View(pregled);
             }
         }
