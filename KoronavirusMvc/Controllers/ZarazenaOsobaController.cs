@@ -6,6 +6,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,14 +24,21 @@ namespace KoronavirusMvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PrepareDropdownLists();
             return View();
+        }
+
+        private async Task PrepareDropdownLists()
+        {
+            var stanja = await ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToListAsync();
+            ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(ZarazenaOsoba zarazenaOsoba)
+        public async Task<IActionResult> Create(ZarazenaOsoba zarazenaOsoba)
         {
             if (ModelState.IsValid)
             {
@@ -39,7 +47,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     ctx.Add(zarazenaOsoba);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba.";
+                    TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba. ";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -47,11 +55,13 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    await PrepareDropdownLists();
                     return View(zarazenaOsoba);
                 }
             }
             else
             {
+                await PrepareDropdownLists();
                 return View(zarazenaOsoba);
             }
         }
@@ -59,7 +69,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.ZarazenaOsoba.AsNoTracking();
+            var query = ctx.ZarazenaOsoba.Include(z => z.SifraStanjaNavigation).Include(z => z.IdentifikacijskiBrojNavigation).AsNoTracking();
 
             int count = query.Count();
 
@@ -84,10 +94,16 @@ namespace KoronavirusMvc.Controllers
                     orderSelector = z => z.IdentifikacijskiBroj;
                     break;
                 case 2:
-                    orderSelector = z => z.DatZaraze;
+                    orderSelector = z => z.IdentifikacijskiBrojNavigation.Ime;
                     break;
                 case 3:
-                    orderSelector = z => z.SifraStanja;
+                    orderSelector = z => z.IdentifikacijskiBrojNavigation.Prezime;
+                    break;
+                case 4:
+                    orderSelector = z => z.DatZaraze;
+                    break;
+                case 5:
+                    orderSelector = z => z.SifraStanjaNavigation.NazivStanja;
                     break;
             }
 
