@@ -55,6 +55,36 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int SifraStozera, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var stozer = ctx.Stozer.Find(SifraStozera);
+            if (stozer == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    string naziv = stozer.Naziv;
+                    ctx.Remove(stozer);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Stožer {naziv} uspješno obrisan";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception exc)
+                {
+                    TempData[Constants.Message] = "Pogreška prilikom brisanja stožera: " + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+        }
+
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
