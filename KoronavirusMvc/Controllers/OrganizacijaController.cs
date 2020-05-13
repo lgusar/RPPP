@@ -8,21 +8,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KoronavirusMvc.Controllers
 {
-    public class SimptomController : Controller
+    public class OrganizacijaController : Controller
     {
         private readonly RPPP09Context ctx;
 
-        public SimptomController(RPPP09Context ctx)
+        public OrganizacijaController(RPPP09Context ctx)
         {
             this.ctx = ctx;
-        } 
+        }
 
         public IActionResult Index()
         {
-            var simptomi = ctx.Simptom
+            var organizacije = ctx.Organizacija
                               .AsNoTracking()
                               .ToList();
-            return View(simptomi);
+            return View(organizacije);
         }
     }
 }
