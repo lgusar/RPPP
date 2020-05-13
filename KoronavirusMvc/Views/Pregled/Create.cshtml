@@ -4,18 +4,22 @@
     <div asp-validation-summary="All"></div>
     <div class="form-group">
         <label asp-for="SifraPregleda"></label>
+        <div><span asp-validation-for="SifraPregleda" class="text-danger"></span></div>
         <input asp-for="SifraPregleda" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Datum"></label>
+        <div><span asp-validation-for="Datum" class="text-danger"></span></div>
         <input asp-for="Datum" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Anamneza"></label>
+        <div><span asp-validation-for="Anamneza" class="text-danger"></span></div>
         <input asp-for="Anamneza" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Dijagnoza"></label>
+        <div><span asp-validation-for="Dijagnoza" class="text-danger"></span></div>
         <input asp-for="Dijagnoza" class="form-control" />
     </div>
     <div class="text-center">

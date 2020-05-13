@@ -1,0 +1,23 @@
+﻿@model Simptom
+
+@{ 
+    ViewBag.Title = "Novi simptom";
+}
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="SifraSimptoma"></label>
+        <div><span asp-validation-for="SifraSimptoma" class="text-danger"></span></div>
+        <input asp-for="SifraSimptoma" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Opis"></label>
+        <div><span asp-validation-for="Opis" class="text-danger"></span></div>
+        <input asp-for="Opis" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+    </div>
+</form>
