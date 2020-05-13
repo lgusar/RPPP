@@ -1,0 +1,27 @@
+﻿@model Stozer
+
+@{
+    ViewBag.Title = "Novi stožer";
+}
+
+<h2>Unos novog stožera</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="SifraStozera"></label>
+        <input asp-for="SifraStozera" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Naziv"></label>
+        <input asp-for="Naziv" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="IdPredsjednika"></label>
+        <input asp-for="IdPredsjednika" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+    </div>
+</form>

@@ -20,6 +20,41 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
+
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Stozer stozer)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Add(stozer);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Stožer {stozer.Naziv} dodan.";
+                    TempData[Constants.ErrorOccurred] = false;
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    return View(stozer);
+                }
+            }
+            else
+            {
+                return View(stozer);
+            }
+        }
+
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;

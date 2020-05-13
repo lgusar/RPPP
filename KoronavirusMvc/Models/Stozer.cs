@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace KoronavirusMvc.Models
 {
@@ -12,8 +13,19 @@ namespace KoronavirusMvc.Models
             StozerOsoba = new HashSet<StozerOsoba>();
         }
 
+        [Required(ErrorMessage = "Šifra stožera je obvezno polje")]
+        [Display(Name = "Šifra stožera", Prompt = "Unesite šifru")]
+        [RegularExpression("[0-9]+", ErrorMessage = "Šifra stožera mora biti broj")]
         public int SifraStozera { get; set; }
+
+        [Required(ErrorMessage = "Naziv stožera je obvezno polje")]
+        [Display(Name = "Naziv stožera", Prompt = "Unesite naziv")]
+        [MaxLength(255, ErrorMessage = "Naziv stožera može sadržavati maksimalno 255 znakova")]
         public string Naziv { get; set; }
+
+        [Required(ErrorMessage = "ID predsjednika je obvezno polje")]
+        [Display(Name = "ID predsjednika", Prompt = "Unesite ID")]
+        [MaxLength(15, ErrorMessage = "ID predsjednika može sadržavati maksimalno 15 znakova")]
         public string IdPredsjednika { get; set; }
 
         public virtual Osoba IdPredsjednikaNavigation { get; set; }
