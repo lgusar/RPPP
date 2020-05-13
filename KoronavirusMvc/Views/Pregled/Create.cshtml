@@ -1,0 +1,25 @@
+﻿@model Pregled
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="SifraPregleda"></label>
+        <input asp-for="SifraPregleda" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Datum"></label>
+        <input asp-for="Datum" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Anamneza"></label>
+        <input asp-for="Anamneza" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Dijagnoza"></label>
+        <input asp-for="Dijagnoza" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+    </div>
+</form>
