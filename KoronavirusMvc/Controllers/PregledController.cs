@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
@@ -101,6 +102,56 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Sort = sort;
                 ViewBag.ascending = ascending;
                 return View(pregled);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Pregled pregled = await ctx.Pregled.FindAsync(id);
+
+                if (pregled == null)
+                {
+                    return NotFound($"Ne postoji pregled s tom šifrom {id}");
+                }
+
+                ViewBag.page = page;
+                ViewBag.sort = sort;
+                ViewBag.ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Pregled>(pregled, "", p => p.Datum, p => p.Anamneza, p => p.Dijagnoza);
+
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
+                        TempData[Constants.ErrorOccured] = false;
+
+                        await ctx.SaveChangesAsync();
+
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch(Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(pregled);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
+                    return View(pregled);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccured] = true;
+
+                return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
         }
 
