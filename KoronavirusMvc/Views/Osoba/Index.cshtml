@@ -52,6 +52,15 @@
                 <td class="text-left">@osoba.Adresa</td>
                 <td class="text-left">@osoba.DatRod</td>
                 <td class="text-left">@osoba.Zanimanje</td>
+                <td class="btn-group">
+                    <form asp-action="Delete" method="post"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="IdentifikacijskiBroj" value="@osoba.IdentifikacijskiBroj" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                    </form>
+                </td>
             </tr>
         }
         </tbody>

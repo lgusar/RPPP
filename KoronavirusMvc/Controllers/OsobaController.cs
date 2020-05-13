@@ -57,6 +57,34 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string IdentifikacijskiBroj, int page=1, int sort = 1, bool ascending = true)
+        {
+            var osoba = ctx.Osoba.Find(IdentifikacijskiBroj);
+            if(osoba == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    string punoime = osoba.Ime + " " + osoba.Prezime;
+                    ctx.Remove(osoba);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Osoba {punoime} uspješno obrisana.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch(Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja osobe: " + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending});
+            }
+        }
+
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
