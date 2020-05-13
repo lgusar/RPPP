@@ -25,10 +25,19 @@
     <tbody>
         @foreach (var stanje in Model.Stanja)
         {
-            <tr>
-                <td class="text-left">@stanje.SifraStanja</td>
-                <td class="text-left">@stanje.NazivStanja</td>
-            </tr>
+        <tr>
+            <td class="text-left">@stanje.SifraStanja</td>
+            <td class="text-left">@stanje.NazivStanja</td>
+            <td class="btn-group">
+                <form asp-action="Delete" method="post"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="SifraStanja" value="@stanje.SifraStanja" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                </form>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

@@ -55,6 +55,33 @@ namespace KoronavirusMvc.Controllers
                 return View(stanje);
             }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int SifraStanja, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var stanje = ctx.Stanje.Find(SifraStanja);
+            if (stanje == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    
+                    ctx.Remove(stanje);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno obrisana.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja stanja: " + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+        }
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
