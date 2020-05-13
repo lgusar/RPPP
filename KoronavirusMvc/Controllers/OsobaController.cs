@@ -8,6 +8,7 @@ using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -54,6 +55,69 @@ namespace KoronavirusMvc.Controllers
             else
             {
                 return View(osoba);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult Edit(string id, int page=1, int sort=1, bool ascending= true)
+        {
+            var osoba = ctx.Osoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
+            if(osoba == null)
+            {
+                return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                return View(osoba);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Osoba osoba =await ctx.Osoba.FindAsync(id);
+                if(osoba == null)
+                {
+                    return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
+                }
+
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Osoba>(osoba, "", o => o.Ime, o => o.Prezime, o => o.Adresa, o => o.DatRod, o => o.Zanimanje);
+                if (ok)
+                {
+                    try
+                    {
+                        string punoime = osoba.Ime + " " + osoba.Prezime;
+                        TempData[Constants.Message] = $"Podaci osobe {punoime} uspješno ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await ctx.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch(Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(osoba);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o osobi nije moguće povezati s forme");
+                    return View(osoba);
+                }
+            }
+            catch(Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
             }
         }
 
