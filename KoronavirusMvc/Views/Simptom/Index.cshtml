@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿@model IEnumerable<Simptom>
 
 @{
@@ -19,6 +18,7 @@
                 <td class="text-left">@simptom.SifraSimptoma</td>
                 <td class="text-left">@simptom.Opis</td>
             </tr>
+
         }
     </tbody>
 </table>
@@ -51,58 +51,4 @@
             });
         });
     </script>
-=======
-﻿@model IEnumerable<Simptom>
-
-@{
-    ViewData["Title"] = "Popis simptoma";
-}
-
-<table class="table table-sm table-striped table-hover" id="tablesimptomi">
-    <thead>
-        <tr>
-            <th>Šifra simptoma</th>
-            <th>Ime simptoma</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var simptom in Model)
-        {
-            <tr>
-                <td class="text-left">@simptom.SifraSimptoma</td>
-                <td class="text-left">@simptom.Opis</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-@section styles{
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
-}
-
-@section scripts{
-    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#tablesimptomi').DataTable({
-                language: {
-                    search: "Pretraga",
-                    info: "_START_ - _END_ (ukupno _TOTAL_)",
-                    lengthMenu: "Prikaži _MENU_ zapisa",
-                    paginate: {
-                        first: "Prva",
-                        previous: "Prethodna",
-                        next: "Sljedeća",
-                        last: "Zadnja"
-                    },
-                    emptyTable: "Nema podataka za prikaz",
-                    info: "_START_ - _END_ od ukupno _TOTAL_ zapisa",
-                    infoEmpty: "Nema podataka za prikaz",
-                    infoFiltered: "(filtrirano od ukupno _MAX_ zapisa)",
-                }
-            });
-        });
-    </script>
->>>>>>> Maglic
 }
