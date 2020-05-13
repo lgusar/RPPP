@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Oprema>
+@{
+    ViewData["Title"] = "Popis Opreme";
+}
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            <th class="text-center">Sifra opreme</th>
+            <th class="text-center">Sifra institucije</th>
+            <th class="text-center">Naziv opreme</th>
+            <th class="text-center">Količina opreme</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var oprema in Model)
+        {
+        <tr>
+            <td class="text-center">@oprema.SifraOpreme</td>
+            <td class="text-center">@oprema.SifraInstitucije</td>
+            <td class="text-center">@oprema.NazivOpreme</td>
+            <td class="text-center">@oprema.KolicinaOpreme</td>
+        </tr>
+        }
+
+    </tbody>
+</table>
