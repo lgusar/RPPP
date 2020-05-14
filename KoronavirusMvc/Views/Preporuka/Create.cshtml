@@ -1,0 +1,52 @@
+﻿@model Preporuka
+
+@{ ViewBag.Title = "Nova preporuka";
+}
+
+<h2>Unos nove preporuke</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="SifraPreporuke"></label>
+        <div><span asp-validation-for="SifraPreporuke" class="text-danger"></span></div>
+        <input asp-for="SifraPreporuke" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="SifraOrganizacije"></label>
+        <div><span asp-validation-for="SifraOrganizacije" class="text-danger"></span></div>
+        <select class="form-control" asp-for="SifraOrganizacije" asp-items="ViewBag.Organizacije">
+            <option selected value="" disabled>Odaberite šifru organizacije</option>
+        </select>
+
+    </div>
+    <div class="form-group">
+        <label asp-for="SifraStozera"></label>
+        <div><span asp-validation-for="SifraStozera" class="text-danger"></span></div>
+        <select class="form-control" asp-for="SifraStozera" asp-items="ViewBag.Stozeri">
+            <option selected value="" disabled>Odaberite šifru stožera</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="SifraPrethodnePreporuke"></label>
+        <div><span asp-validation-for="SifraPrethodnePreporuke" class="text-danger"></span></div>
+        <select class="form-control" asp-for="SifraPrethodnePreporuke" asp-items="ViewBag.Preporuke">
+            <option selected value="" disabled>Odaberite šifru prethodne preporuke</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="Opis"></label>
+        <div><span asp-validation-for="Opis" class="text-danger"></span></div>
+        <input asp-for="Opis" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="VrijemeObjave"></label>
+        <div><span asp-validation-for="VrijemeObjave" class="text-danger"></span></div>
+        <input asp-for="VrijemeObjave" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+    </div>
+</form>
+
