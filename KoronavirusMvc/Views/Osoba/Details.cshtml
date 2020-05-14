@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+
 
 <div>
     <h4>Osoba</h4>
@@ -42,6 +42,40 @@
         </dd>
     </dl>
 </div>
+
+<h4>Osobe s kojima je bila u kontkatu</h4>
+
+<table class="table table-sm table-striped table-hover" id="tableosobe">
+    <thead>
+        <tr>
+            <th>
+                Identifikacijski broj
+            </th>
+            <th>
+                Ime
+            </th>
+            <th>
+               Prezime
+            </th>
+            
+        </tr>
+    </thead>
+    @*<tbody>
+        @foreach (var osoba in @Model.Osoba)
+        {
+            <tr>
+                <td class="text-left">@osoba.IdentifikacijskiBroj</td>
+                <td class="text-left">@osoba.Ime</td>
+                <td class="text-left">@osoba.Prezime</td>
+                
+            </tr>
+        }
+    </tbody>*@
+</table>
+
 <div>
+    
     <a asp-action="Index">Natrag na listu</a>
 </div>
+
+

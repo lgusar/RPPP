@@ -217,13 +217,14 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
 
+            
             var osoba = await ctx.Osoba
                 .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
             if (osoba == null)
             {
                 return NotFound();
             }
-
+            
             return View(osoba);
         }
     }
