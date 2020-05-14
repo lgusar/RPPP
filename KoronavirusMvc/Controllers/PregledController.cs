@@ -40,12 +40,12 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
 
                     TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno obrisan.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                 }
                 catch(Exception exc)
                 {
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja pregleda." + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccured] = true;
+                    TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new {page, sort, ascending});
             }
@@ -70,7 +70,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
 
                     TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno dodan.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
@@ -129,7 +129,7 @@ namespace KoronavirusMvc.Controllers
                     try
                     {
                         TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
-                        TempData[Constants.ErrorOccured] = false;
+                        TempData[Constants.ErrorOccurred] = false;
 
                         await ctx.SaveChangesAsync();
 
@@ -150,7 +150,7 @@ namespace KoronavirusMvc.Controllers
             catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccured] = true;
+                TempData[Constants.ErrorOccurred] = true;
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }

@@ -95,7 +95,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
 
                     TempData[Constants.Message] = $"Pregled {simptom.SifraSimptoma} uspješno dodan.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
