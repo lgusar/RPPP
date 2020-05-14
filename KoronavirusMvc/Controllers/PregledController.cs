@@ -65,6 +65,7 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
+                    pregled.SifraPregleda = (int)NewId();
                     ctx.Add(pregled);
                     ctx.SaveChanges();
 
@@ -215,6 +216,16 @@ namespace KoronavirusMvc.Controllers
             };
 
             return View(model);
+        }
+
+        private decimal NewId()
+        {
+            var maxId = ctx.Pregled
+                      .Select(o => o.SifraPregleda)
+                      .ToList()
+                      .Max();
+
+            return maxId + 1;
         }
     }
 }
