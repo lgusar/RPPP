@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace KoronavirusMvc
+namespace KoronavirusMvc.Extensions
 {
     /// <summary>
     /// Razred sa proširenjima za iznimke

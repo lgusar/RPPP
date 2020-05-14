@@ -1,0 +1,36 @@
+﻿@model Pregled
+
+@{ 
+    ViewBag.Title = "Ažuriranje pregleda";
+}
+
+<form 
+      asp-route-page="@ViewBag.page"
+      asp-route-sort="@ViewBag.sort"
+      asp-route-ascending="@ViewBag.ascending"
+      asp-action="Edit" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="Datum"></label>
+        <div><span asp-validation-for="Datum" class="text-danger"></span></div>
+        <input asp-for="Datum" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Anamneza"></label>
+        <div><span asp-validation-for="Anamneza" class="text-danger"></span></div>
+        <input asp-for="Anamneza" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Dijagnoza"></label>
+        <div><span asp-validation-for="Dijagnoza" class="text-danger"></span></div>
+        <input asp-for="Dijagnoza" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Prihvati promjene</button>
+        <a asp-action="Index"
+           asp-route-page="@ViewBag.page"
+           asp-route-sort="@ViewBag.sort"
+           asp-route-ascending="@ViewBag.ascending"
+           class="btn btn-secondary">Odustani</a>
+    </div>
+</form>

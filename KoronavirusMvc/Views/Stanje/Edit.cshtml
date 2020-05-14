@@ -1,0 +1,27 @@
+﻿@model Stanje
+
+@{
+    ViewBag.Title = "Ažuriranje stanja";
+}
+<form asp-route-page="@ViewBag.Page"
+      asp-route-sort="@ViewBag.Sort"
+      asp-route-ascending="@ViewBag.Ascending"
+      asp-action="Edit"
+      method="post">
+    <div asp-validation-summary="All"></div>
+
+    <div class="form-group">
+        <label asp-for="NazivStanja"></label>
+        <div><span asp-validation-for="NazivStanja" class="text-danger"></span></div>
+        <input asp-for="NazivStanja" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Spremi</button>
+    </div>
+    <a asp-action="Index"
+       asp-route-page="@ViewBag.Page"
+       asp-route-sort="@ViewBag.Sort"
+       asp-route-ascending="@ViewBag.Ascending"
+       class="btn btn-secondary">Odustani</a>
+</form>
+

@@ -1,0 +1,37 @@
+﻿@model Statistika
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="SifraObjave"> Šifra objave</label>
+            <input asp-for="SifraObjave" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="SifraGrada"> Šifra grada</label>
+            <input asp-for="SifraGrada" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="SifraOrganizacije"> Šifra organizacije</label>
+            <input asp-for="SifraOrganizacije" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojSlucajeva"> Ukupni broj slučajeva </label>
+            <input asp-for="BrojSlucajeva" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojAktivnih"> Broj trenutno bolesnih</label>
+            <input asp-for="BrojAktivnih" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojUmrlih"> Broj umrlih </label>
+            <input asp-for="BrojUmrlih" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojIzlijecenih"> Broj izlječenih </label>
+            <input asp-for="BrojIzlijecenih" class="form-control" />
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Dodaj</button>
+            <a asp-action="Index" class="btn btn-secondary"> Odustani</a>
+        </div>
+    </form>

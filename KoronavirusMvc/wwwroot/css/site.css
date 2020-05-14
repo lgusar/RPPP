@@ -1,6 +1,6 @@
 ﻿.validation-summary-errors {
     font-weight: bold;
-    color: red;
+    color: #a94442;
 }
 
 .validation-summary-valid {
@@ -11,7 +11,27 @@
     border-color: red;
 }
 
+.pagebox {
+    width: 45px;
+}
+
+    .pagebox::selection {
+        background-color: grey;
+    }
+
+
+.malaslika {
+    height: 40px;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
+
 main {
-    padding-left:58px;
-    padding-right:58px;
+    padding-left: 50px;
+    padding-right: 50px;
 }
