@@ -209,5 +209,22 @@ namespace KoronavirusMvc.Controllers
             };
             return View(model);
         }
+
+        public async Task<IActionResult> Details(string? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var osoba = await ctx.Osoba
+                .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
+            if (osoba == null)
+            {
+                return NotFound();
+            }
+
+            return View(osoba);
+        }
     }
 }

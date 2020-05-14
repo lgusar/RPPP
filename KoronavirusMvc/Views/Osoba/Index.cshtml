@@ -73,7 +73,12 @@
                         <input type="hidden" name="IdentifikacijskiBroj" value="@osoba.IdentifikacijskiBroj" />
                         <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                     </form>
-                    
+                    <a asp-action="Details"
+                       asp-route-id="@osoba.IdentifikacijskiBroj"
+                       class="btn bt-sm more-info"
+                       title="Prikaži kontakte">
+                        <i class="fas fa-info"></i>
+                    </a>
                 </td>
             </tr>
         }
