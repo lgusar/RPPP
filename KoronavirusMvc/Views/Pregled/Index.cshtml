@@ -1,58 +1,84 @@
-@model IEnumerable<Pregled>
+﻿@model KoronavirusMvc.ViewModels.PreglediViewModel
 
 @{
     ViewData["Title"] = "Popis pregleda";
 }
 
+<a asp-action="Create">Unos novog pregleda</a>
+
+<pager page-info="@Model.PagingInfo" page-title="Unesite željenu stranicu"
+       page-action="Index" class="float-right">
+</pager>
+
 <table class="table table-sm table-striped table-hover" id="tablepregledi">
     <thead>
         <tr>
-            <th>Šifra pregleda</th>
-            <th>Datum</th>
-            <th>Anamneza</th>
-            <th>Dijagnoza</th>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)"
+                >Šifra pregleda</a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)"
+                   >Datum</a>
+            </th>
+            <th>
+                <a asp-route-sort="3"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">
+                    Anamneza</a>
+            </th>
+            <th>
+                <a asp-route-sort="4"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">
+                    Dijagnoza</a>
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var pregled in Model)
+        @foreach (var pregled in Model.Pregledi)
         {
             <tr>
                 <td class="text-left">@pregled.SifraPregleda</td>
                 <td class="text-left">@pregled.Datum</td>
                 <td class="text-left">@pregled.Anamneza</td>
                 <td class="text-left">@pregled.Dijagnoza</td>
+                <td class="btn-group">
+                    <a asp-action="Edit"
+                          asp-route-id="@pregled.SifraPregleda"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending"
+                          class="btn btn-sm" title="Ažuriraj"
+                    >
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="post"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraPregleda" value="@pregled.SifraPregleda" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
 
         }
     </tbody>
 </table>
 
-@section styles{
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+@section styles{ 
+   
 }
 
 @section scripts{
-    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#tablepregledi').DataTable({
-                language: {
-                    search: "Pretraga",
-                    info: "_START_ - _END_ (ukupno _TOTAL_)",
-                    lengthMenu: "Prikaži _MENU_ zapisa",
-                    paginate: {
-                        first: "Prva",
-                        previous: "Prethodna",
-                        next: "Sljedeća",
-                        last: "Zadnja"
-                    },
-                    emptyTable: "Nema podataka za prikaz",
-                    info: "_START_ - _END_ od ukupno _TOTAL_ zapisa",
-                    infoEmpty: "Nema podataka za prikaz",
-                    infoFiltered: "(filtrirano od ukupno _MAX_ zapisa)",
-                }
-            });
-        });
-    </script>
+    
 }

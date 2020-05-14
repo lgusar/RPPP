@@ -27,9 +27,9 @@ namespace KoronavirusMvc
                 connString = connString.Replace("sifra", password);
                 options.UseSqlServer(connString);
             } );
+
             var appSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSection);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
