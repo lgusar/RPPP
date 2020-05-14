@@ -1,12 +1,12 @@
-﻿@model KoronavirusMvc.ViewModels.StozeriViewModel
+﻿@model KoronavirusMvc.ViewModels.SastanciViewModel
+
 @{
-    ViewData["Title"] = "Popis stožera";
+    ViewBag.Title = "Sastanci";
 }
 
-<h2>Popis stožera</h2>
+<h2>Popis sastanaka</h2>
 
-
-<a asp-action="Create">Unos novog stožera</a>
+<a asp-action="Create">Unos novog sastanka</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
        class="float-right">
@@ -17,7 +17,7 @@
         <tr>
             <th>
                 <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
-                    Šifra stožera
+                    Šifra sastanka
                 </a>
             </th>
             <th>
@@ -27,22 +27,22 @@
             </th>
             <th>
                 <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">
-                    Ime predsjednika
+                    Datum
                 </a>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var stozer in Model.Stozeri)
+        @foreach (var sastanak in Model.Sastanci)
         {
             <tr>
-                <td class="text-left">@stozer.SifraStozera</td>
-                <td class="text-left">@stozer.Naziv</td>
-                <td class="text-left">@stozer.IdPredsjednikaNavigation.Ime @stozer.IdPredsjednikaNavigation.Prezime</td>
+                <td class="text-left">@sastanak.SifraSastanka</td>
+                <td class="text-left">@sastanak.SifraStozeraNavigation.Naziv</td>
+                <td class="text-left">@sastanak.Datum</td>
                 <td class="btn-group">
                     <a asp-action="Edit"
-                       asp-route-id="@stozer.SifraStozera"
+                       asp-route-id="@sastanak.SifraSastanka"
                        asp-route-page="@Model.PagingInfo.CurrentPage"
                        asp-route-sort="@Model.PagingInfo.Sort"
                        asp-route-ascending="@Model.PagingInfo.Ascending"
@@ -51,7 +51,7 @@
                           asp-route-page="@Model.PagingInfo.CurrentPage"
                           asp-route-sort="@Model.PagingInfo.Sort"
                           asp-route-ascending="@Model.PagingInfo.Ascending">
-                        <input type="hidden" name="SifraStozera" value="@stozer.SifraStozera" />
+                        <input type="hidden" name="SifraSastanka" value="@sastanak.SifraSastanka" />
                         <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                     </form>
                 </td>
@@ -59,11 +59,3 @@
         }
     </tbody>
 </table>
-
-
-
-@section styles{
-}
-
-@section scripts{
-}

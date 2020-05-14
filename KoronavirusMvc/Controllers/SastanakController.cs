@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
 {
-    public class StozerController : Controller
+    public class SastanakController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
 
-        public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        public SastanakController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
@@ -29,31 +29,27 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
+
         private void PrepareDropDownLists()
         {
-            var osobe = ctx.Osoba
-                            .OrderBy(d => d.IdentifikacijskiBroj)
-                            .Select(d => new
-                            {
-                                IdentifikacijskiBroj = d.IdentifikacijskiBroj,
-                                imePrezime = string.Format("{0} {1}", d.Ime, d.Prezime)
-                            })
+            var stozeri = ctx.Stozer
+                            .OrderBy(d => d.SifraStozera)
+                            .Select(d => new { d.Naziv, d.SifraStozera })
                             .ToList();
-            ViewBag.Osobe = new SelectList(osobe, nameof(Osoba.IdentifikacijskiBroj), nameof(Osoba.imePrezime));
+            ViewBag.Stozeri = new SelectList(stozeri, nameof(Stozer.SifraStozera), nameof(Stozer.Naziv));
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Stozer stozer)
+        public IActionResult Create(Sastanak sastanak)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    ctx.Add(stozer);
+                    ctx.Add(sastanak);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Stožer {stozer.Naziv} dodan.";
+                    TempData[Constants.Message] = $"Sastanak dodan. Šifra sastanka = {sastanak.SifraSastanka}";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -62,24 +58,23 @@ namespace KoronavirusMvc.Controllers
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                     PrepareDropDownLists();
-                    return View(stozer);
+                    return View(sastanak);
                 }
             }
             else
             {
                 PrepareDropDownLists();
-                return View(stozer);
+                return View(sastanak);
             }
         }
-
 
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
-            var stozer = ctx.Stozer.AsNoTracking().Where(d => d.SifraStozera == id).SingleOrDefault();
-            if (stozer == null)
+            var sastanak = ctx.Sastanak.AsNoTracking().Where(d => d.SifraSastanka == id).SingleOrDefault();
+            if (sastanak == null)
             {
-                return NotFound("Ne postoji stožer s oznakom: " + id);
+                return NotFound("Ne postoji sastanak s oznakom: " + id);
             }
             else
             {
@@ -87,7 +82,7 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Sort = sort;
                 ViewBag.Ascending = ascending;
                 PrepareDropDownLists();
-                return View(stozer);
+                return View(sastanak);
             }
         }
 
@@ -98,16 +93,16 @@ namespace KoronavirusMvc.Controllers
         {
             try
             {
-                Stozer stozer = await ctx.Stozer
-                                  .Where(d => d.SifraStozera == id)
+                Sastanak sastanak = await ctx.Sastanak
+                                  .Where(d => d.SifraSastanka == id)
                                   .FirstOrDefaultAsync();
-                if (stozer == null)
+                if (sastanak == null)
                 {
-                    return NotFound("Neispravna šifra stožera: " + id);
+                    return NotFound("Neispravna šifra sastanka: " + id);
                 }
 
-                if (await TryUpdateModelAsync<Stozer>(stozer, "",
-                    d => d.Naziv, d => d.IdPredsjednika
+                if (await TryUpdateModelAsync<Sastanak>(sastanak, "",
+                    d => d.SifraStozera, d => d.Datum
                 ))
                 {
                     ViewBag.Page = page;
@@ -116,7 +111,7 @@ namespace KoronavirusMvc.Controllers
                     try
                     {
                         await ctx.SaveChangesAsync();
-                        TempData[Constants.Message] = "Stožer ažuriran.";
+                        TempData[Constants.Message] = "Sastanak ažuriran.";
                         TempData[Constants.ErrorOccurred] = false;
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
@@ -124,14 +119,14 @@ namespace KoronavirusMvc.Controllers
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                         PrepareDropDownLists();
-                        return View(stozer);
+                        return View(sastanak);
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Podatke o stožeru nije moguće povezati s forme");
+                    ModelState.AddModelError(string.Empty, "Podatke o sastanku nije moguće povezati s forme");
                     PrepareDropDownLists();
-                    return View(stozer);
+                    return View(sastanak);
                 }
             }
             catch (Exception exc)
@@ -145,10 +140,10 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraStozera, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(int SifraSastanka, int page = 1, int sort = 1, bool ascending = true)
         {
-            var stozer = ctx.Stozer.Find(SifraStozera);
-            if (stozer == null)
+            var sastanak = ctx.Sastanak.Find(SifraSastanka);
+            if (sastanak == null)
             {
                 return NotFound();
             }
@@ -156,15 +151,14 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    string naziv = stozer.Naziv;
-                    ctx.Remove(stozer);
+                    ctx.Remove(sastanak);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Stožer {naziv} uspješno obrisan";
+                    TempData[Constants.Message] = $"Sastanak {sastanak.SifraSastanka} uspješno obrisan";
                     TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = "Pogreška prilikom brisanja stožera: " + exc.CompleteExceptionMessage();
+                    TempData[Constants.Message] = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage();
                     TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -174,7 +168,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Stozer.Include(z => z.IdPredsjednikaNavigation).AsNoTracking();
+            var query = ctx.Sastanak.Include(z => z.SifraStozeraNavigation).AsNoTracking();
 
             int count = query.Count();
 
@@ -192,18 +186,18 @@ namespace KoronavirusMvc.Controllers
                 return RedirectToAction(nameof(Index), new { page = pagingInfo.TotalPages, sort, ascending });
             }
 
-            System.Linq.Expressions.Expression<Func<Stozer, object>> orderSelector = null;
+            System.Linq.Expressions.Expression<Func<Sastanak, object>> orderSelector = null;
 
             switch (sort)
             {
                 case 1:
-                    orderSelector = d => d.SifraStozera;
+                    orderSelector = d => d.SifraSastanka;
                     break;
                 case 2:
-                    orderSelector = d => d.Naziv;
+                    orderSelector = d => d.SifraStozera;
                     break;
                 case 3:
-                    orderSelector = d => d.IdPredsjednika;
+                    orderSelector = d => d.Datum;
                     break;
             }
 
@@ -212,19 +206,20 @@ namespace KoronavirusMvc.Controllers
                 query = ascending ? query.OrderBy(orderSelector) : query.OrderByDescending(orderSelector);
             }
 
-            var stozeri = query
+            var sastanci = query
                       .Skip((page - 1) * pagesize)
                       .Take(pagesize)
                       .ToList();
 
 
-            var model = new StozeriViewModel
+            var model = new SastanciViewModel
             {
-                Stozeri = stozeri,
+                Sastanci = sastanci,
                 PagingInfo = pagingInfo
             };
 
             return View(model);
         }
+
     }
 }
