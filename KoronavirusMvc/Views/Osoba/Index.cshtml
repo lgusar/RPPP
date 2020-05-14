@@ -6,6 +6,11 @@
 
 <a asp-action="Create">Dodaj novu osobu</a>
 
+<pager page-info="@Model.PagingInfo" page-title="Unesite željenu stranicu"
+       page-action="Index" class="float-right">
+
+</pager>
+
     <table class="table table-sm table-striped table-hover" id="tableosobe">
         <thead>
             <tr>
