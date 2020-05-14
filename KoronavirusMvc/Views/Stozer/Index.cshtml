@@ -3,7 +3,14 @@
     ViewData["Title"] = "Popis stožera";
 }
 
+<h2>Popis stožera</h2>
+
+
 <a asp-action="Create">Unos novog stožera</a>
+
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
 
 <table class="table table-sm table-striped table-hover">
     <thead>
