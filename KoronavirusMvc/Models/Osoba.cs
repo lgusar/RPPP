@@ -25,5 +25,10 @@ namespace KoronavirusMvc.Models
         public virtual ICollection<Kontakt> KontaktIdKontaktNavigation { get; set; }
         public virtual ICollection<Kontakt> KontaktIdOsobaNavigation { get; set; }
         public virtual ICollection<Stozer> Stozer { get; set; }
+
+        internal static object imePrezime()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
