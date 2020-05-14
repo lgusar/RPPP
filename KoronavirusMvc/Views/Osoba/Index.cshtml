@@ -59,11 +59,11 @@
                 <td class="text-left">@osoba.Zanimanje</td>
                 <td class="btn-group">
                     <a asp-action="Edit"
-                          asp-route-id="@osoba.IdentifikacijskiBroj"
-                          asp-route-page="@Model.PagingInfo.CurrentPage"
-                          asp-route-sort="@Model.PagingInfo.Sort"
-                          asp-route-ascending="@Model.PagingInfo.Ascending"
-                          class="btn btn-sm" title="Ažuriraj">
+                       asp-route-id="@osoba.IdentifikacijskiBroj"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" title="Ažuriraj">
                         <i class="fas fa-edit"></i>
                     </a>
                     <form asp-action="Delete" method="post"
@@ -73,6 +73,7 @@
                         <input type="hidden" name="IdentifikacijskiBroj" value="@osoba.IdentifikacijskiBroj" />
                         <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                     </form>
+                    
                 </td>
             </tr>
         }

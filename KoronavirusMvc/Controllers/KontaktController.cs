@@ -59,7 +59,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Kontakt.AsNoTracking();
+            var query = ctx.Kontakt.Include(k => k.IdKontaktNavigation).AsNoTracking();
 
             int count = query.Count();
 
@@ -84,8 +84,12 @@ namespace KoronavirusMvc.Controllers
                     orderSelector = k => k.IdOsoba;
                     break;
                 case 2:
-                    orderSelector = k => k.IdKontakt;
+                    orderSelector = k => k.IdKontaktNavigation.Ime;
                     break;
+                case 3:
+                    orderSelector = k => k.IdKontaktNavigation.Prezime;
+                    break;
+                
             }
 
             if (orderSelector != null)
