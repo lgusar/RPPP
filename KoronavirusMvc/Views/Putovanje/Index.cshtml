@@ -33,17 +33,29 @@
                    asp-route-page="@Model.PagingInfo.CurrentPage"
                    asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Ime osobe: </a>
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.Putovanje)
         {
-            <tr>
-                <td class="text-left">@item.DatumPolaska</td>
-                <td class="text-left">@item.DatumVracanja</td>
-                <td class="text-left">@item.SifraPutovanja</td>
-                <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
-            </tr>
+        <tr>
+            <td class="text-left">@item.DatumPolaska</td>
+            <td class="text-left">@item.DatumVracanja</td>
+            <td class="text-left">@item.SifraPutovanja</td>
+            <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
+            <td class=" btn-group">
+                <form asp-action="Delete" method="POST"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="SifraPutovanja" value="@item.SifraPutovanja" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
         }
     </tbody>
 </table>

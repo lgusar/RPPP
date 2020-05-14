@@ -28,6 +28,7 @@
                    asp-route-page="@Model.PagingInfo.CurrentPage"
                    asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Ime države: </a>
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -37,6 +38,17 @@
                 <td class="text-left">@item.SifraGrada</td>
                 <td class="text-left">@item.ImeGrada</td>
                 <td class="text-left">@item.SifraDrzaveNavigation.ImeDrzave</td>
+                <td class=" btn-group">
+                    <form asp-action="Delete" method="POST"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraGrada" value="@item.SifraGrada"/>
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
