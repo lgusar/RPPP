@@ -37,7 +37,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(putovanje);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Putovanje {putovanje.SifraPutovanja} uspjesno dodano.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 

@@ -39,7 +39,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(lokacija);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Grad {lokacija.SifraGrada} uspjesno dodan.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 

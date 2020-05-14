@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using KoronavirusMvc.Extensions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

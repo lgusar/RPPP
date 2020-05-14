@@ -1,4 +1,5 @@
-﻿using KoronavirusMvc.Models;
+﻿using KoronavirusMvc.Extensions;
+using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
