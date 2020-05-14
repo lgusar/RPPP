@@ -1,0 +1,21 @@
+﻿@model Lokacija
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="SifraGrada"> Šifra grada</label>
+            <input asp-for="SifraGrada" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="ImeGrada"> Ime grada</label>
+            <input asp-for="ImeGrada" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="SifraDrzave"> Šifra države</label>
+            <input asp-for="SifraDrzave" class="form-control" />
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Dodaj</button>
+            <a asp-action="Index" class="btn btn-secondary"> Odustani</a>
+        </div>
+    </form>

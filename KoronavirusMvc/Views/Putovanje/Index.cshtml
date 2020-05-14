@@ -1,0 +1,54 @@
+﻿@model KoronavirusMvc.ViewModels.PutovanjeViewModel
+
+@{
+    ViewData["Title"] = "Popis putovanja";
+}
+
+<h1>Putovanja</h1>
+<a asp-action="Create">Unos novog putovanja </a>
+
+<table class="table table-sm table-striped table-hover" id="tablePutovanja">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">Datum polaska: </a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Datum Vraćanja: </a>
+            </th>
+            <th>
+                <a asp-route-sort="3"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Šifra putovanja: </a>
+            </th>
+            <th>
+                <a asp-route-sort="4"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Ime osobe: </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Putovanje)
+        {
+        <tr>
+            <td class="text-left">@item.DatumPolaska</td>
+            <td class="text-left">@item.DatumVracanja</td>
+            <td class="text-left">@item.SifraPutovanja</td>
+            <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
+@section styles{
+}
+
+@section scripts{
+
+}
