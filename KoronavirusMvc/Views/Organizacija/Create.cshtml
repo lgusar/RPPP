@@ -1,0 +1,30 @@
+﻿@model Organizacija
+
+@{ ViewBag.Title = "Nova Organizacija";
+}
+
+<h2> Unos nove organizacije</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="SifraOrganizacije"></label>
+        <div><span asp-validation-for="SifraOrganizacije" class="text-danger"></span></div>
+        <input asp-for="SifraOrganizacije" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Naziv"></label>
+        <div><span asp-validation-for="Naziv" class="text-danger"></span></div>
+        <input asp-for="Naziv" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Url"></label>
+        <div><span asp-validation-for="Url" class="text-danger"></span></div>
+        <input asp-for="Url" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+    </div>
+</form>
+

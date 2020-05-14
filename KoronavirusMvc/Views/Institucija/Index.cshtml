@@ -1,31 +1,80 @@
-﻿@model IEnumerable<Institucija>
+﻿@model KoronavirusMvc.ViewModels.InstitucijeViewModel
 @{
-    ViewData["Title"] = "Popis Institucija";
+    ViewData["Title"] = "Popis institucija";
 }
 
-<table class="table table-sn table-striped table-hover">
+<a asp-action="Create"> Unos nove institucije</a>
+
+<table class="table table-sn table-striped table-hover" id="tableinstitucije">
     <thead>
         <tr>
-            <th class="text-center">Sifra institucije</th>
-            <th class="text-center">Naziv institucije</th>
-            <th class="text-center">Radno vrijeme</th>
-            <th class="text-center">Kontakt</th>
-            <th class="text-center">Sifra organizacije</th>
-
+            <th class="text-center">
+                <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                    Sifra institucije
+                </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="2" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Naziv institucije</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Radno vrijeme </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="4" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Kontakt</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="5" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 5 ? !Model.PagingInfo.Ascending : true)">Sifra organizacije</a>
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var institucija in Model)
+        @foreach (var institucija in Model.Institucije)
         {
-        <tr>
-            <td class="text-center">@institucija.SifraInstitucije</td>
-            <td class="text-center">@institucija.NazivInstitucije</td>
-            <td class="text-center">@institucija.RadnoVrijeme</td>
-            <td class="text-center">@institucija.Kontakt</td>
-            <td class="text-center">@institucija.SifraOrganizacije</td>
+            <tr>
+                <td class="text-center">@institucija.SifraInstitucije</td>
+                <td class="text-center">@institucija.NazivInstitucije</td>
+                <td class="text-center">@institucija.RadnoVrijeme</td>
+                <td class="text-center">@institucija.Kontakt</td>
+                <td class="text-center">@institucija.SifraOrganizacije</td>
+                <td class="btn-group">
 
-        </tr>
+                    <a asp-action="Edit"
+                       asp-route-id="@institucija.SifraInstitucije"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" little="Ažuriraj">
+
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="POST"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+
+                        <input type="hidden" name="SifraInstitucije" value="@institucija.SifraInstitucije" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+
+                </td>
+            </tr>
         }
 
     </tbody>
 </table>
+
+@section styles{
+
+}
+
+@section scripts{
+
+}
