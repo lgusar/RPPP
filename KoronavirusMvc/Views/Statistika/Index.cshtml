@@ -1,0 +1,72 @@
+﻿@model KoronavirusMvc.ViewModels.StatistikaViewModel
+
+@{
+    ViewData["Title"] = "Popis svih statistika";
+}
+
+<h1>Statistike</h1>
+<a asp-action="Create">Unos novih podataka </a>
+
+<table class="table table-sm table-striped table-hover" id="tableStatistike">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">Šifra objave: </a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Ime grada: </a>
+            </th>
+            <th>
+                <a asp-route-sort="3"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Ime organizacije: </a>
+            </th>
+            <th>
+                <a asp-route-sort="4"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Ukupni broj slučajeva: </a>
+            </th>
+            <th>
+                <a asp-route-sort="5"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 5 ? !Model.PagingInfo.Ascending : true)">Broj trenutno bolesnih </a>
+            </th>
+            <th>
+                <a asp-route-sort="6"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 6 ? !Model.PagingInfo.Ascending : true)">Broj umrlih u posljednji 24 sata:  </a>
+            </th>
+            <th>
+                <a asp-route-sort="7"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 7 ? !Model.PagingInfo.Ascending : true)">Broj izlječenih u posljednji 24 sata: </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Statistika)
+        {
+        <tr>
+            <td class="text-left">@item.SifraOrganizacije</td>
+            <td class="text-left">@item.SifraGradaNavigation.ImeGrada</td>
+            <td class="text-left">@item.SifraOrganizacijeNavigation.Naziv</td>
+            <td class="text-left">@item.BrojSlucajeva</td>
+            <td class="text-left">@item.BrojAktivnih</td>
+            <td class="text-left">@item.BrojUmrlih</td>
+            <td class="text-left">@item.BrojIzlijecenih</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
+@section styles{
+}
+
+@section scripts{
+
+}
