@@ -4,7 +4,15 @@
     border-color: red
 }
 
+.pagebox {
+    width: 45px;
+}
+
+.pagebox::selection {
+    background-color: gray;
+}
+
 main{
-    padding-left:50px;
-    padding-right:50px;
+    padding-left: 50px;
+    padding-right: 50px;
 }
