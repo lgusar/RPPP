@@ -1,0 +1,48 @@
+﻿@model KoronavirusMvc.ViewModels.LokacijaViewModel
+
+@{
+    ViewData["Title"] = "Popis svih lokacija";
+}
+
+<h1>Lokacije</h1>
+<a asp-action="Create">Unos nove lokacije </a>
+
+<table class="table table-sm table-striped table-hover" id="tableLokacija">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">Šifra grada: </a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Ime grada: </a>
+            </th>
+            <th>
+                <a asp-route-sort="3"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Ime države: </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Lokacija)
+        {
+            <tr>
+                <td class="text-left">@item.SifraGrada</td>
+                <td class="text-left">@item.ImeGrada</td>
+                <td class="text-left">@item.SifraDrzaveNavigation.ImeDrzave</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section styles{
+}
+
+@section scripts{
+
+}
