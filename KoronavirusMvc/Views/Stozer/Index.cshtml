@@ -20,7 +20,7 @@
             </th>
             <th>
                 <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">
-                    ID predsjednika
+                    Ime predsjednika
                 </a>
             </th>
             <th></th>
@@ -32,7 +32,7 @@
             <tr>
                 <td class="text-left">@stozer.SifraStozera</td>
                 <td class="text-left">@stozer.Naziv</td>
-                <td class="text-left">@stozer.IdPredsjednika</td>
+                <td class="text-left">@stozer.IdPredsjednikaNavigation.Ime @stozer.IdPredsjednikaNavigation.Prezime</td>
                 <td class="btn-group">
                     <a asp-action="Edit"
                        asp-route-id="@stozer.SifraStozera"

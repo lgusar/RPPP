@@ -23,9 +23,8 @@ namespace KoronavirusMvc.Models
         [MaxLength(255, ErrorMessage = "Naziv stožera može sadržavati maksimalno 255 znakova")]
         public string Naziv { get; set; }
 
-        [Required(ErrorMessage = "ID predsjednika je obvezno polje")]
-        [Display(Name = "ID predsjednika", Prompt = "Unesite ID")]
-        [MaxLength(15, ErrorMessage = "ID predsjednika može sadržavati maksimalno 15 znakova")]
+        [Required(ErrorMessage = "Predsjednik je obvezno polje")]
+        [Display(Name = "Predsjednik", Prompt = "Unesite predsjednika")]
         public string IdPredsjednika { get; set; }
 
         public virtual Osoba IdPredsjednikaNavigation { get; set; }

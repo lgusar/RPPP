@@ -1,6 +1,7 @@
 ﻿using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
@@ -24,7 +25,21 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            PrepareDropDownLists();
             return View();
+        }
+
+        private void PrepareDropDownLists()
+        {
+            var osobe = ctx.Osoba
+                            .OrderBy(d => d.IdentifikacijskiBroj)
+                            .Select(d => new
+                            {
+                                IdentifikacijskiBroj = d.IdentifikacijskiBroj,
+                                imePrezime = string.Format("{0} {1}", d.Ime, d.Prezime)
+                            })
+                            .ToList();
+            ViewBag.Osobe = new SelectList(osobe, nameof(Osoba.IdentifikacijskiBroj), nameof(Osoba.imePrezime));
         }
 
 
@@ -46,11 +61,13 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    PrepareDropDownLists();
                     return View(stozer);
                 }
             }
             else
             {
+                PrepareDropDownLists();
                 return View(stozer);
             }
         }
@@ -69,6 +86,7 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.Ascending = ascending;
+                PrepareDropDownLists();
                 return View(stozer);
             }
         }
@@ -105,12 +123,14 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        PrepareDropDownLists();
                         return View(stozer);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o stožeru nije moguće povezati s forme");
+                    PrepareDropDownLists();
                     return View(stozer);
                 }
             }
@@ -154,7 +174,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Stozer.AsNoTracking();
+            var query = ctx.Stozer.Include(z => z.IdPredsjednikaNavigation).AsNoTracking();
 
             int count = query.Count();
 

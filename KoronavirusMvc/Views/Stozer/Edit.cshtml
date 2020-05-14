@@ -19,7 +19,9 @@
     <div class="form-group">
         <label asp-for="IdPredsjednika"></label>
         <div><span asp-validation-for="IdPredsjednika" class="text-danger"></span></div>
-        <input asp-for="IdPredsjednika" class="form-control" />
+        <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe">
+            <option disabled selected value="">Odaberite osobu</option>
+        </select>
     </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Spremi</button>
