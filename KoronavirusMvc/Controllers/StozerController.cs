@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
 {
     public class StozerController : Controller
     {
-
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
 
@@ -21,12 +21,12 @@ namespace KoronavirusMvc.Controllers
         }
 
 
-
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -55,6 +55,72 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+
+        [HttpGet]
+        public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var stozer = ctx.Stozer.AsNoTracking().Where(d => d.SifraStozera == id).SingleOrDefault();
+            if (stozer == null)
+            {
+                return NotFound("Ne postoji stožer s oznakom: " + id);
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                return View(stozer);
+            }
+        }
+
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Stozer stozer = await ctx.Stozer
+                                  .Where(d => d.SifraStozera == id)
+                                  .FirstOrDefaultAsync();
+                if (stozer == null)
+                {
+                    return NotFound("Neispravna šifra stožera: " + id);
+                }
+
+                if (await TryUpdateModelAsync<Stozer>(stozer, "",
+                    d => d.Naziv, d => d.IdPredsjednika
+                ))
+                {
+                    ViewBag.Page = page;
+                    ViewBag.Sort = sort;
+                    ViewBag.Ascending = ascending;
+                    try
+                    {
+                        await ctx.SaveChangesAsync();
+                        TempData[Constants.Message] = "Stožer ažuriran.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(stozer);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o stožeru nije moguće povezati s forme");
+                    return View(stozer);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+                return RedirectToAction(nameof(Edit), id);
+            }
+        }
 
 
         [HttpPost]
