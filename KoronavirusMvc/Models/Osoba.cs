@@ -6,12 +6,7 @@ namespace KoronavirusMvc.Models
 {
     public partial class Osoba
     {
-        public Osoba()
-        {
-            KontaktIdKontaktNavigation = new HashSet<Kontakt>();
-            KontaktIdOsobaNavigation = new HashSet<Kontakt>();
-            Stozer = new HashSet<Stozer>();
-        }
+        
         [Display(Name = "Identifikacijski broj", Prompt="Unesite identifikacijski broj osobe")]
         [Required(ErrorMessage ="Identifikacijski broj je obavezno polje")]
         [MaxLength(15, ErrorMessage ="Identifikacijski broj može sadržavati najviše 15 znakova")]
