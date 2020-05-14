@@ -1,0 +1,58 @@
+﻿@model KoronavirusMvc.ViewModels.StanjaViewModel
+
+@{
+    ViewData["Title"] = "Popis stanja";
+}
+
+    <a asp-action="Create">Dodaj novo stanje</a>
+
+<table class="table table-sm table-striped table-hover" id="tablestanje">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp.route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@( Model.PagingInfo.Sort ==1 ? !Model.PagingInfo.Ascending : true)">Šifra stanja</a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp.route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Naziv stanja</a>
+            </th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stanje in Model.Stanja)
+        {
+        <tr>
+            <td class="text-left">@stanje.SifraStanja</td>
+            <td class="text-left">@stanje.NazivStanja</td>
+            <td class="btn-group">
+                <a asp-action="Edit"
+                   asp-route-id="@stanje.SifraStanja"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-sort="@Model.PagingInfo.Sort"
+                   asp-route-ascending="@Model.PagingInfo.Ascending"
+                   class="btn btn-sm" title="Ažuriraj">
+                    <i class="fas fa-edit"></i>
+                </a>
+                <form asp-action="Delete" method="post"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="SifraStanja" value="@stanje.SifraStanja" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                </form>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@section styles{
+}
+
+@section scripts{
+}
+

@@ -1,0 +1,41 @@
+﻿@model Osoba
+
+@{
+    ViewData["Title"] = "Create";
+}
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="IdentifikacijskiBroj"></label>
+            <input asp-for="IdentifikacijskiBroj" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Ime"></label>
+            <input asp-for="Ime" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Prezime"></label>
+            <input asp-for="Prezime" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Adresa"></label>
+            <input asp-for="Adresa" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="DatRod"></label>
+            <input asp-for="DatRod" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Zanimanje"></label>
+            <input asp-for="Zanimanje" class="form-control" />
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Dodaj</button>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-secondary" type="submit">Odustani</button>
+        </div>
+    </form>
+
+
+

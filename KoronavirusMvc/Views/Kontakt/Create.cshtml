@@ -1,0 +1,23 @@
+﻿@model Kontakt
+
+@{
+    ViewData["Title"] = "Create";
+}
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="IdOsoba"></label>
+        <input asp-for="IdOsoba" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="IdKontakt"></label>
+        <input asp-for="IdKontakt" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj</button>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-secondary" type="submit">Odustani</button>
+    </div>
+</form>
+
