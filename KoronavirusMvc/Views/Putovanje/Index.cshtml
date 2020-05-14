@@ -1,47 +1,54 @@
-﻿@model IEnumerable<KoronavirusMvc.Models.Putovanje>
+﻿@model KoronavirusMvc.ViewModels.PutovanjeViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Popis putovanja";
 }
 
-<h1>Index</h1>
+<h1>Putovanja</h1>
+<a asp-action="Create">Unos novog putovanja </a>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table table-sm table-striped table-hover" id="tablePutovanja">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.DatumPolaska)
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">Datum polaska: </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DatumVracanja)
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Datum Vraćanja: </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdentifikacijskiBrojNavigation)
+                <a asp-route-sort="3"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Šifra putovanja: </a>
             </th>
-            <th></th>
+            <th>
+                <a asp-route-sort="4"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Ime osobe: </a>
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model.Putovanje)
+        {
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DatumPolaska)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DatumVracanja)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdentifikacijskiBrojNavigation.IdentifikacijskiBroj)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SifraPutovanja">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SifraPutovanja">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SifraPutovanja">Delete</a>
-            </td>
+            <td class="text-left">@item.DatumPolaska</td>
+            <td class="text-left">@item.DatumVracanja</td>
+            <td class="text-left">@item.SifraPutovanja</td>
+            <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
         </tr>
-}
+        }
     </tbody>
 </table>
+
+
+@section styles{
+}
+
+@section scripts{
+
+}

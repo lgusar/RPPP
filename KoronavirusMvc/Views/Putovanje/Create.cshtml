@@ -1,0 +1,25 @@
+﻿@model Putovanje
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="SifraPutovanja"> Šifra putovanja</label>
+            <input asp-for="SifraPutovanja" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="DatumPolaska"> Datum polaska</label>
+            <input asp-for="DatumPolaska" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="DatumVracanja">Datum vraćanja</label>
+            <input asp-for="DatumVracanja" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="IdentifikacijskiBroj">Identifikacijski broj osobe</label>
+            <input asp-for="IdentifikacijskiBroj" class="form-control" />
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Dodaj</button>
+            <a asp-action="Index" class="btn btn-secondary"> Odustani</a>
+        </div>
+    </form>
