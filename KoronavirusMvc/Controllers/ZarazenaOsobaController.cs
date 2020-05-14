@@ -67,9 +67,9 @@ namespace KoronavirusMvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
+        public async Task<IActionResult> Edit(string id, int page = 1, int sort = 1, bool ascending = true)
         {
-            var zarazenaOsoba = ctx.ZarazenaOsoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
+            var zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
             if (zarazenaOsoba == null)
             {
                 return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
@@ -79,6 +79,8 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.Ascending = ascending;
+                await PrepareDropdownLists();
+                
                 return View(zarazenaOsoba);
             }
         }
@@ -112,12 +114,14 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
                         return View(zarazenaOsoba);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o osobi nije moguće povezati s forme");
+                    await PrepareDropdownLists();
                     return View(zarazenaOsoba);
                 }
             }
