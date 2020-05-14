@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Organizacija>
+@{
+    ViewData["Title"] = "Popis Organizacija";
+}
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            <th class="text-center">Sifra organizacije</th>
+            <th class="text-center">Naziv organizacije</th>
+            <th class="text-center">URL</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var organizacija in Model)
+        {
+            <tr>
+                <td class="text-center">@organizacija.SifraOrganizacije</td>
+                <td class="text-center">@organizacija.Naziv</td>
+                <td class="text-center">@organizacija.Url</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
