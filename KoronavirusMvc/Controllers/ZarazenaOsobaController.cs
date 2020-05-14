@@ -66,6 +66,69 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
+            if (zarazenaOsoba == null)
+            {
+                return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                return View(zarazenaOsoba);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                ZarazenaOsoba zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
+                if (zarazenaOsoba == null)
+                {
+                    return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
+                }
+
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<ZarazenaOsoba>(zarazenaOsoba, "", z => z.DatZaraze, z => z.SifraStanja);
+                if (ok)
+                {
+                    try
+                    {
+                        
+                        TempData[Constants.Message] = $"Podaci osobe  uspješno ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await ctx.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(zarazenaOsoba);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o osobi nije moguće povezati s forme");
+                    return View(zarazenaOsoba);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string IdentifikacijskiBroj, int page = 1, int sort = 1, bool ascending = true)
