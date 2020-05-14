@@ -7,6 +7,9 @@
 <h1>Lokacije</h1>
 <a asp-action="Create">Unos nove lokacije </a>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
 <table class="table table-sm table-striped table-hover" id="tableLokacija">
     <thead>
         <tr>

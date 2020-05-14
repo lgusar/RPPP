@@ -7,6 +7,9 @@
 <h1>Putovanja</h1>
 <a asp-action="Create">Unos novog putovanja </a>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
 <table class="table table-sm table-striped table-hover" id="tablePutovanja">
     <thead>
         <tr>
@@ -35,12 +38,12 @@
     <tbody>
         @foreach (var item in Model.Putovanje)
         {
-        <tr>
-            <td class="text-left">@item.DatumPolaska</td>
-            <td class="text-left">@item.DatumVracanja</td>
-            <td class="text-left">@item.SifraPutovanja</td>
-            <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
-        </tr>
+            <tr>
+                <td class="text-left">@item.DatumPolaska</td>
+                <td class="text-left">@item.DatumVracanja</td>
+                <td class="text-left">@item.SifraPutovanja</td>
+                <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
+            </tr>
         }
     </tbody>
 </table>

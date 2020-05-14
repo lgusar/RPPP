@@ -7,6 +7,10 @@
 <h1>Statistike</h1>
 <a asp-action="Create">Unos novih podataka </a>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
 <table class="table table-sm table-striped table-hover" id="tableStatistike">
     <thead>
         <tr>
@@ -50,15 +54,15 @@
     <tbody>
         @foreach (var item in Model.Statistika)
         {
-        <tr>
-            <td class="text-left">@item.SifraOrganizacije</td>
-            <td class="text-left">@item.SifraGradaNavigation.ImeGrada</td>
-            <td class="text-left">@item.SifraOrganizacijeNavigation.Naziv</td>
-            <td class="text-left">@item.BrojSlucajeva</td>
-            <td class="text-left">@item.BrojAktivnih</td>
-            <td class="text-left">@item.BrojUmrlih</td>
-            <td class="text-left">@item.BrojIzlijecenih</td>
-        </tr>
+            <tr>
+                <td class="text-left">@item.SifraOrganizacije</td>
+                <td class="text-left">@item.SifraGradaNavigation.ImeGrada</td>
+                <td class="text-left">@item.SifraOrganizacijeNavigation.Naziv</td>
+                <td class="text-left">@item.BrojSlucajeva</td>
+                <td class="text-left">@item.BrojAktivnih</td>
+                <td class="text-left">@item.BrojUmrlih</td>
+                <td class="text-left">@item.BrojIzlijecenih</td>
+            </tr>
         }
     </tbody>
 </table>
