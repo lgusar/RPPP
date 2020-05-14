@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(organizacija);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Organizacija {organizacija.SifraOrganizacije} dodana.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -97,7 +98,7 @@ namespace KoronavirusMvc.Controllers
                     try
                     {
                         TempData[Constants.Message] = $"Organizacija {id} ažurirana";
-                        TempData[Constants.ErrorOccured] = false;
+                        TempData[Constants.ErrorOccurred] = false;
                         await ctx.SaveChangesAsync();
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
@@ -116,7 +117,7 @@ namespace KoronavirusMvc.Controllers
             catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccured] = true;
+                TempData[Constants.ErrorOccurred] = true;
                 return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
             }
         }
@@ -138,13 +139,13 @@ namespace KoronavirusMvc.Controllers
                     ctx.Remove(organizacija);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Organizacija {sifra} uspješno obrisana.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
                     TempData[Constants.Message] = "Pogreška prilikom brisanja organizacije" + exc.CompleteExceptionMessage();
 
-                    TempData[Constants.ErrorOccured] = true;
+                    TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }

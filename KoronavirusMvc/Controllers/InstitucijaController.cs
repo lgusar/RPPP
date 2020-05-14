@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -49,7 +50,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(institucija);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Institucija {institucija.SifraInstitucije} dodana.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
 
                 }
@@ -110,7 +111,7 @@ namespace KoronavirusMvc.Controllers
                     try
                     {
                         TempData[Constants.Message] = $"Institucija {id} ažurirana";
-                        TempData[Constants.ErrorOccured] = false;
+                        TempData[Constants.ErrorOccurred] = false;
                         await ctx.SaveChangesAsync();
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
@@ -131,7 +132,7 @@ namespace KoronavirusMvc.Controllers
             catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccured] = true;
+                TempData[Constants.ErrorOccurred] = true;
                 return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
             }
         }
@@ -153,13 +154,13 @@ namespace KoronavirusMvc.Controllers
                     ctx.Remove(institucija);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Institucija {sifra} uspješno obrisana.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
                     TempData[Constants.Message] = "Pogreška prilikom brisanja institucije" + exc.CompleteExceptionMessage();
 
-                    TempData[Constants.ErrorOccured] = true;
+                    TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }
