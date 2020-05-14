@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Preporuka>
+@{
+    ViewData["Title"] = "Popis preporuka";
+}
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            <th class="text-center">Sifra preporuke</th>
+            <th class="text-center">Sifra organizacije</th>
+            <th class="text-center">Sifra stozera</th>
+            <th class="text-center">Sifra prethodne preporuke</th>
+            <th class="text-center">Opis</th>
+            <th class="text-center">Vrijeme objave</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var preporuka in Model)
+        {
+            <tr>
+                <td class="text-center">@preporuka.SifraPreporuke</td>
+                <td class="text-center">@preporuka.SifraOrganizacije</td>
+                <td class="text-center">@preporuka.SifraStozera</td>
+                <td class="text-center">@preporuka.SifraPrethodnePreporuke</td>
+                <td class="text-center">@preporuka.Opis</td>
+                <td class="text-center">@preporuka.VrijemeObjave</td>
+            </tr>
+        }
+
+    </tbody>
+</table>

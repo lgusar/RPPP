@@ -26,6 +26,7 @@
 
     <main>
         <div>
+            <div id="tempmessage" class="alert"></div>
             @if (TempData[Constants.Message] != null)
             {
                 bool error = false;
@@ -34,9 +35,7 @@
                 {
                     error = (bool)obj;
                 }
-                <div class="alert @(error ? "alert-danger" : "alert-success")">
-                    @TempData[Constants.Message]
-                </div>
+                <div class="alert @(error ? "alert-danger" : "alert-success")">@TempData[Constants.Message]</div>
             }
         </div>
         @RenderBody()

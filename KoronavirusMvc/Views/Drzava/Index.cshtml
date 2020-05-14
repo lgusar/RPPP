@@ -1,0 +1,40 @@
+﻿@model KoronavirusMvc.ViewModels.DrzavaViewModel
+
+@{
+    ViewData["Title"] = "Popis država";
+}
+
+<h1>Države</h1>
+
+<div>
+    <h4>Države</h4>
+    <hr />
+</div>
+<a asp-action="Create">Unos nove države </a>
+
+<table class="table table-sm table-striped table-hover" id="tableDrzave">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">Šifra države: </a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Ime države: </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Drzava)
+        {
+            <tr>
+                <td class="text-left">@item.SifraDrzave</td>
+                <td class="text-left">@item.ImeDrzave</td>
+
+            </tr>
+        }
+    </tbody>
+</table>

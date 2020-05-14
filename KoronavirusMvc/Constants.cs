@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace KoronavirusMvc
+﻿namespace KoronavirusMvc
 {
     public static class Constants
     {
@@ -11,6 +6,7 @@ namespace KoronavirusMvc
         {
             get { return "Message"; }
         }
+
         public static string ErrorOccurred
         {
             get { return "ErrorOccurred"; }
