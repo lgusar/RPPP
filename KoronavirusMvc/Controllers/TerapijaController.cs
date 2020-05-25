@@ -10,13 +10,13 @@ using Microsoft.Extensions.Options;
 
 namespace KoronavirusMvc.Controllers
 {
-    public class SimptomController : Controller
+    public class TerapijaController : Controller
     {
         private readonly RPPP09Context ctx;
 
         private readonly AppSettings appSettings;
 
-        public SimptomController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        public TerapijaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
@@ -25,7 +25,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Simptom.AsNoTracking();
+            var query = ctx.Terapija.AsNoTracking();
 
             int count = query.Count();
 
@@ -48,14 +48,14 @@ namespace KoronavirusMvc.Controllers
                 });
             }
 
-            System.Linq.Expressions.Expression<Func<Simptom, object>> orderSelector = null;
+            System.Linq.Expressions.Expression<Func<Terapija, object>> orderSelector = null;
             switch (sort)
             {
                 case 1:
-                    orderSelector = s => s.SifraSimptoma;
+                    orderSelector = s => s.SifraTerapije;
                     break;
                 case 2:
-                    orderSelector = s => s.Opis;
+                    orderSelector = s => s.OpisTerapije;
                     break;
             }
 
@@ -64,14 +64,14 @@ namespace KoronavirusMvc.Controllers
                 query = ascending ? query.OrderBy(orderSelector) : query.OrderByDescending(orderSelector);
             }
 
-            var simptomi = query
+            var terapije = query
                               .Skip((page - 1) * pagesize)
                               .Take(pagesize)
                               .ToList();
 
-            var model = new SimptomiViewModel
+            var model = new TerapijeViewModel
             {
-                Simptomi = simptomi,
+                Terapije = terapije,
                 PagingInfo = pagingInfo
             };
 
@@ -86,38 +86,38 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Simptom simptom)
+        public IActionResult Create(Terapija terapija)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    simptom.SifraSimptoma = (int)NewId();
-                    ctx.Add(simptom);
+                    terapija.SifraTerapije = (int)NewId();
+                    ctx.Add(terapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Pregled {simptom.SifraSimptoma} uspješno dodan.";
+                    TempData[Constants.Message] = $"Pregled {terapija.SifraTerapije} uspješno dodan.";
                     TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                    return View(simptom);
+                    return View(terapija);
                 }
             }
             else
             {
-                return View(simptom);
+                return View(terapija);
             }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraSimptoma, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(int SifraTerapije, int page = 1, int sort = 1, bool ascending = true)
         {
-            var simptom = ctx.Simptom.Find(SifraSimptoma);
-            if (simptom == null)
+            var terapija = ctx.Terapija.Find(SifraTerapije);
+            if (terapija == null)
             {
                 return NotFound();
             }
@@ -125,15 +125,15 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    ctx.Remove(simptom);
+                    ctx.Remove(terapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Simptom {simptom.SifraSimptoma} uspješno obrisan.";
+                    TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno obrisana.";
                     TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom brisanja simptoma." + exc.CompleteExceptionMessage();
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja terapije." + exc.CompleteExceptionMessage();
                     TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -143,21 +143,21 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
-            var simptom = ctx.Simptom
+            var terapija = ctx.Terapija
                              .AsNoTracking()
-                             .Where(p => p.SifraSimptoma == id)
+                             .Where(p => p.SifraTerapije == id)
                              .FirstOrDefault();
 
-            if (simptom == null)
+            if (terapija == null)
             {
-                return NotFound($"Ne postoji simptom s tom šifrom: {id}");
+                return NotFound($"Ne postoji terapija s tom šifrom: {id}");
             }
             else
             {
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.ascending = ascending;
-                return View(simptom);
+                return View(terapija);
             }
         }
 
@@ -167,9 +167,9 @@ namespace KoronavirusMvc.Controllers
         {
             try
             {
-                Simptom simptom = await ctx.Simptom.FindAsync(id);
+                Terapija terapija = await ctx.Terapija.FindAsync(id);
 
-                if (simptom == null)
+                if (terapija == null)
                 {
                     return NotFound($"Ne postoji pregled s tom šifrom {id}");
                 }
@@ -177,13 +177,13 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.page = page;
                 ViewBag.sort = sort;
                 ViewBag.ascending = ascending;
-                bool ok = await TryUpdateModelAsync<Simptom>(simptom, "", p => p.Opis);
+                bool ok = await TryUpdateModelAsync<Terapija>(terapija, "", p => p.OpisTerapije);
 
                 if (ok)
                 {
                     try
                     {
-                        TempData[Constants.Message] = $"Simptom {simptom.SifraSimptoma} uspješno ažuriran.";
+                        TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno ažurirana.";
                         TempData[Constants.ErrorOccurred] = false;
 
                         await ctx.SaveChangesAsync();
@@ -193,13 +193,13 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                        return View(simptom);
+                        return View(terapija);
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Podatke o simptomu nije moguće povezati s forme.");
-                    return View(simptom);
+                    ModelState.AddModelError(string.Empty, "Podatke o terapiji nije moguće povezati s forme.");
+                    return View(terapija);
                 }
             }
             catch (Exception exc)
@@ -210,11 +210,10 @@ namespace KoronavirusMvc.Controllers
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
         }
-
         private decimal NewId()
         {
-            var maxId = ctx.Simptom
-                      .Select(o => o.SifraSimptoma)
+            var maxId = ctx.Terapija
+                      .Select(o => o.SifraTerapije)
                       .ToList()
                       .Max();
 

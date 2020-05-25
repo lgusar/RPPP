@@ -32,10 +32,30 @@
     <tbody>
         @foreach (var simptom in Model.Simptomi)
         {
-            <tr>
-                <td class="text-left">@simptom.SifraSimptoma</td>
-                <td class="text-left">@simptom.Opis</td>
-            </tr>
+        <tr>
+            <td class="text-left">@simptom.SifraSimptoma</td>
+            <td class="text-left">@simptom.Opis</td>
+            <td class="btn-group">
+                <a asp-action="Edit"
+                   asp-route-id="@simptom.SifraSimptoma"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-sort="@Model.PagingInfo.Sort"
+                   asp-route-ascending="@Model.PagingInfo.Ascending"
+                   class="btn btn-sm" title="Ažuriraj">
+                    <i class="fas fa-edit"></i>
+                </a>
+
+                <form asp-action="Delete" method="post"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="SifraSimptoma" value="@simptom.SifraSimptoma" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+        </tr>
 
         }
     </tbody>
