@@ -91,12 +91,18 @@ namespace KoronavirusMvc.Controllers
                     orderSelector = k => k.IdOsoba;
                     break;
                 case 2:
-                    orderSelector = k => k.IdKontaktNavigation.IdentifikacijskiBroj;
+                    orderSelector = k => k.IdOsobaNavigation.Ime;
                     break;
                 case 3:
-                    orderSelector = k => k.IdKontaktNavigation.Ime;
+                    orderSelector = k => k.IdOsobaNavigation.Prezime;
                     break;
                 case 4:
+                    orderSelector = k => k.IdKontaktNavigation.IdentifikacijskiBroj;
+                    break;
+                case 5:
+                    orderSelector = k => k.IdKontaktNavigation.Ime;
+                    break;
+                case 6:
                     orderSelector = k => k.IdKontaktNavigation.Prezime;
                     break;
 
