@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -25,12 +27,14 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewData["IdOsoba"] = new SelectList(ctx.Osoba, "IdOsoba", "Ime");
+            ViewData["IdKontakt"] = new SelectList(ctx.Kontakt, "IdKontakt");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Kontakt kontakt)
+        public IActionResult Create([Bind("IdOsoba, IdKontakt, Ime, Prezime")] Kontakt kontakt)
         {
             if (ModelState.IsValid)
             {
@@ -84,12 +88,16 @@ namespace KoronavirusMvc.Controllers
                     orderSelector = k => k.IdOsoba;
                     break;
                 case 2:
-                    orderSelector = k => k.IdKontaktNavigation.Ime;
+                    orderSelector = k => k.IdKontaktNavigation.IdentifikacijskiBroj;
                     break;
                 case 3:
+                    orderSelector = k => k.IdKontaktNavigation.Ime;
+                    break;
+                case 4:
                     orderSelector = k => k.IdKontaktNavigation.Prezime;
                     break;
-                
+
+
             }
 
             if (orderSelector != null)
@@ -107,6 +115,34 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string id1, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var kontakt = ctx.Kontakt.Find(id1);
+            if (kontakt == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+
+                    ctx.Remove(kontakt);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Osoba uspješno obrisana.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja osobe: " + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction("Index");
+            }
         }
     }
 }

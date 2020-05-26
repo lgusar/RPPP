@@ -21,12 +21,17 @@
             <th>
                 <a asp-route-sort="2"
                    asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Ime osobe s kojom je bila u kontaktu</a>
+                   asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Identifikacijski broj osobe s kojom je bila u kontaktu</a>
             </th>
             <th>
                 <a asp-route-sort="3"
                    asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==3 ? !Model.PagingInfo.Ascending : true)">Prezime osobe s kojom je bila u kontaktu</a>
+                   asp-route-ascending="@( Model.PagingInfo.Sort ==3 ? !Model.PagingInfo.Ascending : true)">Ime osobe s kojom je bila u kontaktu</a>
+            </th>
+            <th>
+                <a asp-route-sort="4"
+                   asp.route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@( Model.PagingInfo.Sort ==4 ? !Model.PagingInfo.Ascending : true)">Prezime osobe s kojom je bila u kontaktu</a>
             </th>
 
         </tr>
@@ -36,9 +41,20 @@
         {
         <tr>
             <td class="text-left">@kontakt.IdOsoba</td>
+            <td class="text-left">@kontakt.IdKontaktNavigation.IdentifikacijskiBroj</td>
             <td class="text-left">@kontakt.IdKontaktNavigation.Ime</td>
             <td class="text-left">@kontakt.IdKontaktNavigation.Prezime</td>
-
+            <td class="btn-group">
+                
+                <form asp-action="Delete" method="post"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="id" value="@kontakt.IdOsoba" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                </form>
+               
+            </td>
         </tr>
         }
     </tbody>
