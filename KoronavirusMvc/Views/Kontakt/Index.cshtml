@@ -40,17 +40,19 @@
         @foreach (var kontakt in Model.Kontakti)
         {
         <tr>
-            <td class="text-left">@kontakt.IdOsoba</td>
+            <td class="text-left">@kontakt.IdOsobaNavigation.Ime</td>
             <td class="text-left">@kontakt.IdKontaktNavigation.IdentifikacijskiBroj</td>
             <td class="text-left">@kontakt.IdKontaktNavigation.Ime</td>
             <td class="text-left">@kontakt.IdKontaktNavigation.Prezime</td>
             <td class="btn-group">
                 
                 <form asp-action="Delete" method="post"
+                      asp-route-idOsoba="@kontakt.IdOsoba"
+                      asp-route-idKontakt="@kontakt.IdKontakt"
                       asp-route-page="@Model.PagingInfo.CurrentPage"
                       asp-route-sort="@Model.PagingInfo.Sort"
                       asp-route-ascending="@Model.PagingInfo.Ascending">
-                    <input type="hidden" name="id" value="@kontakt.IdOsoba" />
+                    @*<input type="hidden" name="id1" value="@kontakt.IdOsoba" />*@
                     <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                 </form>
                

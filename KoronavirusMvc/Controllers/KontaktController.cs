@@ -27,24 +27,27 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewData["IdOsoba"] = new SelectList(ctx.Osoba, "IdOsoba", "Ime");
-            ViewData["IdKontakt"] = new SelectList(ctx.Kontakt, "IdKontakt");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("IdOsoba, IdKontakt, Ime, Prezime")] Kontakt kontakt)
+        public IActionResult Create(Kontakt kontakt)
         {
             if (ModelState.IsValid)
             {
 
                 try
-                {
+                { 
                     ctx.Add(kontakt);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Osoba {kontakt.IdOsoba} uspješno dodana.";
                     TempData[Constants.ErrorOccurred] = false;
+
+                    Kontakt kontakt1 = new Kontakt { IdOsoba = kontakt.IdKontakt, IdKontakt = kontakt.IdOsoba };
+                    ctx.Add(kontakt1);
+                    ctx.SaveChanges();
+
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -63,7 +66,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Kontakt.Include(k => k.IdKontaktNavigation).AsNoTracking();
+            var query = ctx.Kontakt.Include(k => k.IdKontaktNavigation).Include(k => k.IdOsobaNavigation).AsNoTracking();
 
             int count = query.Count();
 
@@ -119,10 +122,11 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string id1, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(string idOsoba, string idKontakt, int page = 1, int sort = 1, bool ascending = true)
         {
-            var kontakt = ctx.Kontakt.Find(id1);
-            if (kontakt == null)
+            Kontakt kontakt = ctx.Kontakt.Where(k => k.IdOsoba == idOsoba && k.IdKontakt == idKontakt).FirstOrDefault();
+            Kontakt kontakt2 = ctx.Kontakt.Where(k => k.IdOsoba == idKontakt && k.IdKontakt == idOsoba).FirstOrDefault();
+            if (kontakt == null || kontakt2 == null)
             {
                 return NotFound();
             }
@@ -133,6 +137,10 @@ namespace KoronavirusMvc.Controllers
 
                     ctx.Remove(kontakt);
                     ctx.SaveChanges();
+
+                    ctx.Remove(kontakt2);
+                    ctx.SaveChanges();
+
                     TempData[Constants.Message] = $"Osoba uspješno obrisana.";
                     TempData[Constants.ErrorOccurred] = false;
                 }
