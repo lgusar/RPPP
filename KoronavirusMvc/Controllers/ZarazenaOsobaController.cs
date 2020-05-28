@@ -30,11 +30,11 @@ namespace KoronavirusMvc.Controllers
         //    return View();
         //}
 
-        //private async Task PrepareDropdownLists()
-        //{
-        //    var stanja = await ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToListAsync();
-        //    ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
-        //}
+        private void PrepareDropDownLists()
+        {
+            var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
+            ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
+        }
 
         //[HttpPost]
         //[ValidateAntiForgeryToken]
@@ -66,72 +66,82 @@ namespace KoronavirusMvc.Controllers
         //    }
         //}
 
-        //[HttpGet]
-        //public async Task<IActionResult> Edit(string id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
-        //    if (zarazenaOsoba == null)
-        //    {
-        //        return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Page = page;
-        //        ViewBag.Sort = sort;
-        //        ViewBag.Ascending = ascending;
-        //        await PrepareDropdownLists();
+        [HttpGet]
+        public IActionResult Edit(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .Include(o => o.IdentifikacijskiBrojNavigation)
+                             .AsNoTracking()
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            if (zarazenaOsoba != null)
+            {
+                PrepareDropDownLists();
+                return PartialView(zarazenaOsoba);
+            }
+            else
+            {
+                return NotFound($"Neispravan id mjesta: {id}");
+            }
+        }
 
-        //        return View(zarazenaOsoba);
-        //    }
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(ZarazenaOsoba zarazenaOsoba)
+        {
+            if (zarazenaOsoba == null)
+            {
+                return NotFound("Nema poslanih podataka");
+            }
+            bool checkId = ctx.ZarazenaOsoba.Any(m => m.IdentifikacijskiBroj == zarazenaOsoba.IdentifikacijskiBroj);
+            if (!checkId)
+            {
+                return NotFound($"Neispravan identifikacijski broj zarazene osobe: {zarazenaOsoba?.IdentifikacijskiBroj}");
+            }
 
-        //[HttpPost, ActionName("Edit")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    try
-        //    {
-        //        ZarazenaOsoba zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
-        //        if (zarazenaOsoba == null)
-        //        {
-        //            return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
-        //        }
+            PrepareDropDownLists();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Update(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    return StatusCode(302, Url.Action(nameof(Row), new { id = zarazenaOsoba.IdentifikacijskiBroj }));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    return PartialView(zarazenaOsoba);
+                }
+            }
+            else
+            {
+                return PartialView(zarazenaOsoba);
+            }
+        }
 
-        //        ViewBag.Page = page;
-        //        ViewBag.Sort = sort;
-        //        ViewBag.Ascending = ascending;
-        //        bool ok = await TryUpdateModelAsync<ZarazenaOsoba>(zarazenaOsoba, "", z => z.DatZaraze, z => z.SifraStanja);
-        //        if (ok)
-        //        {
-        //            try
-        //            {
-
-        //                TempData[Constants.Message] = $"Podaci osobe  uspješno ažurirani.";
-        //                TempData[Constants.ErrorOccurred] = false;
-        //                await ctx.SaveChangesAsync();
-        //                return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //            }
-        //            catch (Exception exc)
-        //            {
-        //                ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-        //                await PrepareDropdownLists();
-        //                return View(zarazenaOsoba);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "Podatke o osobi nije moguće povezati s forme");
-        //            await PrepareDropdownLists();
-        //            return View(zarazenaOsoba);
-        //        }
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        TempData[Constants.Message] = exc.CompleteExceptionMessage();
-        //        TempData[Constants.ErrorOccurred] = true;
-        //        return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
-        //    }
-        //}
+        public PartialViewResult Row(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                                    .Where(z => z.IdentifikacijskiBroj == id)
+                                    .Select(z => new ZarazenaOsobaViewModel
+                                    {
+                                        IdentifikacijskiBroj = z.IdentifikacijskiBroj,
+                                        Ime = z.IdentifikacijskiBrojNavigation.Ime,
+                                        Prezime = z.IdentifikacijskiBrojNavigation.Prezime,
+                                        DatZaraze = z.DatZaraze,
+                                        NazivStanja = z.SifraStanjaNavigation.NazivStanja
+                                    })
+                                    .SingleOrDefault();
+            if(zarazenaOsoba != null)
+            {
+                return PartialView(zarazenaOsoba);
+            }
+            else
+            {
+                return PartialView("ErrorMessageRow", $"Neispravan identifikacijski broj osobe.");
+            }
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
