@@ -80,7 +80,7 @@ namespace KoronavirusMvc.Controllers
         //        ViewBag.Sort = sort;
         //        ViewBag.Ascending = ascending;
         //        await PrepareDropdownLists();
-                
+
         //        return View(zarazenaOsoba);
         //    }
         //}
@@ -105,7 +105,7 @@ namespace KoronavirusMvc.Controllers
         //        {
         //            try
         //            {
-                        
+
         //                TempData[Constants.Message] = $"Podaci osobe  uspješno ažurirani.";
         //                TempData[Constants.ErrorOccurred] = false;
         //                await ctx.SaveChangesAsync();
@@ -133,33 +133,43 @@ namespace KoronavirusMvc.Controllers
         //    }
         //}
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Delete(string IdentifikacijskiBroj, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var zarazenaOsoba = ctx.ZarazenaOsoba.Find(IdentifikacijskiBroj);
-        //    if (zarazenaOsoba == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .AsNoTracking() 
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            if (zarazenaOsoba != null)
+            {
+                try
+                {
                     
-        //            ctx.Remove(zarazenaOsoba);
-        //            ctx.SaveChanges();
-        //            TempData[Constants.Message] = $"Osoba uspješno obrisana.";
-        //            TempData[Constants.ErrorOccurred] = false;
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            TempData[Constants.Message] = $"Pogreška prilikom brisanja osobe: " + exc.CompleteExceptionMessage();
-        //            TempData[Constants.ErrorOccurred] = true;
-        //        }
-        //        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //    }
-        //}
+                    ctx.Remove(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    var result = new
+                    {
+                        message = $"Zaražena osoba obrisana.",
+                        successful = true
+                    };
+                    return Json(result);
+                }
+                catch (Exception exc)
+                {
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja zaražene osobe: " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    return Json(result);
+                }
+            }
+            else
+            {
+                return NotFound($"Zaražena osoba s identifikacijskim brojem {id} ne postoji");
+            }
+        }
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {

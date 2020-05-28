@@ -14,7 +14,7 @@
         <td>
             <form asp-action="Delete" method="post">
                 <input type="hidden" name="id" value="@Model.IdentifikacijskiBroj" />
-                <button type="submit" class="btn btn-sm btn-danger" title="Obriši">
+                <button data-idzarazene="@Model.IdentifikacijskiBroj" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši">
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </form>
