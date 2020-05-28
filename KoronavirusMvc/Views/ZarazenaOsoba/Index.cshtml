@@ -13,61 +13,22 @@
 <table class="table table-sm table-striped table-hover" id="tablezarazena">
     <thead>
         <tr>
-            <th>
-                <a asp-route-sort="1"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==1 ? !Model.PagingInfo.Ascending : true)">Identifikacijski broj</a>
-            </th>
-            <th>
-                <a asp-route-sort="2"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Ime</a>
-            </th>
-            <th>
-                <a asp-route-sort="3"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==3 ? !Model.PagingInfo.Ascending : true)">Prezime</a>
-            </th>
-            <th>
-                <a asp-route-sort="4"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==4 ? !Model.PagingInfo.Ascending : true)">Datum zaraze</a>
-            </th>
-            <th>
-                <a asp-route-sort="5"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==5 ? !Model.PagingInfo.Ascending : true)">Naziv stanja</a>
-            </th>
+            @{ string[] nazivi = { "Identifikacijski broj", "Ime", "Prezime", "Datum zaraze", "Stanje osobe" };
+                            for (int i = 1; i <= nazivi.Length; i++)
+                            {
+                                <th>
+                                    <a asp-route-sort="@i"
+                                       asp.route-page="@Model.PagingInfo.CurrentPage"
+                                       asp-route-ascending="@( Model.PagingInfo.Sort ==i ? !Model.PagingInfo.Ascending : true)">@nazivi[i-1]</a>
+                                </th>
+                            }
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var zarazena in Model.ZarazeneOsobe)
         {
-        <tr>
-            <td class="text-left">@zarazena.IdentifikacijskiBroj</td>
-            <td class="text-left">@zarazena.IdentifikacijskiBrojNavigation.Ime</td>
-            <td class="text-left">@zarazena.IdentifikacijskiBrojNavigation.Prezime</td>
-            <td class="text-left">@zarazena.DatZaraze</td>
-            <td class="text-left">@zarazena.SifraStanjaNavigation.NazivStanja</td>
-            <td class="btn-group">
-                <a asp-action="Edit"
-                   asp-route-id="@zarazena.IdentifikacijskiBroj"
-                   asp-route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-sort="@Model.PagingInfo.Sort"
-                   asp-route-ascending="@Model.PagingInfo.Ascending"
-                   class="btn btn-sm" title="Ažuriraj">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <form asp-action="Delete" method="post"
-                      asp-route-page="@Model.PagingInfo.CurrentPage"
-                      asp-route-sort="@Model.PagingInfo.Sort"
-                      asp-route-ascending="@Model.PagingInfo.Ascending">
-                    <input type="hidden" name="IdentifikacijskiBroj" value="@zarazena.IdentifikacijskiBroj" />
-                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
-                </form>
-            </td>
-
-        </tr>
+            <partial name="Row" model="zarazena"/>
         }
     </tbody>
 </table>
