@@ -8,10 +8,10 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="IdentifikacijskiBroj"></label>
-        <div><span asp-validation-for="IdentifikacijskiBroj" class="text-danger"></span></div>
-        <input asp-for="IdentifikacijskiBroj" class="form-control" />
-    </div>
+            <label asp-for="IdentifikacijskiBroj"></label>
+            <div><span asp-validation-for="IdentifikacijskiBroj" class="text-danger"></span></div>
+            <input asp-for="IdentifikacijskiBroj" class="form-control" />
+        </div>
     <div class="form-group">
         <label asp-for="DatZaraze"></label>
         <div><span asp-validation-for="DatZaraze" class="text-danger"></span></div>
@@ -31,4 +31,10 @@
         <a asp-action="Index" class="btn btn-secondary" type="button">Odustani</a>
     </div>
 </form>
+
+@section scripts{ 
+<script src="~/lib/jqueryui/jquery-ui.js"></script>
+<script src="~/js/autocomplete.js"></script>
+}
+
 
