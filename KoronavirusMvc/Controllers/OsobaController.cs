@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -123,12 +124,12 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string IdentifikacijskiBroj, int page=1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(string id, int page=1, int sort = 1, bool ascending = true)
         {
-            var osoba = ctx.Osoba.Find(IdentifikacijskiBroj);
+            var osoba = ctx.Osoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).SingleOrDefault();
             if(osoba == null)
             {
-                return NotFound();
+                return NotFound($"Osoba s identifikacijski brojem {id} ne postoji.");
             }
             else
             {
@@ -137,15 +138,22 @@ namespace KoronavirusMvc.Controllers
                     string punoime = osoba.Ime + " " + osoba.Prezime;
                     ctx.Remove(osoba);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Osoba {punoime} uspješno obrisana.";
-                    TempData[Constants.ErrorOccurred] = false;
+                    var result = new
+                    {
+                        message = $"Osoba {punoime} obrisana.",
+                        successful = true
+                    };
+                    return Json(result);
                 }
                 catch(Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom brisanja osobe: " + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccurred] = true;
+                    var result = new
+                    {
+                        message = $"Pogreška prilikom brisanja osobe. {exc.CompleteExceptionMessage()}",
+                        successful = false
+                    };
+                    return Json(result);
                 }
-                return RedirectToAction(nameof(Index), new { page, sort, ascending});
             }
         }
 
@@ -210,7 +218,7 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Details(string? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {

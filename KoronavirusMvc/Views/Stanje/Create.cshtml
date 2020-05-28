@@ -6,11 +6,8 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="SifraStanja"></label>
-        <input asp-for="SifraStanja" class="form-control" />
-    </div>
-    <div class="form-group">
         <label asp-for="NazivStanja"></label>
+        <div><span asp-validation-for="NazivStanja" class="text-danger"></span></div>
         <input asp-for="NazivStanja" class="form-control" />
     </div>
     <div class="text-center">

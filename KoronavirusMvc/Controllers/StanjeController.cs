@@ -37,6 +37,7 @@ namespace KoronavirusMvc.Controllers
 
                 try
                 {
+                    stanje.SifraStanja = (int)NewId();
                     ctx.Add(stanje);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno dodano.";
@@ -121,9 +122,9 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraStanja, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(int sifrastanja, int page = 1, int sort = 1, bool ascending = true)
         {
-            var stanje = ctx.Stanje.Find(SifraStanja);
+            var stanje = ctx.Stanje.Find(sifrastanja);
             if (stanje == null)
             {
                 return NotFound();
@@ -132,10 +133,10 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    
+
                     ctx.Remove(stanje);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno obrisana.";
+                    TempData[Constants.Message] = $"Stanje uspješno obrisano.";
                     TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
@@ -146,6 +147,7 @@ namespace KoronavirusMvc.Controllers
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }
         }
+
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
@@ -194,6 +196,15 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+        private decimal NewId()
+        {
+            var maxId = ctx.Stanje
+                      .Select(o => o.SifraStanja)
+                      .ToList()
+                      .Max();
+
+            return maxId + 1;
         }
     }
 }
