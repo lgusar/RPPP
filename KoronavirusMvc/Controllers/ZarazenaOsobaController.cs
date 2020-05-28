@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
@@ -8,6 +9,7 @@ using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace KoronavirusMvc.Controllers
@@ -16,11 +18,12 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        public ZarazenaOsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<ZarazenaOsobaController> logger;
+        public ZarazenaOsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<ZarazenaOsobaController> logger)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
-
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -40,6 +43,7 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(ZarazenaOsoba zarazenaOsoba)
         {
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
             if (ModelState.IsValid)
             {
 
@@ -48,6 +52,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(zarazenaOsoba);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba. ";
+                    logger.LogInformation($"Osoba dodana");
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -55,6 +60,7 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom dodavanja zaražene osobe {exc.CompleteExceptionMessage()}");
                     PrepareDropDownLists();
                     return View(zarazenaOsoba);
                 }
@@ -81,7 +87,7 @@ namespace KoronavirusMvc.Controllers
             }
             else
             {
-                return NotFound($"Neispravan id mjesta: {id}");
+                return NotFound($"Neispravan id osobe: {id}");
             }
         }
 
@@ -89,6 +95,7 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(ZarazenaOsoba zarazenaOsoba)
         {
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
             if (zarazenaOsoba == null)
             {
                 return NotFound("Nema poslanih podataka");
@@ -106,11 +113,13 @@ namespace KoronavirusMvc.Controllers
                 {
                     ctx.Update(zarazenaOsoba);
                     ctx.SaveChanges();
+                    logger.LogInformation($"Osoba ažurirana");
                     return StatusCode(302, Url.Action(nameof(Row), new { id = zarazenaOsoba.IdentifikacijskiBroj }));
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
                     return PartialView(zarazenaOsoba);
                 }
             }
@@ -151,6 +160,7 @@ namespace KoronavirusMvc.Controllers
                              .AsNoTracking() 
                              .Where(m => m.IdentifikacijskiBroj == id)
                              .SingleOrDefault();
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
             if (zarazenaOsoba != null)
             {
                 try
@@ -163,6 +173,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Zaražena osoba obrisana.",
                         successful = true
                     };
+                    logger.LogInformation($"Osoba obrisana");
                     return Json(result);
                 }
                 catch (Exception exc)
@@ -172,6 +183,7 @@ namespace KoronavirusMvc.Controllers
                         message = "Pogreška prilikom brisanja zaražene osobe: " + exc.CompleteExceptionMessage(),
                         successful = false
                     };
+                    logger.LogError($"Pogreška prilikom brisanja zaražene osobe {exc.CompleteExceptionMessage()}");
                     return Json(result);
                 }
             }

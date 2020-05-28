@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
@@ -10,8 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+
 
 namespace KoronavirusMvc.Controllers
 {
@@ -19,9 +22,11 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        public OsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<OsobaController> logger;
+        public OsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<OsobaController> logger)
         {
             this.ctx = ctx;
+            this.logger = logger;
             appSettings = optionsSnapshot.Value;
         }
 
@@ -35,6 +40,7 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Osoba osoba)
         {
+            logger.LogTrace(JsonSerializer.Serialize(osoba));
             if (ModelState.IsValid)
             {
 
@@ -44,11 +50,13 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Osoba {osoba.Ime} {osoba.Prezime} uspješno dodana.";
                     TempData[Constants.ErrorOccurred] = false;
+                    logger.LogInformation($"Osoba {osoba.Ime} {osoba.Prezime} dodana");
 
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
                 {
+                    logger.LogError($"Pogreška prilikom dodavanja osobe {exc.CompleteExceptionMessage()}");
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                     return View(osoba);
                 }
@@ -87,7 +95,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
                 }
-
+                logger.LogTrace(JsonSerializer.Serialize(osoba));
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.Ascending = ascending;
@@ -100,10 +108,12 @@ namespace KoronavirusMvc.Controllers
                         TempData[Constants.Message] = $"Podaci osobe {punoime} uspješno ažurirani.";
                         TempData[Constants.ErrorOccurred] = false;
                         await ctx.SaveChangesAsync();
+                        logger.LogInformation($"Osoba {osoba.Ime} {osoba.Prezime} ažurirana");
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
                     catch(Exception exc)
                     {
+                        logger.LogError($"Pogreška prilikom ažuriranja podataka osobe {exc.CompleteExceptionMessage()}");
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                         return View(osoba);
                     }
@@ -127,7 +137,8 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Delete(string id, int page=1, int sort = 1, bool ascending = true)
         {
             var osoba = ctx.Osoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).SingleOrDefault();
-            if(osoba == null)
+            logger.LogTrace(JsonSerializer.Serialize(osoba));
+            if (osoba == null)
             {
                 return NotFound($"Osoba s identifikacijski brojem {id} ne postoji.");
             }
@@ -143,6 +154,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Osoba {punoime} obrisana.",
                         successful = true
                     };
+                    logger.LogInformation($"Osoba {osoba.Ime} {osoba.Prezime} obrisana");
                     return Json(result);
                 }
                 catch(Exception exc)
@@ -152,6 +164,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Pogreška prilikom brisanja osobe. {exc.CompleteExceptionMessage()}",
                         successful = false
                     };
+                    logger.LogError($"Pogreška prilikom brisanja osobe {exc.CompleteExceptionMessage()}");
                     return Json(result);
                 }
             }

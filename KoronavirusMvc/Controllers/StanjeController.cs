@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace KoronavirusMvc.Controllers
@@ -15,11 +17,12 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        public StanjeController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<StanjeController> logger;
+        public StanjeController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<StanjeController> logger)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
-
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -32,6 +35,7 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stanje stanje)
         {
+            logger.LogTrace(JsonSerializer.Serialize(stanje));
             if (ModelState.IsValid)
             {
 
@@ -41,6 +45,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(stanje);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno dodano.";
+                    logger.LogInformation($"Stanje dodano");
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -48,6 +53,7 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom dodavanja stanja {exc.CompleteExceptionMessage()}");
                     return View(stanje);
                 }
             }
@@ -81,6 +87,7 @@ namespace KoronavirusMvc.Controllers
             try
             {
                 Stanje stanje = await ctx.Stanje.FindAsync(id);
+                logger.LogTrace(JsonSerializer.Serialize(stanje));
                 if (stanje == null)
                 {
                     return NotFound($"Ne postoji stanje sa šifrom {id}");
@@ -96,6 +103,7 @@ namespace KoronavirusMvc.Controllers
                     {
                         
                         TempData[Constants.Message] = $"Podaci stanja {stanje.NazivStanja} uspješno ažurirani.";
+                        logger.LogInformation($"Stanje ažurirano");
                         TempData[Constants.ErrorOccurred] = false;
                         await ctx.SaveChangesAsync();
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -103,6 +111,7 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        logger.LogError($"Pogreška prilikom ažuriranja stanja {exc.CompleteExceptionMessage()}");
                         return View(stanje);
                     }
                 }
@@ -125,6 +134,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Delete(int sifrastanja, int page = 1, int sort = 1, bool ascending = true)
         {
             var stanje = ctx.Stanje.Find(sifrastanja);
+            logger.LogTrace(JsonSerializer.Serialize(stanje));
             if (stanje == null)
             {
                 return NotFound();
@@ -138,10 +148,12 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Stanje uspješno obrisano.";
                     TempData[Constants.ErrorOccurred] = false;
+                    logger.LogInformation($"Stanje {sifrastanja} obrisano");
                 }
                 catch (Exception exc)
                 {
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja stanja: " + exc.CompleteExceptionMessage();
+                    logger.LogError($"Pogreška prilikom brisanja stanja {exc.CompleteExceptionMessage()}");
                     TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
