@@ -23,12 +23,12 @@ namespace KoronavirusMvc.Controllers
 
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Create()
-        //{
-        //    await PrepareDropdownLists();
-        //    return View();
-        //}
+        [HttpGet]
+        public IActionResult Create()
+        {
+            PrepareDropDownLists();
+            return View();
+        }
 
         private void PrepareDropDownLists()
         {
@@ -36,35 +36,35 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(ZarazenaOsoba zarazenaOsoba)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(ZarazenaOsoba zarazenaOsoba)
+        {
+            if (ModelState.IsValid)
+            {
 
-        //        try
-        //        {
-        //            ctx.Add(zarazenaOsoba);
-        //            ctx.SaveChanges();
-        //            TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba. ";
-        //            TempData[Constants.ErrorOccurred] = false;
+                try
+                {
+                    ctx.Add(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba. ";
+                    TempData[Constants.ErrorOccurred] = false;
 
-        //            return RedirectToAction(nameof(Index));
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-        //            await PrepareDropdownLists();
-        //            return View(zarazenaOsoba);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        await PrepareDropdownLists();
-        //        return View(zarazenaOsoba);
-        //    }
-        //}
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    PrepareDropDownLists();
+                    return View(zarazenaOsoba);
+                }
+            }
+            else
+            {
+                PrepareDropDownLists();
+                return View(zarazenaOsoba);
+            }
+        }
 
         [HttpGet]
         public IActionResult Edit(string id)
