@@ -42,12 +42,12 @@ namespace KoronavirusMvc.Controllers
                     TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno obrisan.";
                     TempData[Constants.ErrorOccurred] = false;
                 }
-                catch(Exception exc)
+                catch (Exception exc)
                 {
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja pregleda." + exc.CompleteExceptionMessage();
                     TempData[Constants.ErrorOccurred] = true;
                 }
-                return RedirectToAction(nameof(Index), new {page, sort, ascending});
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }
         }
 
@@ -135,7 +135,7 @@ namespace KoronavirusMvc.Controllers
 
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                         return View(pregled);
@@ -174,7 +174,7 @@ namespace KoronavirusMvc.Controllers
 
             if (page > pagingInfo.TotalPages)
             {
-                return RedirectToAction(nameof(Index), new { 
+                return RedirectToAction(nameof(Index), new {
                     page = pagingInfo.TotalPages,
                     sort,
                     ascending
@@ -216,6 +216,23 @@ namespace KoronavirusMvc.Controllers
             };
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var pregled = await ctx.Pregled.FirstOrDefaultAsync(p => p.SifraPregleda == id);
+
+            if (pregled == null)
+            {
+                return NotFound();
+            }
+
+            return View(pregled);
         }
 
         private decimal NewId()

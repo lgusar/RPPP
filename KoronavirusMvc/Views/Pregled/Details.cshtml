@@ -1,0 +1,75 @@
+﻿@model KoronavirusMvc.Models.Pregled
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+
+<div>
+    <h4>Pregled</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.SifraPregleda)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SifraPregleda)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Datum)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Datum)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Anamneza)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Anamneza)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Dijagnoza)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Dijagnoza)
+        </dd>
+    </dl>
+</div>
+
+<h4>Propisane terapije</h4>
+
+<table class="table table-sm table-striped table-hover" id="tableosobe">
+    <thead>
+        <tr>
+            <th>
+                Identifikacijski broj
+            </th>
+            <th>
+                Ime
+            </th>
+            <th>
+               Prezime
+            </th>
+            
+        </tr>
+    </thead>
+    @*<tbody>
+        @foreach (var osoba in @Model.Osoba)
+        {
+            <tr>
+                <td class="text-left">@osoba.IdentifikacijskiBroj</td>
+                <td class="text-left">@osoba.Ime</td>
+                <td class="text-left">@osoba.Prezime</td>
+                
+            </tr>
+        }
+    </tbody>*@
+</table>
+
+<div>
+    
+    <a asp-action="Index">Natrag na listu</a>
+</div>
+
+
