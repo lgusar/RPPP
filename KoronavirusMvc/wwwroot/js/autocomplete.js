@@ -1,5 +1,5 @@
 ﻿$(function () {
-    
+
 
     $("[data-autocomplete]").each(function (index, element) {
         var url = $(element).data('autocomplete');
@@ -24,10 +24,8 @@
                 var dest = $("[data-autocomplete-placeholder='" + resultplaceholder + "']");
                 $(dest).val(ui.item.id);
                 $(dest).data('selected-label', ui.item.label);
-
-                
-                }
             }
-        });
+        }
+        );
     });
-});
+})
