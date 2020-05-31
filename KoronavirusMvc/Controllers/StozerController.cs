@@ -4,9 +4,11 @@ using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
@@ -15,10 +17,12 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
+        private readonly ILogger<DrzavaController> logger;
 
-        public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<DrzavaController> logger)
         {
             this.ctx = ctx;
+            this.logger = logger;
             appSettings = optionsSnapshot.Value;
         }
 
@@ -48,12 +52,14 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stozer stozer)
         {
+            logger.LogTrace(JsonSerializer.Serialize(stozer), new JsonSerializerOptions { IgnoreNullValues = true });
             if (ModelState.IsValid)
             {
                 try
                 {
                     ctx.Add(stozer);
                     ctx.SaveChanges();
+                    logger.LogInformation(new EventId(1000), $"Stožer {stozer.Naziv} dodan.");
                     TempData[Constants.Message] = $"Stožer {stozer.Naziv} dodan.";
                     TempData[Constants.ErrorOccurred] = false;
 
@@ -61,6 +67,7 @@ namespace KoronavirusMvc.Controllers
                 }
                 catch (Exception exc)
                 {
+                    logger.LogError("Pogreška prilikom dodavanje novog stožera: {0}", exc.CompleteExceptionMessage());
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                     PrepareDropDownLists();
                     return View(stozer);
