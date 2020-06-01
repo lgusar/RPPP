@@ -143,66 +143,18 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(PregledCreateViewModel model, int page = 1, int sort = 1, bool ascending = true)
-        {
-            try
-            {
-                Pregled pregled = await ctx.Pregled.FindAsync(model.Pregled.SifraPregleda);
-                OsobaPregled op = await ctx.OsobaPregled.FindAsync(model.Pregled.SifraPregleda);
-
-                if (pregled == null)
-                {
-                    return NotFound($"Ne postoji pregled s tom šifrom {model.Pregled.SifraPregleda}");
-                }
-
-                ViewBag.page = page;
-                ViewBag.sort = sort;
-                ViewBag.ascending = ascending;
-
-                if (ctx.Osoba.Find(model.idOsoba) != null) {
-                    ctx.Pregled.Update(model.Pregled);
-                    op.IdentifikacijskiBroj = model.idOsoba;
-                    ctx.OsobaPregled.Update(op);
-
-                    try
-                    {
-                        TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
-                        TempData[Constants.ErrorOccurred] = false;
-
-                        await ctx.SaveChangesAsync();
-
-                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-                    }
-                    catch (Exception exc)
-                    {
-                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                        return View(model);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
-                    return View(model);
-                }
-
-            }
-            catch (Exception exc)
-            {
-                TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccurred] = true;
-
-                return RedirectToAction(nameof(Edit), new { page, sort, ascending });
-            }
-        }
-
-        /*[HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
         {
             try
             {
                 Pregled pregled = await ctx.Pregled.FindAsync(id);
                 OsobaPregled op = await ctx.OsobaPregled.FindAsync(id);
+
+                PregledCreateViewModel pc = new PregledCreateViewModel
+                {
+                    Pregled = pregled,
+                    idOsoba = op.IdentifikacijskiBroj
+                };
 
                 if (pregled == null)
                 {
@@ -212,9 +164,7 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.page = page;
                 ViewBag.sort = sort;
                 ViewBag.ascending = ascending;
-                bool ok = await TryUpdateModelAsync<Pregled>(pregled, "", p => p.Datum, p => p.Anamneza, p => p.Dijagnoza);
-
-                ok = await TryUpdateModelAsync<OsobaPregled>(op, "", p => p.IdentifikacijskiBroj);
+                bool ok = await TryUpdateModelAsync<PregledCreateViewModel>(pc, "", p => p.Pregled, p => p.idOsoba);
 
                 if (ok)
                 {
@@ -254,7 +204,7 @@ namespace KoronavirusMvc.Controllers
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
-        }*/
+        }
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
