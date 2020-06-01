@@ -1,4 +1,4 @@
-﻿@model KoronavirusMvc.Models.Pregled
+﻿@model KoronavirusMvc.ViewModels.PregledDetailViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -10,66 +10,82 @@
     <h4>Pregled</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SifraPregleda)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Pregled.SifraPregleda)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SifraPregleda)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Pregled.SifraPregleda)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Datum)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Pregled.Datum)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Datum)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Pregled.Datum)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Anamneza)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Pregled.Anamneza)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Anamneza)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Pregled.Anamneza)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Dijagnoza)
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Pregled.Dijagnoza)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Dijagnoza)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Pregled.Dijagnoza)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IdOsoba)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdOsoba)
         </dd>
     </dl>
 </div>
 
-<h4>Propisane terapije</h4>
+<h4>Simptomi</h4>
 
-<table class="table table-sm table-striped table-hover" id="tableosobe">
+<table class="table table-sm table-striped table-hover" id="tablesimptomi">
     <thead>
         <tr>
             <th>
-                Identifikacijski broj
+                Simptomi
             </th>
-            <th>
-                Ime
-            </th>
-            <th>
-               Prezime
-            </th>
-            
         </tr>
     </thead>
-    @*<tbody>
-        @foreach (var osoba in @Model.Osoba)
+    <tbody>
+        @foreach (var simptom in @Model.Simptomi)
         {
             <tr>
-                <td class="text-left">@osoba.IdentifikacijskiBroj</td>
-                <td class="text-left">@osoba.Ime</td>
-                <td class="text-left">@osoba.Prezime</td>
-                
+                <td class="text-left">@simptom.Opis</td>
             </tr>
         }
-    </tbody>*@
+    </tbody>
+</table>
+
+<h4>Terapije</h4>
+
+<table class="table table-sm table-striped table-hover" id="tableterapije">
+    <thead>
+        <tr>
+            <th>
+                Terapije
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var terapija in @Model.Terapije)
+        {
+            <tr>
+                <td class="text-left">@terapija.OpisTerapije</td>
+            </tr>
+        }
+    </tbody>
 </table>
 
 <div>
-    
-    <a asp-action="Index">Natrag na listu</a>
+
+    <a asp-action="Index">Natrag na listu pregleda</a>
 </div>
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -232,7 +233,41 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
 
-            return View(pregled);
+            pregled.PregledSimptom = ctx.PregledSimptom.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Simptom> simptomi = new List<Simptom>();
+
+            foreach(PregledSimptom ps in pregled.PregledSimptom)
+            {
+                var simptom = await ctx.Simptom.FirstOrDefaultAsync(p => p.SifraSimptoma == ps.SifraSimptoma);
+                simptomi.Add(simptom);
+            }
+
+            pregled.PregledTerapija = ctx.PregledTerapija.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Terapija> terapije = new List<Terapija>();
+
+            foreach (PregledTerapija pt in pregled.PregledTerapija)
+            {
+                var terapija = await ctx.Terapija.FirstOrDefaultAsync(p => p.SifraTerapije == pt.SifraTerapije);
+                terapije.Add(terapija);
+            }
+
+            var osoba = await ctx.OsobaPregled.FirstOrDefaultAsync(p => p.SifraPregleda == id);
+
+            var model = new PregledDetailViewModel
+            {
+                Pregled = pregled,
+                Simptomi = simptomi,
+                Terapije = terapije,
+                IdOsoba = osoba.IdentifikacijskiBroj
+            };
+
+            return View(model);
         }
 
         private decimal NewId()

@@ -338,13 +338,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany(p => p.PregledSimptom)
                     .HasForeignKey(d => d.SifraPregleda)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PREGLED_S__sifra__0E6E26BF");
 
                 entity.HasOne(d => d.SifraSimptomaNavigation)
                     .WithMany(p => p.PregledSimptom)
                     .HasForeignKey(d => d.SifraSimptoma)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_PREGLED_SIMPTOM_SIMPTOM");
             });
 
@@ -362,13 +362,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany(p => p.PregledTerapija)
                     .HasForeignKey(d => d.SifraPregleda)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PROPISUJE__sifra__276EDEB3");
 
                 entity.HasOne(d => d.SifraTerapijeNavigation)
                     .WithMany(p => p.PregledTerapija)
                     .HasForeignKey(d => d.SifraTerapije)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PROPISUJE__sifra__286302EC");
             });
 
