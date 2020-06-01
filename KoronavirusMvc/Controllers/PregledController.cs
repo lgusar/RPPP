@@ -66,17 +66,28 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    pregledCreate.Pregled.SifraPregleda = (int)NewId();
-                    ctx.Add(pregledCreate.Pregled);
-                    ctx.OsobaPregled.Add(new OsobaPregled {
-                        IdentifikacijskiBroj = pregledCreate.idOsoba,
-                        SifraPregleda = pregledCreate.Pregled.SifraPregleda
-                    });
-                    ctx.SaveChanges();
+                    if(ctx.Osoba.Find(pregledCreate.idOsoba) != null)
+                    {
+                        pregledCreate.Pregled.SifraPregleda = (int)NewId();
+                        ctx.Add(pregledCreate.Pregled);
+                        ctx.OsobaPregled.Add(new OsobaPregled
+                        {
+                            IdentifikacijskiBroj = pregledCreate.idOsoba,
+                            SifraPregleda = pregledCreate.Pregled.SifraPregleda
+                        });
+                        ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
-                    TempData[Constants.ErrorOccurred] = false;
-                    return RedirectToAction(nameof(Index));
+                        TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    else
+                    {
+                        TempData[Constants.Message] = $"Ne postoji osoba s tim identifikacijskim brojem.";
+                        TempData[Constants.ErrorOccurred] = true;
+                        return View(pregledCreate);
+                    }
                 }
                 catch (Exception exc)
                 {
