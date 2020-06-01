@@ -109,6 +109,10 @@ namespace KoronavirusMvc.Controllers
                              .Where(p => p.SifraPregleda == id)
                              .FirstOrDefault();
 
+            var idOsoba = ctx.OsobaPregled.AsNoTracking()
+                             .Where(p => p.SifraPregleda == id)
+                             .FirstOrDefault();
+
             if (pregled == null)
             {
                 return NotFound($"Ne postoji pregled s tom šifrom: {id}");
@@ -118,30 +122,48 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.ascending = ascending;
-                return View(pregled);
+
+                string ident = "";
+
+                if (idOsoba == null)
+                {
+                    ident = "Nema ident. broja osobe";
+                }
+                else
+                {
+                    ident = idOsoba.IdentifikacijskiBroj;
+                }
+
+                return View(new PregledCreateViewModel { 
+                    Pregled = pregled,
+                    idOsoba = ident
+                });
             }
         }
 
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        public async Task<IActionResult> Update(PregledCreateViewModel model, int page = 1, int sort = 1, bool ascending = true)
         {
             try
             {
-                Pregled pregled = await ctx.Pregled.FindAsync(id);
+                Pregled pregled = await ctx.Pregled.FindAsync(model.Pregled.SifraPregleda);
+                OsobaPregled op = await ctx.OsobaPregled.FindAsync(model.Pregled.SifraPregleda);
 
                 if (pregled == null)
                 {
-                    return NotFound($"Ne postoji pregled s tom šifrom {id}");
+                    return NotFound($"Ne postoji pregled s tom šifrom {model.Pregled.SifraPregleda}");
                 }
 
                 ViewBag.page = page;
                 ViewBag.sort = sort;
                 ViewBag.ascending = ascending;
-                bool ok = await TryUpdateModelAsync<Pregled>(pregled, "", p => p.Datum, p => p.Anamneza, p => p.Dijagnoza);
 
-                if (ok)
-                {
+                if (ctx.Osoba.Find(model.idOsoba) != null) {
+                    ctx.Pregled.Update(model.Pregled);
+                    op.IdentifikacijskiBroj = model.idOsoba;
+                    ctx.OsobaPregled.Update(op);
+
                     try
                     {
                         TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
@@ -154,6 +176,68 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(model);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
+                    return View(model);
+                }
+
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { page, sort, ascending });
+            }
+        }
+
+        /*[HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Pregled pregled = await ctx.Pregled.FindAsync(id);
+                OsobaPregled op = await ctx.OsobaPregled.FindAsync(id);
+
+                if (pregled == null)
+                {
+                    return NotFound($"Ne postoji pregled s tom šifrom {id}");
+                }
+
+                ViewBag.page = page;
+                ViewBag.sort = sort;
+                ViewBag.ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Pregled>(pregled, "", p => p.Datum, p => p.Anamneza, p => p.Dijagnoza);
+
+                ok = await TryUpdateModelAsync<OsobaPregled>(op, "", p => p.IdentifikacijskiBroj);
+
+                if (ok)
+                {
+                    if (ctx.Osoba.Find(op.IdentifikacijskiBroj) != null)
+                    {
+                        try
+                        {
+                            TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
+                            TempData[Constants.ErrorOccurred] = false;
+
+                            await ctx.SaveChangesAsync();
+
+                            return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                        }
+                        catch (Exception exc)
+                        {
+                            ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                            return View(pregled);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
                         return View(pregled);
                     }
                 }
@@ -170,7 +254,7 @@ namespace KoronavirusMvc.Controllers
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
-        }
+        }*/
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
@@ -274,12 +358,23 @@ namespace KoronavirusMvc.Controllers
 
             var osoba = await ctx.OsobaPregled.FirstOrDefaultAsync(p => p.SifraPregleda == id);
 
+            string idOsoba = "";
+
+            if (osoba == null)
+            {
+                idOsoba = "Nema ident. broj osobe";
+            }
+            else
+            {
+                idOsoba = osoba.IdentifikacijskiBroj;
+            }
+
             var model = new PregledDetailViewModel
             {
                 Pregled = pregled,
                 Simptomi = simptomi,
                 Terapije = terapije,
-                IdOsoba = osoba.IdentifikacijskiBroj
+                IdOsoba = idOsoba
             };
 
             return View(model);
