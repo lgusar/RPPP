@@ -291,12 +291,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.IdentifikacijskiBrojNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.IdentifikacijskiBroj)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__OBAVLJA__identif__2A4B4B5E");
 
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.SifraPregleda)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__OBAVLJA__sifra_p__2B3F6F97");
             });
 
