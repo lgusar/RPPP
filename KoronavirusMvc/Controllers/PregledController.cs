@@ -60,29 +60,33 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Pregled pregled)
+        public IActionResult Create(PregledCreateViewModel pregledCreate)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    pregled.SifraPregleda = (int)NewId();
-                    ctx.Add(pregled);
+                    pregledCreate.Pregled.SifraPregleda = (int)NewId();
+                    ctx.Add(pregledCreate.Pregled);
+                    ctx.OsobaPregled.Add(new OsobaPregled {
+                        IdentifikacijskiBroj = pregledCreate.idOsoba,
+                        SifraPregleda = pregledCreate.Pregled.SifraPregleda
+                    });
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno dodan.";
+                    TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
                     TempData[Constants.ErrorOccurred] = false;
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                    return View(pregled);
+                    return View(pregledCreate);
                 }
             }
             else
             {
-                return View(pregled);
+                return View(pregledCreate);
             }
         }
 

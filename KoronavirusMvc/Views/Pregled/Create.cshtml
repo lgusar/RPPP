@@ -1,21 +1,26 @@
-﻿@model Pregled
+﻿@model KoronavirusMvc.ViewModels.PregledCreateViewModel
 
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="Datum"></label>
-        <div><span asp-validation-for="Datum" class="text-danger"></span></div>
-        <input asp-for="Datum" class="form-control" />
+        <label asp-for="Pregled.Datum"></label>
+        <div><span asp-validation-for="Pregled.Datum" class="text-danger"></span></div>
+        <input asp-for="Pregled.Datum" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Anamneza"></label>
-        <div><span asp-validation-for="Anamneza" class="text-danger"></span></div>
-        <input asp-for="Anamneza" class="form-control" />
+        <label asp-for="Pregled.Anamneza"></label>
+        <div><span asp-validation-for="Pregled.Anamneza" class="text-danger"></span></div>
+        <input asp-for="Pregled.Anamneza" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="Dijagnoza"></label>
-        <div><span asp-validation-for="Dijagnoza" class="text-danger"></span></div>
-        <input asp-for="Dijagnoza" class="form-control" />
+        <label asp-for="Pregled.Dijagnoza"></label>
+        <div><span asp-validation-for="Pregled.Dijagnoza" class="text-danger"></span></div>
+        <input asp-for="Pregled.Dijagnoza" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="idOsoba"></label>
+        <div><span asp-validation-for="idOsoba" class="text-danger"></span></div>
+        <input asp-for="idOsoba" class="form-control" />
     </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Dodaj</button>

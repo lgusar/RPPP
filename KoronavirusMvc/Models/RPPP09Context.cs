@@ -276,7 +276,7 @@ namespace KoronavirusMvc.Models
 
             modelBuilder.Entity<OsobaPregled>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.SifraPregleda);
 
                 entity.ToTable("OSOBA_PREGLED");
 
