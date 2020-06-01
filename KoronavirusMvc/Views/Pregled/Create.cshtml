@@ -23,9 +23,9 @@
             <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
         </div>
         <div class="form-group">
-            <label>Simptomi</label>
-            <div><span class="text-danger"></span></div>
-            <select multiple class="form-control" asp-items="ViewBag.Simptomi">
+            <label asp-for="Simptomi">Simptomi</label>
+            <div><span asp-validation-for="Simptomi" class="text-danger"></span></div>
+            <select multiple class="form-control" asp-for="Simptomi" asp-items="ViewBag.Simptomi">
                 <option disabled selected value="">Odaberite simptom</option>
             </select>
         </div>

@@ -74,6 +74,21 @@ namespace KoronavirusMvc.Controllers
                         ctx.Add(pregledCreate.Pregled);
                         pregledCreate.OsobaPregled.SifraPregleda = pregledCreate.Pregled.SifraPregleda;
                         ctx.Add(pregledCreate.OsobaPregled);
+                        
+                        foreach(var opis in pregledCreate.Simptomi)
+                        {
+                            var simptom = ctx.Simptom.AsNoTracking().Where(p => p.Opis == opis).FirstOrDefault();
+
+                            if (simptom != null)
+                            {
+                                ctx.Add(new PregledSimptom
+                                {
+                                    SifraPregleda = pregledCreate.Pregled.SifraPregleda,
+                                    SifraSimptoma = simptom.SifraSimptoma
+                                });
+                            }
+                        }
+
                         ctx.SaveChanges();
 
                         TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";

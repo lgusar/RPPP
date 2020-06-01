@@ -8,5 +8,6 @@ namespace KoronavirusMvc.ViewModels
     {
         public Pregled Pregled { get; set; }
         public OsobaPregled OsobaPregled { get; set; }
+        public List<string> Simptomi { get; set; }
     }
 }
