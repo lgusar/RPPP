@@ -1,29 +1,36 @@
 ﻿@model KoronavirusMvc.ViewModels.PregledCreateViewModel
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="All"></div>
-    <div class="form-group">
-        <label asp-for="Pregled.Datum"></label>
-        <div><span asp-validation-for="Pregled.Datum" class="text-danger"></span></div>
-        <input asp-for="Pregled.Datum" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Pregled.Anamneza"></label>
-        <div><span asp-validation-for="Pregled.Anamneza" class="text-danger"></span></div>
-        <input asp-for="Pregled.Anamneza" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Pregled.Dijagnoza"></label>
-        <div><span asp-validation-for="Pregled.Dijagnoza" class="text-danger"></span></div>
-        <input asp-for="Pregled.Dijagnoza" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="OsobaPregled.IdentifikacijskiBroj">Identifikacijski broj osobe</label>
-        <div><span asp-validation-for="OsobaPregled.IdentifikacijskiBroj" class="text-danger"></span></div>
-        <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
-    </div>
-    <div class="text-center">
-        <button class="btn btn-primary" type="submit">Dodaj</button>
-        <a asp-action="Index" class="btn btn-secondary">Odustani</a>
-    </div>
-</form>
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="Pregled.Datum"></label>
+            <div><span asp-validation-for="Pregled.Datum" class="text-danger"></span></div>
+            <input asp-for="Pregled.Datum" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pregled.Anamneza"></label>
+            <div><span asp-validation-for="Pregled.Anamneza" class="text-danger"></span></div>
+            <input asp-for="Pregled.Anamneza" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pregled.Dijagnoza"></label>
+            <div><span asp-validation-for="Pregled.Dijagnoza" class="text-danger"></span></div>
+            <input asp-for="Pregled.Dijagnoza" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="OsobaPregled.IdentifikacijskiBroj">Identifikacijski broj osobe</label>
+            <div><span asp-validation-for="OsobaPregled.IdentifikacijskiBroj" class="text-danger"></span></div>
+            <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label>Simptomi</label>
+            <div><span class="text-danger"></span></div>
+            <select class="form-control" asp-items="ViewBag.Simptomi">
+                <option disabled selected value="">Odaberite simptom</option>
+            </select>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Dodaj</button>
+            <a asp-action="Index" class="btn btn-secondary">Odustani</a>
+        </div>
+    </form>

@@ -7,6 +7,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -55,6 +56,7 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            prepareDropDownSimptomi();
             return View();
         }
 
@@ -315,6 +317,17 @@ namespace KoronavirusMvc.Controllers
             };
 
             return View(model);
+        }
+
+        private void prepareDropDownSimptomi()
+        {
+            var simptomi = ctx.Simptom.AsNoTracking().ToList();
+            List<string> opisi = new List<string>();
+            foreach(var simptom in simptomi)
+            {
+                opisi.Add(simptom.Opis);
+            }
+            ViewBag.Simptomi = new MultiSelectList(opisi);
         }
 
         private decimal NewId()
