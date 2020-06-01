@@ -56,6 +56,7 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            prepareDropDownTerapije();
             prepareDropDownSimptomi();
             return View();
         }
@@ -89,6 +90,20 @@ namespace KoronavirusMvc.Controllers
                             }
                         }
 
+                        foreach (var opis in pregledCreate.Terapije)
+                        {
+                            var terapija = ctx.Terapija.AsNoTracking().Where(p => p.OpisTerapije == opis).FirstOrDefault();
+
+                            if (terapija != null)
+                            {
+                                ctx.Add(new PregledTerapija
+                                {
+                                    SifraPregleda = pregledCreate.Pregled.SifraPregleda,
+                                    SifraTerapije = terapija.SifraTerapije
+                                });
+                            }
+                        }
+
                         ctx.SaveChanges();
 
                         TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
@@ -100,17 +115,23 @@ namespace KoronavirusMvc.Controllers
                     {
                         TempData[Constants.Message] = $"Ne postoji osoba s tim identifikacijskim brojem.";
                         TempData[Constants.ErrorOccurred] = true;
+                        prepareDropDownTerapije();
+                        prepareDropDownSimptomi();
                         return View(pregledCreate);
                     }
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    prepareDropDownTerapije();
+                    prepareDropDownSimptomi();
                     return View(pregledCreate);
                 }
             }
             else
             {
+                prepareDropDownTerapije();
+                prepareDropDownSimptomi();
                 return View(pregledCreate);
             }
         }
@@ -343,6 +364,17 @@ namespace KoronavirusMvc.Controllers
                 opisi.Add(simptom.Opis);
             }
             ViewBag.Simptomi = new MultiSelectList(opisi);
+        }
+
+        private void prepareDropDownTerapije()
+        {
+            var terapije = ctx.Terapija.AsNoTracking().ToList();
+            List<string> opisi= new List<string>();
+            foreach (var terapija in terapije)
+            {
+                opisi.Add(terapija.OpisTerapije);
+            }
+            ViewBag.Terapije = new MultiSelectList(opisi);
         }
 
         private decimal NewId()

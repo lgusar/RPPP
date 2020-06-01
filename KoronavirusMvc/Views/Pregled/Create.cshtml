@@ -26,10 +26,17 @@
             <label asp-for="Simptomi">Simptomi</label>
             <div><span asp-validation-for="Simptomi" class="text-danger"></span></div>
             <select multiple class="form-control" asp-for="Simptomi" asp-items="ViewBag.Simptomi">
-                <option disabled selected value="">Odaberite simptom</option>
+                <option disabled selected value="">Odaberite simptome</option>
             </select>
         </div>
-        <p>Za odabir više simptoma držite CTRL i kliknite mišem na željene simptome</p>
+        <div class="form-group">
+            <label asp-for="Terapije">Terapije</label>
+            <div><span asp-validation-for="Terapije" class="text-danger"></span></div>
+            <select multiple class="form-control" asp-for="Terapije" asp-items="ViewBag.Terapije">
+                <option disabled selected value="">Odaberite terapije</option>
+            </select>
+        </div>
+        <p>Za odabir više simptoma ili terapija držite CTRL i kliknite mišem na željene simptome ili terapije</p>
         <div class="text-center">
             <button class="btn btn-primary" type="submit">Dodaj</button>
             <a asp-action="Index" class="btn btn-secondary">Odustani</a>
