@@ -18,9 +18,9 @@
         <input asp-for="Pregled.Dijagnoza" class="form-control" />
     </div>
     <div class="form-group">
-        <label>Identifikacijski broj osobe</label>
-        <div><span asp-validation-for="idOsoba" class="text-danger"></span></div>
-        <input asp-for="idOsoba" class="form-control" />
+        <label asp-for="OsobaPregled.IdentifikacijskiBroj">Identifikacijski broj osobe</label>
+        <div><span asp-validation-for="OsobaPregled.IdentifikacijskiBroj" class="text-danger"></span></div>
+        <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
     </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Dodaj</button>

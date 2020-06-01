@@ -66,15 +66,12 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    if(ctx.Osoba.Find(pregledCreate.idOsoba) != null)
+                    if(ctx.Osoba.Find(pregledCreate.OsobaPregled.IdentifikacijskiBroj) != null)
                     {
                         pregledCreate.Pregled.SifraPregleda = (int)NewId();
                         ctx.Add(pregledCreate.Pregled);
-                        ctx.OsobaPregled.Add(new OsobaPregled
-                        {
-                            IdentifikacijskiBroj = pregledCreate.idOsoba,
-                            SifraPregleda = pregledCreate.Pregled.SifraPregleda
-                        });
+                        pregledCreate.OsobaPregled.SifraPregleda = pregledCreate.Pregled.SifraPregleda;
+                        ctx.Add(pregledCreate.OsobaPregled);
                         ctx.SaveChanges();
 
                         TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
@@ -123,20 +120,10 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.Sort = sort;
                 ViewBag.ascending = ascending;
 
-                string ident = "";
-
-                if (idOsoba == null)
-                {
-                    ident = "Nema ident. broja osobe";
-                }
-                else
-                {
-                    ident = idOsoba.IdentifikacijskiBroj;
-                }
 
                 return View(new PregledCreateViewModel { 
                     Pregled = pregled,
-                    idOsoba = ident
+                    OsobaPregled = idOsoba
                 });
             }
         }
@@ -148,12 +135,12 @@ namespace KoronavirusMvc.Controllers
             try
             {
                 Pregled pregled = await ctx.Pregled.FindAsync(id);
-                OsobaPregled op = await ctx.OsobaPregled.FindAsync(id);
+                OsobaPregled osobaPregled = await ctx.OsobaPregled.FindAsync(id);
 
                 PregledCreateViewModel pc = new PregledCreateViewModel
                 {
                     Pregled = pregled,
-                    idOsoba = op.IdentifikacijskiBroj
+                    OsobaPregled = osobaPregled
                 };
 
                 if (pregled == null)
@@ -164,11 +151,11 @@ namespace KoronavirusMvc.Controllers
                 ViewBag.page = page;
                 ViewBag.sort = sort;
                 ViewBag.ascending = ascending;
-                bool ok = await TryUpdateModelAsync<PregledCreateViewModel>(pc, "", p => p.Pregled, p => p.idOsoba);
+                bool ok = await TryUpdateModelAsync<PregledCreateViewModel>(pc, "", p => p.Pregled, p => p.OsobaPregled);
 
                 if (ok)
                 {
-                    if (ctx.Osoba.Find(op.IdentifikacijskiBroj) != null)
+                    if (ctx.Osoba.Find(osobaPregled.IdentifikacijskiBroj) != null)
                     {
                         try
                         {
@@ -182,19 +169,19 @@ namespace KoronavirusMvc.Controllers
                         catch (Exception exc)
                         {
                             ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                            return View(pregled);
+                            return View(pc);
                         }
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
-                        return View(pregled);
+                        return View(pc);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
-                    return View(pregled);
+                    return View(pc);
                 }
             }
             catch (Exception exc)
