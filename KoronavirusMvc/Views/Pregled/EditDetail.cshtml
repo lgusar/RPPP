@@ -1,0 +1,41 @@
+﻿@model KoronavirusMvc.ViewModels.PregledCreateViewModel
+
+@{ 
+    ViewBag.Title = "Ažuriranje pregleda";
+}
+
+    <form asp-action="EditDetail" method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="Pregled.Datum"></label>
+            <div><span asp-validation-for="Pregled.Datum" class="text-danger"></span></div>
+            <input asp-for="Pregled.Datum" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pregled.Anamneza"></label>
+            <div><span asp-validation-for="Pregled.Anamneza" class="text-danger"></span></div>
+            <input asp-for="Pregled.Anamneza" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Pregled.Dijagnoza"></label>
+            <div><span asp-validation-for="Pregled.Dijagnoza" class="text-danger"></span></div>
+            <input asp-for="Pregled.Dijagnoza" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="OsobaPregled.IdentifikacijskiBroj"></label>
+            <div><span asp-validation-for="OsobaPregled.IdentifikacijskiBroj" class="text-danger"></span></div>
+            <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Prihvati promjene</button>
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Vrati se na popis pregleda
+            </a>
+            <a asp-action="Details"
+               asp-route-id="@Model.Pregled.SifraPregleda"
+               class="btn btn-secondary">
+                Vrati se na detalje pregleda
+            </a>
+        </div>
+    </form>

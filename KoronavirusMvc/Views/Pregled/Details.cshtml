@@ -1,13 +1,13 @@
 ﻿@model KoronavirusMvc.ViewModels.PregledDetailViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji pregleda";
 }
 
 
 
 <div>
-    <h4>Pregled</h4>
+    <h4>Pregled @Model.Pregled.SifraPregleda</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -41,7 +41,18 @@
             @Html.DisplayFor(model => model.IdOsoba)
         </dd>
     </dl>
+
+    <a asp-action="EditDetail"
+        asp-route-id="@Model.Pregled.SifraPregleda">
+        Ažuriraj pregled
+    </a>
 </div>
+
+<p>
+
+
+
+</p>
 
 <h4>Simptomi</h4>
 
@@ -58,6 +69,15 @@
         {
             <tr>
                 <td class="text-left">@simptom.Opis</td>
+                <td class="btn-group" style="float: right;">
+                    <form asp-action="RemoveSimptom" method="post">
+                        <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+                        <input type="hidden" name="SifraSimptoma" value="@simptom.SifraSimptoma" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Ukloni">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
@@ -76,15 +96,23 @@
     <tbody>
         @foreach (var terapija in @Model.Terapije)
         {
-            <tr>
-                <td class="text-left">@terapija.OpisTerapije</td>
-            </tr>
+         <tr>
+            <td class="text-left">@terapija.OpisTerapije</td>
+            <td class="btn-group" style="float: right;">
+                <form asp-action="RemoveTerapija" method="post">
+                    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+                    <input type="hidden" name="SifraTerapije" value="@terapija.SifraTerapije" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Ukloni">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+         </tr>
         }
     </tbody>
 </table>
 
 <div>
-
     <a asp-action="Index">Natrag na listu pregleda</a>
 </div>
 

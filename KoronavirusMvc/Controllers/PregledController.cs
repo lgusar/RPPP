@@ -377,6 +377,150 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Terapije = new MultiSelectList(opisi);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveSimptom(int SifraPregleda, int SifraSimptoma)
+        {
+            var pregledSimptom = ctx.PregledSimptom.Find(SifraSimptoma, SifraPregleda);
+            if (pregledSimptom == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    ctx.Remove(pregledSimptom);
+                    ctx.SaveChanges();
+
+                    TempData[Constants.Message] = $"Simptom {pregledSimptom.SifraSimptoma} uspješno uklonjen.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Details), new { id = SifraPregleda });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveTerapija(int SifraPregleda, int SifraTerapije)
+        {
+            var pregledTerapija = ctx.PregledTerapija.Find(SifraPregleda, SifraTerapije);
+            if (pregledTerapija == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    ctx.Remove(pregledTerapija);
+                    ctx.SaveChanges();
+
+                    TempData[Constants.Message] = $"Terapija {pregledTerapija.SifraTerapije} uspješno uklonjena.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception exc)
+                {
+                    TempData[Constants.Message] = $"Pogreška prilikom uklanjanja terapije." + exc.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Details), new { id = SifraPregleda });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult EditDetail(int id)
+        {
+            var pregled = ctx.Pregled
+                             .AsNoTracking()
+                             .Where(p => p.SifraPregleda == id)
+                             .FirstOrDefault();
+
+            var idOsoba = ctx.OsobaPregled.AsNoTracking()
+                             .Where(p => p.SifraPregleda == id)
+                             .FirstOrDefault();
+
+            if (pregled == null)
+            {
+                return NotFound($"Ne postoji pregled s tom šifrom: {id}");
+            }
+            else
+            {
+                return View(new PregledCreateViewModel
+                {
+                    Pregled = pregled,
+                    OsobaPregled = idOsoba
+                });
+            }
+        }
+
+        [HttpPost, ActionName("EditDetail")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDetail(int id)
+        {
+            try
+            {
+                Pregled pregled = await ctx.Pregled.FindAsync(id);
+                OsobaPregled osobaPregled = await ctx.OsobaPregled.FindAsync(id);
+
+                PregledCreateViewModel pc = new PregledCreateViewModel
+                {
+                    Pregled = pregled,
+                    OsobaPregled = osobaPregled
+                };
+
+                if (pregled == null)
+                {
+                    return NotFound($"Ne postoji pregled s tom šifrom {id}");
+                }
+
+                bool ok = await TryUpdateModelAsync<PregledCreateViewModel>(pc, "", p => p.Pregled, p => p.OsobaPregled);
+
+                if (ok)
+                {
+                    if (ctx.Osoba.Find(osobaPregled.IdentifikacijskiBroj) != null)
+                    {
+                        try
+                        {
+                            TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
+                            TempData[Constants.ErrorOccurred] = false;
+
+                            await ctx.SaveChangesAsync();
+
+                            return RedirectToAction(nameof(Details), new { id });
+                        }
+                        catch (Exception exc)
+                        {
+                            ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                            return View(pc);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
+                        return View(pc);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
+                    return View(pc);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(EditDetail), new { id });
+            }
+        }
+
         private decimal NewId()
         {
             var maxId = ctx.Pregled
