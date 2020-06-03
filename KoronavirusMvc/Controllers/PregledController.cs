@@ -370,10 +370,12 @@ namespace KoronavirusMvc.Controllers
         public IActionResult RemoveSimptom(int SifraPregleda, int SifraSimptoma)
         {
             var pregledSimptom = ctx.PregledSimptom.Find(SifraSimptoma, SifraPregleda);
+
             if (pregledSimptom == null)
             {
                 return NotFound();
             }
+
             else
             {
                 try
@@ -381,15 +383,24 @@ namespace KoronavirusMvc.Controllers
                     ctx.Remove(pregledSimptom);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Simptom {pregledSimptom.SifraSimptoma} uspješno uklonjen.";
-                    TempData[Constants.ErrorOccurred] = false;
+                    var result = new
+                    {
+                        message = $"Simptom {pregledSimptom.SifraSimptoma} uspješno uklonjen.",
+                        successful = true
+                    };
+
+                    return Json(result);
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccurred] = true;
+                    var result = new
+                    {
+                        message = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+
+                    return Json(result);
                 }
-                return RedirectToAction(nameof(Details), new { id = SifraPregleda });
             }
         }
 
@@ -398,10 +409,12 @@ namespace KoronavirusMvc.Controllers
         public IActionResult RemoveTerapija(int SifraPregleda, int SifraTerapije)
         {
             var pregledTerapija = ctx.PregledTerapija.Find(SifraPregleda, SifraTerapije);
+
             if (pregledTerapija == null)
             {
                 return NotFound();
             }
+
             else
             {
                 try
@@ -409,15 +422,24 @@ namespace KoronavirusMvc.Controllers
                     ctx.Remove(pregledTerapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Terapija {pregledTerapija.SifraTerapije} uspješno uklonjena.";
-                    TempData[Constants.ErrorOccurred] = false;
+                    var result = new
+                    {
+                        message = $"Terapija {pregledTerapija.SifraTerapije} uspješno uklonjena.",
+                        successful = true
+                    };
+
+                    return Json(result);
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom uklanjanja terapije." + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccurred] = true;
+                    var result = new
+                    {
+                        message = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+
+                    return Json(result);
                 }
-                return RedirectToAction(nameof(Details), new { id = SifraPregleda });
             }
         }
 

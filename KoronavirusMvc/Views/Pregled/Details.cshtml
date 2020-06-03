@@ -43,7 +43,7 @@
     </dl>
 
     <a asp-action="EditDetail"
-        asp-route-id="@Model.Pregled.SifraPregleda">
+       asp-route-id="@Model.Pregled.SifraPregleda">
         Ažuriraj pregled
     </a>
 </div>
@@ -73,7 +73,7 @@
                     <form asp-action="RemoveSimptom" method="post">
                         <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
                         <input type="hidden" name="SifraSimptoma" value="@simptom.SifraSimptoma" />
-                        <button type="submit" class="btn btn-sm btn-danger delete" title="Ukloni">
+                        <button data-sifraSimptoma="@simptom.SifraSimptoma" data-sifraPregleda="@Model.Pregled.SifraPregleda" type="submit" class="btn btn-sm btn-danger deletesimptom" title="Ukloni">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </form>
@@ -96,18 +96,18 @@
     <tbody>
         @foreach (var terapija in @Model.Terapije)
         {
-         <tr>
-            <td class="text-left">@terapija.OpisTerapije</td>
-            <td class="btn-group" style="float: right;">
-                <form asp-action="RemoveTerapija" method="post">
-                    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
-                    <input type="hidden" name="SifraTerapije" value="@terapija.SifraTerapije" />
-                    <button type="submit" class="btn btn-sm btn-danger delete" title="Ukloni">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
-            </td>
-         </tr>
+            <tr>
+                <td class="text-left">@terapija.OpisTerapije</td>
+                <td class="btn-group" style="float: right;">
+                    <form asp-action="RemoveTerapija" method="post">
+                        <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+                        <input type="hidden" name="SifraTerapije" value="@terapija.SifraTerapije" />
+                        <button type="submit" data-sifraTerapije="@terapija.SifraTerapije" data-sifraPregleda="@Model.Pregled.SifraPregleda" class="btn btn-sm btn-danger deleteterapija" title="Ukloni">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
@@ -116,4 +116,13 @@
     <a asp-action="Index">Natrag na listu pregleda</a>
 </div>
 
-
+@section scripts {
+    <script type="text/javascript">
+        $(function(){
+            SetDeleteSimptom(".deletesimptom", '@Url.Action("RemoveSimptom")', 'sifrasimptoma', 'sifrapregleda');
+        });
+        $(function(){
+            SetDeleteTerapija(".deleteterapija", '@Url.Action("RemoveTerapija")', 'sifraterapije', 'sifrapregleda');
+        });
+    </script>
+}
