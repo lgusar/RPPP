@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using KoronavirusMvc.Extensions;
+﻿using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -333,23 +332,12 @@ namespace KoronavirusMvc.Controllers
 
             var osoba = await ctx.OsobaPregled.FirstOrDefaultAsync(p => p.SifraPregleda == id);
 
-            string idOsoba = "";
-
-            if (osoba == null)
-            {
-                idOsoba = "Nema ident. broj osobe";
-            }
-            else
-            {
-                idOsoba = osoba.IdentifikacijskiBroj;
-            }
-
             var model = new PregledDetailViewModel
             {
                 Pregled = pregled,
                 Simptomi = simptomi,
                 Terapije = terapije,
-                IdOsoba = idOsoba
+                OsobaPregled = osoba
             };
 
             return View(model);
@@ -434,7 +422,7 @@ namespace KoronavirusMvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditDetail(int id)
+        public async Task<IActionResult> EditDetail(int id)
         {
             var pregled = ctx.Pregled
                              .AsNoTracking()
@@ -445,16 +433,42 @@ namespace KoronavirusMvc.Controllers
                              .Where(p => p.SifraPregleda == id)
                              .FirstOrDefault();
 
+            pregled.PregledSimptom = ctx.PregledSimptom.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Simptom> simptomi = new List<Simptom>();
+
+            foreach (PregledSimptom ps in pregled.PregledSimptom)
+            {
+                var simptom = await ctx.Simptom.FirstOrDefaultAsync(p => p.SifraSimptoma == ps.SifraSimptoma);
+                simptomi.Add(simptom);
+            }
+
+            pregled.PregledTerapija = ctx.PregledTerapija.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Terapija> terapije = new List<Terapija>();
+
+            foreach (PregledTerapija pt in pregled.PregledTerapija)
+            {
+                var terapija = await ctx.Terapija.FirstOrDefaultAsync(p => p.SifraTerapije == pt.SifraTerapije);
+                terapije.Add(terapija);
+            }
+
             if (pregled == null)
             {
                 return NotFound($"Ne postoji pregled s tom šifrom: {id}");
             }
             else
             {
-                return View(new PregledCreateViewModel
+                return View(new PregledDetailViewModel
                 {
                     Pregled = pregled,
-                    OsobaPregled = idOsoba
+                    OsobaPregled = idOsoba,
+                    Simptomi = simptomi,
+                    Terapije = terapije
                 });
             }
         }
