@@ -26,7 +26,7 @@ namespace KoronavirusMvc
                 string password = Configuration["RPPP09SqlPassword"];
                 connString = connString.Replace("sifra", password);
                 options.UseSqlServer(connString);
-            } );
+            });
 
             var appSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSection);
@@ -45,6 +45,10 @@ namespace KoronavirusMvc
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute("Stozeri i sastanci",
+                    "{controller:regex(^(Stozer|Sastanak)$)}/Page{page}/Sort{sort:int}/ASC-{ascending:bool}",
+                        new { action = "Index" }
+                 );
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"

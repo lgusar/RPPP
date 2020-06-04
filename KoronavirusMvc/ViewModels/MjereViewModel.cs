@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace KoronavirusMvc.ViewModels
 {
-    public class StozeriViewModel
+    public class MjereViewModel
     {
-        public IEnumerable<StozerViewModel> Stozeri { get; set; }
+        public IEnumerable<MjeraViewModel> Mjere { get; set; }
         public PagingInfo PagingInfo { get; set; }
     }
 }
