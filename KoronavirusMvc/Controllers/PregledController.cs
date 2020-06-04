@@ -4,6 +4,7 @@ using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -18,9 +19,12 @@ namespace KoronavirusMvc.Controllers
 
         private readonly AppSettings appSettings;
 
-        public PregledController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<PregledController> logger;
+
+        public PregledController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<PregledController> logger)
         {
             this.ctx = ctx;
+            this.logger = logger;
             appSettings = optionsSnapshot.Value;
         }
 
@@ -40,11 +44,13 @@ namespace KoronavirusMvc.Controllers
                     ctx.Remove(pregled);
                     ctx.SaveChanges();
 
+                    logger.LogInformation($"Pregled {pregled.SifraPregleda} obrisan.");
                     TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno obrisan.";
                     TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
+                    logger.LogError($"Pogreška prilikom brisanja pregleda {exc.CompleteExceptionMessage()} ");
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja pregleda." + exc.CompleteExceptionMessage();
                     TempData[Constants.ErrorOccurred] = true;
                 }
@@ -105,6 +111,7 @@ namespace KoronavirusMvc.Controllers
 
                         ctx.SaveChanges();
 
+                        logger.LogInformation($"Pregled {pregledCreate.Pregled.SifraPregleda} dodan.");
                         TempData[Constants.Message] = $"Pregled {pregledCreate.Pregled.SifraPregleda} uspješno dodan.";
                         TempData[Constants.ErrorOccurred] = false;
                         return RedirectToAction(nameof(Index));
@@ -112,6 +119,7 @@ namespace KoronavirusMvc.Controllers
 
                     else
                     {
+                        logger.LogError($"Ne postoji osoba s tim identifikacijskim brojem.");
                         TempData[Constants.Message] = $"Ne postoji osoba s tim identifikacijskim brojem.";
                         TempData[Constants.ErrorOccurred] = true;
                         prepareDropDownTerapije();
@@ -121,6 +129,7 @@ namespace KoronavirusMvc.Controllers
                 }
                 catch (Exception exc)
                 {
+                    logger.LogError($"Pogreška prilikom dodavanja pregleda {exc.CompleteExceptionMessage()} ");
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                     prepareDropDownTerapije();
                     prepareDropDownSimptomi();
@@ -200,23 +209,26 @@ namespace KoronavirusMvc.Controllers
                             TempData[Constants.ErrorOccurred] = false;
 
                             await ctx.SaveChangesAsync();
-
+                            logger.LogInformation($"Pregled {pregled.SifraPregleda} uspješno ažuriran.");
                             return RedirectToAction(nameof(Index), new { page, sort, ascending });
                         }
                         catch (Exception exc)
                         {
+                            logger.LogError($"Pogreška prilikom ažuriranja pregleda {exc.CompleteExceptionMessage()} ");
                             ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                             return View(pc);
                         }
                     }
                     else
                     {
+                        logger.LogError($"Ne postoji osoba s tim identifikacijskim brojem.");
                         ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
                         return View(pc);
                     }
                 }
                 else
                 {
+                    logger.LogError($"Podatke o pregledu nije moguće povezati s forme.");
                     ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
                     return View(pc);
                 }
@@ -225,7 +237,7 @@ namespace KoronavirusMvc.Controllers
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
                 TempData[Constants.ErrorOccurred] = true;
-
+                logger.LogError($"Pogreška prilikom ažuriranja pregleda {exc.CompleteExceptionMessage()} ");
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
         }
@@ -388,7 +400,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Simptom {pregledSimptom.SifraSimptoma} uspješno uklonjen.",
                         successful = true
                     };
-
+                    logger.LogInformation($"Simptom {pregledSimptom.SifraSimptoma} uspješno uklonjen.");
                     return Json(result);
                 }
                 catch (Exception exc)
@@ -398,7 +410,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage(),
                         successful = false
                     };
-
+                    logger.LogError($"Pogreška prilikom uklanjanja simptoma. {exc.CompleteExceptionMessage()} ");
                     return Json(result);
                 }
             }
@@ -427,6 +439,7 @@ namespace KoronavirusMvc.Controllers
                         message = $"Terapija {pregledTerapija.SifraTerapije} uspješno uklonjena.",
                         successful = true
                     };
+
 
                     return Json(result);
                 }
