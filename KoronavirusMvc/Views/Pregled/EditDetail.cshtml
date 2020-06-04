@@ -42,6 +42,27 @@
 
 <h4>Simptomi</h4>
 
+<form asp-action="DodajSimptome" method="post">
+    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+    <div class="form-group">
+        <label>Terapije</label>
+        <div><span asp-validation-for="Simptomi" class="text-danger"></span></div>
+        <select multiple class="form-control" asp-for="Simptomi" asp-items="ViewBag.Simptomi">
+            <option disabled selected value="">Odaberite simptome</option>
+        </select>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj simptome</button>
+    </div>
+</form>
+
+<p>
+
+
+
+
+</p>
+
 <table class="table table-sm table-striped table-hover" id="tablesimptomi">
     <thead>
         <tr>
@@ -70,6 +91,26 @@
 </table>
 
 <h4>Terapije</h4>
+<form asp-action="DodajTerapije" method="post">
+    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+    <div class="form-group">
+        <label>Terapije</label>
+        <div><span asp-validation-for="Terapije" class="text-danger"></span></div>
+        <select multiple class="form-control" asp-for="Terapije" asp-items="ViewBag.Terapije">
+            <option disabled selected value="">Odaberite terapije</option>
+        </select>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj terapije</button>
+    </div>
+</form>
+
+<p>
+
+
+
+
+</p>
 
 <table class="table table-sm table-striped table-hover" id="tableterapije">
     <thead>
@@ -104,11 +145,11 @@
 
 @section scripts {
     <script type="text/javascript">
-        $(function(){
-            SetDeleteSimptom(".deletesimptom", '@Url.Action("RemoveSimptom")', 'sifrasimptoma', 'sifrapregleda');
-        });
-        $(function(){
-            SetDeleteTerapija(".deleteterapija", '@Url.Action("RemoveTerapija")', 'sifraterapije', 'sifrapregleda');
-        });
+    $(function(){
+        SetDeleteSimptom(".deletesimptom", '@Url.Action("RemoveSimptom")', 'sifrasimptoma', 'sifrapregleda');
+    });
+    $(function(){
+        SetDeleteTerapija(".deleteterapija", '@Url.Action("RemoveTerapija")', 'sifraterapije', 'sifrapregleda');
+    });
     </script>
 }

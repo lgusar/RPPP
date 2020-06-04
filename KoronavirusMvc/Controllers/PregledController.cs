@@ -445,7 +445,10 @@ namespace KoronavirusMvc.Controllers
 
         [HttpGet]
         public async Task<IActionResult> EditDetail(int id)
-        {
+        {;
+            prepareDropDownTerapije();
+            prepareDropDownSimptomi();
+
             var pregled = ctx.Pregled
                              .AsNoTracking()
                              .Where(p => p.SifraPregleda == id)
@@ -555,6 +558,68 @@ namespace KoronavirusMvc.Controllers
 
                 return RedirectToAction(nameof(EditDetail), new { id });
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DodajSimptome(int SifraPregleda, List<string> simptomi)
+        {
+            foreach (var opis in simptomi)
+            {
+                var simptom = ctx.Simptom.AsNoTracking().Where(p => p.Opis == opis).FirstOrDefault();
+
+                if (simptom != null)
+                {
+                    ctx.Add(new PregledSimptom
+                    {
+                        SifraPregleda = SifraPregleda,
+                        SifraSimptoma = simptom.SifraSimptoma
+                    });
+                }
+                else
+                {
+                    TempData[Constants.Message] = $"Simptomi nisu dodani.";
+                    TempData[Constants.ErrorOccurred] = true;
+                    return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
+                }
+            }
+
+            ctx.SaveChanges();
+
+            TempData[Constants.Message] = $"Simptomi uspješno dodani.";
+            TempData[Constants.ErrorOccurred] = false;
+            return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DodajTerapije(int SifraPregleda, List<string> terapije)
+        {
+            foreach (var opis in terapije)
+            {
+                var terapija = ctx.Terapija.AsNoTracking().Where(p => p.OpisTerapije == opis).FirstOrDefault();
+
+                if (terapija != null)
+                {
+                    ctx.Add(new PregledTerapija
+                    {
+                        SifraPregleda = SifraPregleda,
+                        SifraTerapije = terapija.SifraTerapije
+                    });
+                }
+                else
+                {
+                    TempData[Constants.Message] = $"Terapije nisu dodane.";
+                    TempData[Constants.ErrorOccurred] = true;
+                    return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
+                }
+            }
+
+            ctx.SaveChanges();
+
+            TempData[Constants.Message] = $"Terapije uspješno dodane.";
+            TempData[Constants.ErrorOccurred] = false;
+            return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
         }
 
         private decimal NewId()
