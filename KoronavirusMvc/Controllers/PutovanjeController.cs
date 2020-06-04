@@ -117,6 +117,76 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var putovanje = _context.Putovanje
+                .AsNoTracking()
+                .Where(d => d.SifraPutovanja == id)
+                .FirstOrDefault();
+
+            if (putovanje == null)
+            {
+                return NotFound($"Ne postoji putovanje s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                await PrepareDropdownLists();
+                return View(putovanje);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Putovanje putovanje = await _context.Putovanje.FindAsync(id);
+                if (putovanje == null)
+                {
+                    return NotFound($"Ne postoji putovanje s identifikacijskom oznakom {id}");
+                }
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Putovanje>(putovanje, "", z => z.DatumPolaska, z => z.DatumVracanja, z => z.IdentifikacijskiBroj);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o putovanju uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
+                        return View(putovanje);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o drzavi nije moguće povezati s forme");
+                    await PrepareDropdownLists();
+                    return View(putovanje);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraPutovanja, int page = 1, int sort = 1, bool ascending = true)
