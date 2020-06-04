@@ -127,6 +127,77 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var statistika = _context.Statistika
+                .AsNoTracking()
+                .Where(d => d.SifraObjave == id)
+                .FirstOrDefault();
+
+            if (statistika == null)
+            {
+                return NotFound($"Ne postoji statistika s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                await PrepareDropdownLists();
+                return View(statistika);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Statistika statistika = await _context.Statistika.FindAsync(id);
+                if (statistika == null)
+                {
+                    return NotFound($"Ne postoji statistika s identifikacijskom oznakom {id}");
+                }
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Statistika>(statistika, "", z => z.SifraGrada, z => z.SifraOrganizacije, z => z.BrojSlucajeva, 
+                                                                            z => z.BrojUmrlih, z => z.BrojIzlijecenih, z => z.BrojAktivnih, z => z.Datum);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o statistici uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
+                        return View(statistika);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o statistici nije moguće povezati s forme");
+                    await PrepareDropdownLists();
+                    return View(statistika);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraObjave, int page = 1, int sort = 1, bool ascending = true)
