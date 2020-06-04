@@ -171,58 +171,58 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(string idOsoba, string idKontakt)
-        {
-            Kontakt kontakt = await ctx.Kontakt
-                             .AsNoTracking()
-                             .Where(m => (m.IdOsoba == idOsoba && m.IdKontakt == idKontakt) || (m.IdOsoba == idKontakt && m.IdKontakt == idOsoba))
-                             .FirstOrDefaultAsync();
-            if (kontakt != null)
-            {
-                return PartialView(kontakt);
-            }
-            else
-            {
-                return NotFound($"Neispravan id osobe: {idOsoba}");
-            }
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Edit(string idOsoba, string idKontakt)
+        //{
+        //    Kontakt kontakt = await ctx.Kontakt
+        //                     .AsNoTracking()
+        //                     .Where(m => (m.IdOsoba == idOsoba && m.IdKontakt == idKontakt) || (m.IdOsoba == idKontakt && m.IdKontakt == idOsoba))
+        //                     .FirstOrDefaultAsync();
+        //    if (kontakt != null)
+        //    {
+        //        return PartialView(kontakt);
+        //    }
+        //    else
+        //    {
+        //        return NotFound($"Neispravan id osobe: {idOsoba}");
+        //    }
+        //}
 
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public IActionResult Update(Kontakt kontakt)
-        {
-            logger.LogTrace(JsonSerializer.Serialize(kontakt));
-            if (kontakt == null)
-            {
-                return NotFound("Nema poslanih podataka");
-            }
-            bool checkId = ctx.Kontakt.Any(m => m.IdOsoba == kontakt.IdOsoba && m.IdKontakt == kontakt.IdKontakt || m.IdOsoba == kontakt.IdKontakt && m.IdKontakt == kontakt.IdOsoba);
-            if (!checkId)
-            {
-                return NotFound($"Neispravan identifikacijski broj zarazene osobe: {kontakt?.IdOsoba}");
-            }
+        //[HttpPost, ActionName("Edit")]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Update(Kontakt kontakt)
+        //{
+        //    logger.LogTrace(JsonSerializer.Serialize(kontakt));
+        //    if (kontakt == null)
+        //    {
+        //        return NotFound("Nema poslanih podataka");
+        //    }
+        //    bool checkId = ctx.Kontakt.Any(m => m.IdOsoba == kontakt.IdOsoba && m.IdKontakt == kontakt.IdKontakt || m.IdOsoba == kontakt.IdKontakt && m.IdKontakt == kontakt.IdOsoba);
+        //    if (!checkId)
+        //    {
+        //        return NotFound($"Neispravan identifikacijski broj zarazene osobe: {kontakt?.IdOsoba}");
+        //    }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    ctx.Update(kontakt);
-                    ctx.SaveChanges();
-                    logger.LogInformation($"Osoba ažurirana");
-                    return View(nameof(Index), new { idOsoba = kontakt.IdOsoba, idKontakt = kontakt.IdKontakt });
-                }
-                catch (Exception exc)
-                {
-                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                    logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
-                    return View(kontakt);
-                }
-            }
-            else
-            {
-                return View(kontakt);
-            }
-        }
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            ctx.Update(kontakt);
+        //            ctx.SaveChanges();
+        //            logger.LogInformation($"Osoba ažurirana");
+        //            return View(nameof(Index), new { idOsoba = kontakt.IdOsoba, idKontakt = kontakt.IdKontakt });
+        //        }
+        //        catch (Exception exc)
+        //        {
+        //            ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+        //            logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
+        //            return View(kontakt);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        return View(kontakt);
+        //    }
+        //}
     }
 }
