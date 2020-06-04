@@ -6,6 +6,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,14 +24,22 @@ namespace KoronavirusMvc.Controllers
             _appSettings = appSettings.Value;
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PrepareDropdownLists();
             return View();
         }
 
+        private async Task PrepareDropdownLists()
+        {
+            var drzava = await _context.Drzava.OrderBy(d => d.ImeDrzave).Select(d => new { d.ImeDrzave, d.SifraDrzave }).ToListAsync();
+            ViewBag.Drzave = new SelectList(drzava, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave));
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Lokacija lokacija)
+        public async Task<IActionResult> Create(Lokacija lokacija)
         {
             if (ModelState.IsValid)
             {
@@ -47,11 +56,13 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.CompleteExceptionMessage());
+                    await PrepareDropdownLists();
                     return View(lokacija);
                 }
             }
             else
             {
+                await PrepareDropdownLists();
                 return View(lokacija);
             }
         }

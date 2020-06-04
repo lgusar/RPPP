@@ -15,8 +15,11 @@
             <input asp-for="DatumVracanja" class="form-control" />
         </div>
         <div class="form-group">
-            <label asp-for="IdentifikacijskiBroj">Identifikacijski broj osobe</label>
-            <input asp-for="IdentifikacijskiBroj" class="form-control" />
+            <label asp-for="IdentifikacijskiBroj">Osoba</label>
+            <div><span asp-validation-for="IdentifikacijskiBroj" class="text-danger"></span></div>
+            <select class="form-control" asp-for="IdentifikacijskiBroj" asp-items="ViewBag.Osobe">
+                <option selected value="" disabled>Odaberite osobu</option>
+            </select>
         </div>
         <div class="text-center">
             <button class="btn btn-primary" type="submit">Dodaj</button>

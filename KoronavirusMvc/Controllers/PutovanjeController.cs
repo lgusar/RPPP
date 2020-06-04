@@ -6,6 +6,8 @@ using KoronavirusMvc.Models;
 using Microsoft.Extensions.Options;
 using KoronavirusMvc.ViewModels;
 using KoronavirusMvc.Extensions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -21,11 +23,20 @@ namespace KoronavirusMvc.Controllers
             _appSettings = appSettings.Value;
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PrepareDropdownLists();
             return View();
         }
-        
+        private async Task PrepareDropdownLists()
+        {
+            var grad = await _context.Lokacija.OrderBy(d => d.ImeGrada).Select(d => new { d.ImeGrada, d.SifraGrada }).ToListAsync();
+            ViewBag.Gradovi = new SelectList(grad, nameof(Lokacija.SifraGrada), nameof(Lokacija.ImeGrada));
+            var osoba = await _context.Osoba.OrderBy(d => d.Ime).Select(d => new { d.Ime, d.IdentifikacijskiBroj }).ToListAsync();
+            ViewBag.Osobe = new SelectList(osoba, nameof(Osoba.IdentifikacijskiBroj), nameof(Osoba.Ime));
+
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Putovanje putovanje)
