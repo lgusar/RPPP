@@ -91,18 +91,12 @@ namespace KoronavirusMvc.Controllers
                     orderSelector = k => k.IdOsoba;
                     break;
                 case 2:
-                    orderSelector = k => k.IdOsobaNavigation.Ime;
-                    break;
-                case 3:
-                    orderSelector = k => k.IdOsobaNavigation.Prezime;
-                    break;
-                case 4:
                     orderSelector = k => k.IdKontaktNavigation.IdentifikacijskiBroj;
                     break;
-                case 5:
+                case 3:
                     orderSelector = k => k.IdKontaktNavigation.Ime;
                     break;
-                case 6:
+                case 4:
                     orderSelector = k => k.IdKontaktNavigation.Prezime;
                     break;
 
@@ -115,6 +109,13 @@ namespace KoronavirusMvc.Controllers
             }
 
             var kontakti = query
+                            .Select(z => new KontaktViewModel
+                            {
+                                IdOsobe = z.IdOsoba,
+                                IdKontakt = z.IdKontakt,
+                                ImeKontakt = z.IdKontaktNavigation.Ime,
+                                PrezimeKontakt = z.IdKontaktNavigation.Prezime
+                            })
                             .Skip((page - 1) * pagesize)
                            .Take(pagesize)
                            .ToList();
@@ -128,7 +129,7 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string idOsoba, string idKontakt, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(string idOsoba, string idKontakt)
         {
             Kontakt kontakt = ctx.Kontakt.Where(k => k.IdOsoba == idOsoba && k.IdKontakt == idKontakt).FirstOrDefault();
             Kontakt kontakt2 = ctx.Kontakt.Where(k => k.IdOsoba == idKontakt && k.IdKontakt == idOsoba).FirstOrDefault();
