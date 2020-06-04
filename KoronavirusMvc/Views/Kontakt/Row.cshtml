@@ -2,11 +2,16 @@
 
     <tr>
         <td class="text-left">@Model.IdOsobe</td>
+        <td class="text-left">@Model.ImeOsoba</td>
+        <td class="text-left">@Model.PrezimeOsoba</td>
         <td class="text-left">@Model.IdKontakt</td>
         <td class="text-left">@Model.ImeKontakt</td>
         <td class="text-left">@Model.PrezimeKontakt</td>
         <td>
-            <a class="btn btn-sm" title="Ažuriraj">
+            <a asp-action="Edit"
+               asp-route-idOsoba="@Model.IdOsobe"
+               asp-route-idKontakt="@Model.IdKontakt"
+               class="btn btn-sm" title="Ažuriraj">
                 <i class="fas fa-edit"></i>
             </a>
         </td>

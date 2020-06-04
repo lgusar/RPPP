@@ -10,6 +10,8 @@ namespace KoronavirusMvc.ViewModels
     {
         public string IdOsobe { get; set; }
         public string IdKontakt { get; set; }
+        public string ImeOsoba { get; set; }
+        public string PrezimeOsoba { get; set; }
         public string ImeKontakt { get; set; }
         public string PrezimeKontakt { get; set; }
     }
