@@ -1,20 +1,20 @@
 ﻿$(function () {
-    $('.pagebox').click(function () {
+    $(".pagebox").click(function () {
         $(this).select();
     });
 
-    $('.pagebox').keyup(function (event) {
-        var keycode = event.which;
-        var pageBox = $(this);
+    $(".pagebox").bind('keyup', function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        var pagebox = $(this);
         if (keycode == 13) {
-            if (validRange(pageBox.val(), pageBox.data("min"), pageBox.data("max"))) {
-                var link = pageBox.data('url');
-                link = link.replace('-1', pageBox.val());
+            if (validRange(pagebox.val(), pagebox.data('min'), pagebox.data('max'))) {
+                var link = pagebox.data('url');
+                link = link.replace('-1', pagebox.val());
                 window.location = link;
             }
         }
         else if (keycode == 27) {
-            pageBox.val(pageBox.data('current'));
+            pagebox.val(pagebox.data('current'));
         }
     });
 });
@@ -23,10 +23,7 @@ function validRange(str, min, max) {
     var intRegex = /^\d+$/;
     if (intRegex.test(str)) {
         var num = parseInt(str);
-        if (num >= min && num <= max)
-            return true;
-        else
-            return false;
+        return num >= min && num <= max;
     }
     else {
         return false;

@@ -1,21 +1,47 @@
-﻿@model IEnumerable<Preporuka>
+﻿@model KoronavirusMvc.ViewModels.PreporukeViewModel
 @{
     ViewData["Title"] = "Popis preporuka";
 }
 
-<table class="table table-sn table-striped table-hover">
+<a asp-action="Create"> Unos nove preporuke</a>
+
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
+<table class="table table-sn table-striped table-hover" id="tablepreporuke">
     <thead>
         <tr>
-            <th class="text-center">Sifra preporuke</th>
-            <th class="text-center">Sifra organizacije</th>
-            <th class="text-center">Sifra stozera</th>
-            <th class="text-center">Sifra prethodne preporuke</th>
-            <th class="text-center">Opis</th>
-            <th class="text-center">Vrijeme objave</th>
+            <th class="text-center">
+                <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                    Sifra preporuke
+                </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="2" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Sifra organizacije</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Sifra stozera </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="4" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Sifra prethodne preporuke</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="5" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 5 ? !Model.PagingInfo.Ascending : true)">Opis</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="6" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 6 ? !Model.PagingInfo.Ascending : true)">Vrijeme objave</a>
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var preporuka in Model)
+        @foreach (var preporuka in Model.Preporuke)
         {
             <tr>
                 <td class="text-center">@preporuka.SifraPreporuke</td>
@@ -24,8 +50,40 @@
                 <td class="text-center">@preporuka.SifraPrethodnePreporuke</td>
                 <td class="text-center">@preporuka.Opis</td>
                 <td class="text-center">@preporuka.VrijemeObjave</td>
+                <td class="btn-group">
+                    
+                    <a asp-action="Edit"
+                          asp-route-id="@preporuka.SifraPreporuke"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending"
+                          class= "btn btn-sm" little="Ažuriraj">
+                          
+                            <i class="fas fa-edit"></i>
+                    </a>
+                    
+                    <form asp-action="Delete" method="POST"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        
+                        <input type="hidden" name="SifraPreporuke" value="@preporuka.SifraPreporuke" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+
+                </td>
             </tr>
         }
 
     </tbody>
 </table>
+
+@section styles{
+
+}
+
+@section scripts{
+    
+}

@@ -43,7 +43,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(drzava);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Putovanje {drzava.SifraDrzave} uspjesno dodano.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 
@@ -93,18 +93,31 @@ namespace KoronavirusMvc.Controllers
         // POST: Drzava/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(string SifraDrzave, int page = 1, int sort = 1, bool ascending = true)
         {
-            try
-            {
-                // TODO: Add delete logic here
+                var drzava = _context.Drzava.Find(SifraDrzave);
+                if(drzava == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    try
+                    {
+                    string naziv = drzava.ImeDrzave;
+                    _context.Remove(drzava);
+                    _context.SaveChanges();
+                    TempData[Constants.Message] = $"Država {naziv} je uspješno pobrisana.";
+                    TempData[Constants.ErrorOccurred] = false;
+                    }
+                    catch(Exception ex)
+                    {
+                    TempData[Constants.Message] = $"Pogreska prilikom brisanja drzave: " + ex.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                    }
+                return RedirectToAction(nameof(Index), new {page, sort, ascending });
+                }
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
         }
 
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)

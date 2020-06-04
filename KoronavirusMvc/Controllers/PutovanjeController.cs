@@ -37,7 +37,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(putovanje);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Putovanje {putovanje.SifraPutovanja} uspjesno dodano.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 
@@ -104,6 +104,36 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int SifraPutovanja, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var putovanje = _context.Putovanje.Find(SifraPutovanja);
+
+            if (putovanje == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    int naziv = putovanje.SifraPutovanja;
+                    _context.Remove(putovanje);
+                    _context.SaveChanges();
+                    TempData[Constants.Message] = $"Putovanje {naziv} je uspješno obrisano.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception ex)
+                {
+                    TempData[Constants.Message] = $"Pogreska prilikom brisanja putovanja: " + ex.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+
         }
     }
 }

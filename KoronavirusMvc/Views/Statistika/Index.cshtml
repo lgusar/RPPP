@@ -7,6 +7,10 @@
 <h1>Statistike</h1>
 <a asp-action="Create">Unos novih podataka </a>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
 <table class="table table-sm table-striped table-hover" id="tableStatistike">
     <thead>
         <tr>
@@ -45,6 +49,7 @@
                    asp-route-page="@Model.PagingInfo.CurrentPage"
                    asp-route-ascending="@(Model.PagingInfo.Sort == 7 ? !Model.PagingInfo.Ascending : true)">Broj izlječenih u posljednji 24 sata: </a>
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -58,6 +63,17 @@
             <td class="text-left">@item.BrojAktivnih</td>
             <td class="text-left">@item.BrojUmrlih</td>
             <td class="text-left">@item.BrojIzlijecenih</td>
+            <td class=" btn-group">
+                <form asp-action="Delete" method="POST"
+                      asp-route-page="@Model.PagingInfo.CurrentPage"
+                      asp-route-sort="@Model.PagingInfo.Sort"
+                      asp-route-ascending="@Model.PagingInfo.Ascending">
+                    <input type="hidden" name="SifraObjave" value="@item.SifraObjave" />
+                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
         </tr>
         }
     </tbody>

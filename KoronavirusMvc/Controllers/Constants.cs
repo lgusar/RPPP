@@ -12,7 +12,7 @@ namespace KoronavirusMvc.Controllers
         {
             get { return "Message"; }
         }
-        public static string ErrorOccured
+        public static string ErrorOccurred
         {
             get { return "ErrorOccured"; }
         }

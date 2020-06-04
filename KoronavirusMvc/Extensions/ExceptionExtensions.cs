@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace KoronavirusMvc
+namespace KoronavirusMvc.Extensions
 {
     /// <summary>
     /// Razred sa proširenjima za iznimke

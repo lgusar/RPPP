@@ -1,28 +1,79 @@
-﻿@model IEnumerable<Oprema>
+﻿@model KoronavirusMvc.ViewModels.OpremaViewModel
 @{
-    ViewData["Title"] = "Popis Opreme";
+    ViewData["Title"] = "Popis opreme";
 }
 
-<table class="table table-sn table-striped table-hover">
+<a asp-action="Create"> Unos nove opreme</a>
+
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
+<table class="table table-sn table-striped table-hover" id="tableoprema">
     <thead>
         <tr>
-            <th class="text-center">Sifra opreme</th>
-            <th class="text-center">Sifra institucije</th>
-            <th class="text-center">Naziv opreme</th>
-            <th class="text-center">Količina opreme</th>
-
+            <th class="text-center">
+                <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                    Sifra opreme
+                </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="2" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Sifra institucije</a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">Naziv opreme </a>
+            </th>
+            <th class="text-center">
+                <a asp-route-sort="4" asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 4 ? !Model.PagingInfo.Ascending : true)">Kolicina opreme</a>
+            </th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var oprema in Model)
+        @foreach (var oprema in Model.Opremas)
         {
-        <tr>
-            <td class="text-center">@oprema.SifraOpreme</td>
-            <td class="text-center">@oprema.SifraInstitucije</td>
-            <td class="text-center">@oprema.NazivOpreme</td>
-            <td class="text-center">@oprema.KolicinaOpreme</td>
-        </tr>
+            <tr>
+                <td class="text-center">@oprema.SifraOpreme</td>
+                <td class="text-center">@oprema.SifraInstitucije</td>
+                <td class="text-center">@oprema.NazivOpreme</td>
+                <td class="text-center">@oprema.KolicinaOpreme</td>
+                <td class="btn-group">
+
+                    <a asp-action="Edit"
+                       asp-route-id="@oprema.SifraInstitucije"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" little="Ažuriraj">
+
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="POST"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+
+                        <input type="hidden" name="SifraOpreme" value="@oprema.SifraOpreme" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+
+                </td>
+            </tr>
         }
 
     </tbody>
 </table>
+
+@section styles{
+
+}
+
+@section scripts{
+
+}

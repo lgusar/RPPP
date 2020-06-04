@@ -39,7 +39,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(statistika);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Putovanje {statistika.SifraObjave} uspjesno dodano.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 
@@ -115,6 +115,36 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int SifraObjave, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var statistika = _context.Statistika.Find(SifraObjave);
+
+            if (statistika == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    int naziv = statistika.SifraObjave;
+                    _context.Remove(statistika);
+                    _context.SaveChanges();
+                    TempData[Constants.Message] = $"Statistika broja {naziv} je uspješno obrisana.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception ex)
+                {
+                    TempData[Constants.Message] = $"Pogreska prilikom brisanja statistike: " + ex.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+
         }
     }
 }

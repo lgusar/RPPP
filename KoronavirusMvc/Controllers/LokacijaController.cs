@@ -39,7 +39,7 @@ namespace KoronavirusMvc.Controllers
                     _context.Add(lokacija);
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Grad {lokacija.SifraGrada} uspjesno dodan.";
-                    TempData[Constants.ErrorOccured] = false;
+                    TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
 
@@ -103,6 +103,36 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int SifraGrada, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var lokacija = _context.Lokacija.Find(SifraGrada);
+                                  
+            if (lokacija == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                try
+                {
+                    string naziv = lokacija.ImeGrada;
+                    _context.Remove(lokacija);
+                    _context.SaveChanges();
+                    TempData[Constants.Message] = $"Grad {naziv} je uspješno obrisan.";
+                    TempData[Constants.ErrorOccurred] = false;
+                }
+                catch (Exception ex)
+                {
+                    TempData[Constants.Message] = $"Pogreska prilikom brisanja grada: " + ex.CompleteExceptionMessage();
+                    TempData[Constants.ErrorOccurred] = true;
+                }
+                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+
         }
     }
 }
