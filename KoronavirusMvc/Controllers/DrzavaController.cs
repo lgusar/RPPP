@@ -42,7 +42,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     _context.Add(drzava);
                     _context.SaveChanges();
-                    TempData[Constants.Message] = $"Putovanje {drzava.SifraDrzave} uspjesno dodano.";
+                    TempData[Constants.Message] = $"Država {drzava.SifraDrzave} uspjesno dodano.";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));

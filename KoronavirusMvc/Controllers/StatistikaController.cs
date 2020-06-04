@@ -38,7 +38,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     _context.Add(statistika);
                     _context.SaveChanges();
-                    TempData[Constants.Message] = $"Putovanje {statistika.SifraObjave} uspjesno dodano.";
+                    TempData[Constants.Message] = $"Statistika {statistika.SifraObjave} uspjesno dodano.";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
