@@ -116,6 +116,76 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var lokacija = _context.Lokacija
+                .AsNoTracking()
+                .Where(d => d.SifraGrada == id)
+                .FirstOrDefault();
+
+            if (lokacija == null)
+            {
+                return NotFound($"Ne postoji lokacija s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                await PrepareDropdownLists();
+                return View(lokacija);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Lokacija lokacija = await _context.Lokacija.FindAsync(id);
+                if (lokacija == null)
+                {
+                    return NotFound($"Ne postoji lokacija s identifikacijskom oznakom {id}");
+                }
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Lokacija>(lokacija, "", z => z.ImeGrada, z => z.SifraDrzave);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o putovanju uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
+                        return View(lokacija);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o gradu nije moguće povezati s forme");
+                    await PrepareDropdownLists();
+                    return View(lokacija);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraGrada, int page = 1, int sort = 1, bool ascending = true)
