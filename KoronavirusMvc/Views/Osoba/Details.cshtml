@@ -48,7 +48,7 @@
         <dt class="col-sm-2">
             @Html.DisplayName("Zaražen/a?")
         </dt>
-        <dd class="col-sm-10">
+        <dd class="col-sm-10" id="zarazenostanje">
             @Html.DisplayFor(model => model.Zarazenastring)
         </dd>
     </dl>
@@ -73,7 +73,7 @@
                     <td class="text-left">@Model.DatZaraze</td>
                     <td class="text-left">@Model.NazivStanja</td>
                     <td class="btn-group">
-                        <a asp-action="Edit"
+                        <a asp-action="EditZarazenaOsoba"
                            asp-route-id="@Model.IdentifikacijskiBroj"
                            class="btn btn-sm" title="Ažuriraj">
                             <i class="fas fa-edit"></i>

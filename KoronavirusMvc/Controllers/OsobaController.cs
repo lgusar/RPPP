@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
@@ -69,10 +70,10 @@ namespace KoronavirusMvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(string id, int page=1, int sort=1, bool ascending= true)
+        public IActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
         {
             var osoba = ctx.Osoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
-            if(osoba == null)
+            if (osoba == null)
             {
                 return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
             }
@@ -91,8 +92,8 @@ namespace KoronavirusMvc.Controllers
         {
             try
             {
-                Osoba osoba =await ctx.Osoba.FindAsync(id);
-                if(osoba == null)
+                Osoba osoba = await ctx.Osoba.FindAsync(id);
+                if (osoba == null)
                 {
                     return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
                 }
@@ -112,7 +113,7 @@ namespace KoronavirusMvc.Controllers
                         logger.LogInformation($"Osoba {osoba.Ime} {osoba.Prezime} ažurirana");
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
                         logger.LogError($"Pogreška prilikom ažuriranja podataka osobe {exc.CompleteExceptionMessage()}");
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
@@ -125,7 +126,7 @@ namespace KoronavirusMvc.Controllers
                     return View(osoba);
                 }
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
                 TempData[Constants.ErrorOccurred] = true;
@@ -135,7 +136,7 @@ namespace KoronavirusMvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string id, int page=1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(string id, int page = 1, int sort = 1, bool ascending = true)
         {
             var osoba = ctx.Osoba.AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).SingleOrDefault();
             logger.LogTrace(JsonSerializer.Serialize(osoba));
@@ -158,7 +159,7 @@ namespace KoronavirusMvc.Controllers
                     logger.LogInformation($"Osoba {osoba.Ime} {osoba.Prezime} obrisana");
                     return Json(result);
                 }
-                catch(Exception exc)
+                catch (Exception exc)
                 {
                     var result = new
                     {
@@ -187,7 +188,7 @@ namespace KoronavirusMvc.Controllers
                 TotalItems = count
             };
 
-            if(page > pagingInfo.TotalPages)
+            if (page > pagingInfo.TotalPages)
             {
                 return RedirectToAction(nameof(Index), new { page = pagingInfo.TotalItems, sort, ascending });
             }
@@ -215,13 +216,13 @@ namespace KoronavirusMvc.Controllers
                     break;
             }
 
-            if(orderSelector != null)
+            if (orderSelector != null)
             {
                 query = ascending ? query.OrderBy(orderSelector) : query.OrderByDescending(orderSelector);
             }
 
             var osobe = query
-                            .Skip((page -1) * pagesize)
+                            .Skip((page - 1) * pagesize)
                            .Take(pagesize)
                            .ToList();
             var model = new OsobeViewModel
@@ -264,31 +265,31 @@ namespace KoronavirusMvc.Controllers
             var zarazena = ctx.ZarazenaOsoba
                               .Where(z => z.IdentifikacijskiBroj == id)
                               .FirstOrDefault();
-                var osoba = await ctx.Osoba
-                                .Where(z => z.IdentifikacijskiBroj == id)
-                                .Select(z => new OsobaDetailsViewModel
-                                {
-                                    IdentifikacijskiBroj = z.IdentifikacijskiBroj,
-                                    Ime = z.Ime,
-                                    Prezime = z.Prezime,
-                                    Adresa = z.Adresa,
-                                    DatRod = z.DatRod,
-                                    Zanimanje = z.Zanimanje,
-                                    DatZaraze = z.ZarazenaOsoba.DatZaraze,
-                                    Zarazena = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
-                                    Zarazenastring = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? "Da" : "Ne",
-                                    NazivStanja = z.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja,
-                                    Kontakti = kontakti,
-                                    ZarazenaOsoba = z.ZarazenaOsoba
-                                })
-                                .SingleOrDefaultAsync();
+            var osoba = await ctx.Osoba
+                            .Where(z => z.IdentifikacijskiBroj == id)
+                            .Select(z => new OsobaDetailsViewModel
+                            {
+                                IdentifikacijskiBroj = z.IdentifikacijskiBroj,
+                                Ime = z.Ime,
+                                Prezime = z.Prezime,
+                                Adresa = z.Adresa,
+                                DatRod = z.DatRod,
+                                Zanimanje = z.Zanimanje,
+                                DatZaraze = z.ZarazenaOsoba.DatZaraze,
+                                Zarazena = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
+                                Zarazenastring = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? "Da" : "Ne",
+                                NazivStanja = z.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja,
+                                Kontakti = kontakti,
+                                ZarazenaOsoba = z.ZarazenaOsoba
+                            })
+                            .SingleOrDefaultAsync();
 
             //var osoba = await ctx.Osoba
             //    .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
-                if (osoba == null)
-                {
+            if (osoba == null)
+            {
                 return NotFound();
-                }
+            }
 
 
             return View(osoba);
