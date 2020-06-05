@@ -8,6 +8,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets;
 using Microsoft.EntityFrameworkCore;
@@ -238,16 +239,32 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
 
-            List<Kontakt> kontakti = new List<Kontakt>();
+
+            List<KontaktViewModel> kontakti = new List<KontaktViewModel>();
             var kontakt = ctx.Kontakt
                              .Where(k => k.IdOsoba == id)
+                             .Select(k => new KontaktViewModel
+                             {
+                                 IdOsobe = k.IdOsoba,
+                                 IdKontakt = k.IdKontakt,
+                                 ImeOsoba = k.IdOsobaNavigation.Ime,
+                                 PrezimeOsoba = k.IdOsobaNavigation.Prezime,
+                                 ImeKontakt = k.IdKontaktNavigation.Ime,
+                                 PrezimeKontakt = k.IdKontaktNavigation.Prezime
+                             })
                              .ToList();
-            foreach(Kontakt k in kontakt)
+            if (kontakt.Count != 0)
             {
-                kontakti.Add(k);
+                foreach (KontaktViewModel k in kontakt)
+                {
+                    kontakti.Add(k);
+                }
             }
 
-            var osoba = await ctx.Osoba
+            var zarazena = ctx.ZarazenaOsoba
+                              .Where(z => z.IdentifikacijskiBroj == id)
+                              .FirstOrDefault();
+                var osoba = await ctx.Osoba
                                 .Where(z => z.IdentifikacijskiBroj == id)
                                 .Select(z => new OsobaDetailsViewModel
                                 {
@@ -258,19 +275,73 @@ namespace KoronavirusMvc.Controllers
                                     DatRod = z.DatRod,
                                     Zanimanje = z.Zanimanje,
                                     DatZaraze = z.ZarazenaOsoba.DatZaraze,
-                                    zarazena = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
+                                    Zarazena = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
+                                    Zarazenastring = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? "Da" : "Ne",
                                     NazivStanja = z.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja,
-                                    Kontakti = kontakti
+                                    Kontakti = kontakti,
+                                    ZarazenaOsoba = z.ZarazenaOsoba
                                 })
                                 .SingleOrDefaultAsync();
 
             //var osoba = await ctx.Osoba
             //    .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
-            if (osoba == null)
-            {
+                if (osoba == null)
+                {
                 return NotFound();
-            }
+                }
+
+
             return View(osoba);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteZarazenaOsoba(string id, OsobaDetailsViewModel osoba)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .AsNoTracking()
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
+            if (zarazenaOsoba != null)
+            {
+                try
+                {
+
+                    ctx.Remove(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    var result = new
+                    {
+                        message = $"Zaražena osoba obrisana.",
+                        successful = true
+
+                    };
+                    logger.LogInformation($"Osoba obrisana");
+                    return Json(result);
+                }
+                catch (Exception exc)
+                {
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja zaražene osobe: " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    logger.LogError($"Pogreška prilikom brisanja zaražene osobe {exc.CompleteExceptionMessage()}");
+                    return Json(result);
+                }
+            }
+            else
+            {
+                return NotFound($"Zaražena osoba s identifikacijskim brojem {id} ne postoji");
+            }
+
+        }
+
+
+        private void PrepareDropDownLists()
+        {
+            var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
+            ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
     }
 }

@@ -15,10 +15,13 @@ namespace KoronavirusMvc.ViewModels
         public DateTime DatRod { get; set; }
         public string Zanimanje { get; set; }
         public DateTime? DatZaraze { get; set; }
-        public bool zarazena { get; set; }
+        public bool Zarazena { get; set; }
+        public string Zarazenastring { get; set; }
         public string NazivStanja { get; set; }
 
-        public List<Kontakt> Kontakti;
+        public List<KontaktViewModel> Kontakti;
+        public PagingInfo PagingInfo;
+        public ZarazenaOsoba ZarazenaOsoba;
 
     }
 }
