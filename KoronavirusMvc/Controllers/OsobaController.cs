@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -294,9 +294,11 @@ namespace KoronavirusMvc.Controllers
             return View(osoba);
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteZarazenaOsoba(string id, OsobaDetailsViewModel osoba)
+        public IActionResult DeleteZarazenaOsoba(string id)
         {
             var zarazenaOsoba = ctx.ZarazenaOsoba
                              .AsNoTracking()
@@ -334,7 +336,6 @@ namespace KoronavirusMvc.Controllers
             {
                 return NotFound($"Zaražena osoba s identifikacijskim brojem {id} ne postoji");
             }
-
         }
 
 
