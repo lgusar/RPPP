@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
@@ -70,6 +71,7 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(PregledCreateViewModel pregledCreate)
         {
+            logger.LogTrace(JsonSerializer.Serialize(pregledCreate), new JsonSerializerOptions { IgnoreNullValues = true});
             if (ModelState.IsValid)
             {
                 try
@@ -440,6 +442,7 @@ namespace KoronavirusMvc.Controllers
                         successful = true
                     };
 
+                    logger.LogInformation($"Terapija {pregledTerapija.SifraTerapije} uspješno uklonjena.");
 
                     return Json(result);
                 }
@@ -447,9 +450,11 @@ namespace KoronavirusMvc.Controllers
                 {
                     var result = new
                     {
-                        message = $"Pogreška prilikom uklanjanja simptoma." + exc.CompleteExceptionMessage(),
+                        message = $"Pogreška prilikom uklanjanja terapije." + exc.CompleteExceptionMessage(),
                         successful = false
                     };
+
+                    logger.LogError($"Pogreška prilikom uklanjanja terapije." + exc.CompleteExceptionMessage());
 
                     return Json(result);
                 }
@@ -528,6 +533,7 @@ namespace KoronavirusMvc.Controllers
 
                 if (pregled == null)
                 {
+                    logger.LogError($"Ne postoji pregled s tom šifrom {id}");
                     return NotFound($"Ne postoji pregled s tom šifrom {id}");
                 }
 
@@ -542,6 +548,8 @@ namespace KoronavirusMvc.Controllers
                             TempData[Constants.Message] = $"Pregled {pregled.SifraPregleda} uspješno ažuriran.";
                             TempData[Constants.ErrorOccurred] = false;
 
+                            logger.LogInformation($"Pregled {pregled.SifraPregleda} uspješno ažuriran.");
+
                             await ctx.SaveChangesAsync();
 
                             return RedirectToAction(nameof(Details), new { id });
@@ -549,18 +557,21 @@ namespace KoronavirusMvc.Controllers
                         catch (Exception exc)
                         {
                             ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                            logger.LogError($"Greška prilikom ažuriranja pregleda {exc.CompleteExceptionMessage()}");
                             return View(pc);
                         }
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
+                        logger.LogError($"Greška prilikom ažuriranja pregleda. Ne postoji osoba s tim identifikacijskim brojem.");
                         return View(pc);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
+                    logger.LogError($"Greška prilikom ažuriranja pregleda. Podatke o pregledu nije moguće povezati s forme.");
                     return View(pc);
                 }
             }
@@ -568,6 +579,8 @@ namespace KoronavirusMvc.Controllers
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
                 TempData[Constants.ErrorOccurred] = true;
+
+                logger.LogError($"Greška prilikom ažuriranja pregleda. {exc.CompleteExceptionMessage()}");
 
                 return RedirectToAction(nameof(EditDetail), new { id });
             }
@@ -593,6 +606,9 @@ namespace KoronavirusMvc.Controllers
                 {
                     TempData[Constants.Message] = $"Simptomi nisu dodani.";
                     TempData[Constants.ErrorOccurred] = true;
+
+                    logger.LogError($"Simptomi nisu dodani.");
+
                     return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
                 }
             }
@@ -601,6 +617,9 @@ namespace KoronavirusMvc.Controllers
 
             TempData[Constants.Message] = $"Simptomi uspješno dodani.";
             TempData[Constants.ErrorOccurred] = false;
+
+            logger.LogInformation($"Simptomi uspješno dodani.");
+
             return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
         }
 
@@ -624,6 +643,9 @@ namespace KoronavirusMvc.Controllers
                 {
                     TempData[Constants.Message] = $"Terapije nisu dodane.";
                     TempData[Constants.ErrorOccurred] = true;
+
+                    logger.LogError($"Terapije nisu dodane.");
+
                     return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
                 }
             }
@@ -632,6 +654,9 @@ namespace KoronavirusMvc.Controllers
 
             TempData[Constants.Message] = $"Terapije uspješno dodane.";
             TempData[Constants.ErrorOccurred] = false;
+
+            logger.LogInformation($"Terapije uspješno dodane.");
+
             return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
         }
 
