@@ -6,6 +6,7 @@ using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace KoronavirusMvc.Controllers
@@ -16,9 +17,12 @@ namespace KoronavirusMvc.Controllers
 
         private readonly AppSettings appSettings;
 
-        public TerapijaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<TerapijaController> logger;
+
+        public TerapijaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<TerapijaController> logger)
         {
             this.ctx = ctx;
+            this.logger = logger;
             appSettings = optionsSnapshot.Value;
         }
 
@@ -96,18 +100,23 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(terapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Pregled {terapija.SifraTerapije} uspješno dodan.";
+                    TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno dodana.";
                     TempData[Constants.ErrorOccurred] = false;
+
+                    logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno dodana.");
+
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom dodavanja nove terapije {exc.CompleteExceptionMessage()}");
                     return View(terapija);
                 }
             }
             else
             {
+                logger.LogError($"Pogreška prilikom dodavanja nove terapije");
                 return View(terapija);
             }
         }
@@ -129,11 +138,13 @@ namespace KoronavirusMvc.Controllers
                     ctx.SaveChanges();
 
                     TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno obrisana.";
+                    logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno obrisana.");
                     TempData[Constants.ErrorOccurred] = false;
                 }
                 catch (Exception exc)
                 {
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja terapije." + exc.CompleteExceptionMessage();
+                    logger.LogError($"Pogreška prilikom brisanja terapije." + exc.CompleteExceptionMessage());
                     TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -171,7 +182,8 @@ namespace KoronavirusMvc.Controllers
 
                 if (terapija == null)
                 {
-                    return NotFound($"Ne postoji pregled s tom šifrom {id}");
+                    logger.LogError($"Pogreška prilikom ažuriranja terapije. Ne postoji terapija s tom šifrom: {id}");
+                    return NotFound($"Ne postoji terapija s tom šifrom {id}");
                 }
 
                 ViewBag.page = page;
@@ -186,6 +198,8 @@ namespace KoronavirusMvc.Controllers
                         TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno ažurirana.";
                         TempData[Constants.ErrorOccurred] = false;
 
+                        logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno ažurirana.");
+
                         await ctx.SaveChangesAsync();
 
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -193,18 +207,21 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        logger.LogError($"Pogreška prilikom ažuriranja terapije. {exc.CompleteExceptionMessage()}");
                         return View(terapija);
                     }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o terapiji nije moguće povezati s forme.");
+                    logger.LogError($"Pogreška prilikom ažuriranja terapije. Podatke o terapiji nije moguće povezati s forme.");
                     return View(terapija);
                 }
             }
             catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                logger.LogError($"Pogreška prilikom ažuriranja terapije. {exc.CompleteExceptionMessage()}");
                 TempData[Constants.ErrorOccurred] = true;
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
