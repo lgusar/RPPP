@@ -238,14 +238,38 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
 
-            
+            List<Kontakt> kontakti = new List<Kontakt>();
+            var kontakt = ctx.Kontakt
+                             .Where(k => k.IdOsoba == id)
+                             .ToList();
+            foreach(Kontakt k in kontakt)
+            {
+                kontakti.Add(k);
+            }
+
             var osoba = await ctx.Osoba
-                .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
+                                .Where(z => z.IdentifikacijskiBroj == id)
+                                .Select(z => new OsobaDetailsViewModel
+                                {
+                                    IdentifikacijskiBroj = z.IdentifikacijskiBroj,
+                                    Ime = z.Ime,
+                                    Prezime = z.Prezime,
+                                    Adresa = z.Adresa,
+                                    DatRod = z.DatRod,
+                                    Zanimanje = z.Zanimanje,
+                                    DatZaraze = z.ZarazenaOsoba.DatZaraze,
+                                    zarazena = z.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
+                                    NazivStanja = z.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja,
+                                    Kontakti = kontakti
+                                })
+                                .SingleOrDefaultAsync();
+
+            //var osoba = await ctx.Osoba
+            //    .FirstOrDefaultAsync(m => m.IdentifikacijskiBroj == id);
             if (osoba == null)
             {
                 return NotFound();
             }
-            
             return View(osoba);
         }
     }

@@ -1,82 +1,97 @@
-﻿@model KoronavirusMvc.Models.Osoba
+﻿@model KoronavirusMvc.ViewModels.OsobaDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
+<h4>Osoba</h4>
+<hr />
 
-
-<div>
-    <h4>Osoba</h4>
-    <hr />
+<div class="podaci">
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IdentifikacijskiBroj)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdentifikacijskiBroj)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Ime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Ime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Prezime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Prezime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Adresa)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Adresa)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DatRod)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DatRod)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Zanimanje)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Zanimanje)
         </dd>
     </dl>
 </div>
 
-<h4>Osobe s kojima je bila u kontkatu</h4>
-
-<table class="table table-sm table-striped table-hover" id="tableosobe">
-    <thead>
-        <tr>
-            <th>
-                Identifikacijski broj
-            </th>
-            <th>
-                Ime
-            </th>
-            <th>
-               Prezime
-            </th>
-            
-        </tr>
-    </thead>
-    @*<tbody>
-        @foreach (var osoba in @Model.Osoba)
-        {
-            <tr>
-                <td class="text-left">@osoba.IdentifikacijskiBroj</td>
-                <td class="text-left">@osoba.Ime</td>
-                <td class="text-left">@osoba.Prezime</td>
-                
-            </tr>
-        }
-    </tbody>*@
-</table>
-
 <div>
-
+    
     <a asp-action="Index">Natrag na listu</a>
     <a asp-action="Edit" asp-route-id="@Model.IdentifikacijskiBroj">Uredi</a>
+</div>
+
+<div class="kontakti">
+    <table class="table table-sm table-striped table-hover" id="tablekontakti">
+        <thead>
+            <tr>
+                <th>
+                    <a>Identifikacijski broj</a>
+                </th>
+                @*<th>
+                    <a>Ime</a>
+                </th>
+                <th>
+                    <a >Prezime</a>
+                </th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var osoba in Model.Kontakti)
+            {
+                <tr>
+                    <td class="text-left">@osoba.IdKontakt</td>
+                    @*<td class="text-left">@osoba.IdKontaktNavigation.Ime</td>
+                    <td class="text-left">@osoba.IdKontaktNavigation.Prezime</td>*@
+                    <td class="btn-group">
+                        <a asp-action="Edit"
+                           asp-route-id-osoba="@osoba.IdOsoba"
+                           asp-route-id-kontakt="@osoba.IdKontakt"
+                           class="btn btn-sm" title="Ažuriraj">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form asp-action="Delete" method="post" >
+                            <input type="hidden" name="id" value="@osoba.IdOsoba" />
+                            <button data-idosobe="@osoba.IdOsoba" data-idkontakt="@osoba.IdKontakt" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 
