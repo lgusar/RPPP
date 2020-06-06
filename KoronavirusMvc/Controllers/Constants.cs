@@ -28,8 +28,8 @@ namespace KoronavirusMvc.Controllers
                 doc.PageSize(PdfPageSize.A4);
                 doc.DocumentMetadata(new DocumentMetadata
                 {
-                    Author = "RPPP05",
-                    Application = "COVID-tracker",
+                    Author = "RPPP09",
+                    Application = "KoronavirusMvc",
                     Title = naslov
                 });
                 doc.Compression(new CompressionSettings
