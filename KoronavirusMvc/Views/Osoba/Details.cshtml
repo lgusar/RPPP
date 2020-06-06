@@ -67,9 +67,7 @@
                     <td class="text-left">@Model.DatZaraze</td>
                     <td class="text-left">@Model.NazivStanja</td>
                     <td class="btn-group">
-                        <a asp-action="EditZarazenaOsoba"
-                           asp-route-id="@Model.IdentifikacijskiBroj"
-                           class="btn btn-sm" title="Ažuriraj">
+                        <a data-idzarazene="@Model.IdentifikacijskiBroj" class="btn btn-sm editajax" title="Ažuriraj">
                             <i class="fas fa-edit"></i>
                         </a>
                         <form asp-action="DeleteZarazenaOsoba" method="post">

@@ -457,5 +457,82 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
         }
+
+        [HttpGet]
+        public IActionResult EditZarazenaOsoba(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .Include(o => o.IdentifikacijskiBrojNavigation)
+                             .AsNoTracking()
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            if (zarazenaOsoba != null)
+            {
+                PrepareDropDownLists();
+                return PartialView(zarazenaOsoba);
+            }
+            else
+            {
+                return NotFound($"Neispravan id osobe: {id}");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditZarazenaOsoba(ZarazenaOsoba zarazenaOsoba)
+        {
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
+            if (zarazenaOsoba == null)
+            {
+                return NotFound("Nema poslanih podataka");
+            }
+            bool checkId = ctx.ZarazenaOsoba.Any(m => m.IdentifikacijskiBroj == zarazenaOsoba.IdentifikacijskiBroj);
+            if (!checkId)
+            {
+                return NotFound($"Neispravan identifikacijski broj zarazene osobe: {zarazenaOsoba?.IdentifikacijskiBroj}");
+            }
+
+            PrepareDropDownLists();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Update(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    logger.LogInformation($"Osoba ažurirana");
+                    return StatusCode(302, Url.Action(nameof(Row), new { id = zarazenaOsoba.IdentifikacijskiBroj }));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
+                    return PartialView(zarazenaOsoba);
+                }
+            }
+            else
+            {
+                return PartialView(zarazenaOsoba);
+            }
+        }
+
+        public PartialViewResult Row(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                                    .Where(z => z.IdentifikacijskiBroj == id)
+                                    .Select(z => new ZarazenaOsobaViewModel
+                                    {
+                                        DatZaraze = z.DatZaraze,
+                                        NazivStanja = z.SifraStanjaNavigation.NazivStanja
+                                    })
+                                    .SingleOrDefault();
+            if (zarazenaOsoba != null)
+            {
+                return PartialView(zarazenaOsoba);
+            }
+            else
+            {
+                return PartialView("ErrorMessageRow", $"Neispravan identifikacijski broj osobe.");
+            }
+        }
     }
 }

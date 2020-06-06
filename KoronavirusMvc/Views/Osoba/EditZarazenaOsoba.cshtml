@@ -1,11 +1,11 @@
-﻿@model KoronavirusMvc.ViewModels.OsobaDetailsViewModel
+﻿@model ZarazenaOsoba
 
 <tr>
     <td>
         <input asp-for="DatZaraze" data-save="" class="form-control" />
     </td>
     <td>
-        <select class="form-control" asp-for="ZarazenaOsoba.SifraStanja" asp-items="ViewBag.Stanja" data-save="">
+        <select class="form-control" asp-for="SifraStanja" asp-items="ViewBag.Stanja" data-save="">
             <option selected value="" disabled>Odaberite stanje</option>
         </select>
     </td>
