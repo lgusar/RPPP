@@ -4,6 +4,7 @@
 
 <a asp-action="Create" class="btn btn-primary">Dodaj novo stanje</a>
 <a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Export Excel</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
        class="float-right">

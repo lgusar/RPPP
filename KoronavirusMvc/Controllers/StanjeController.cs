@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 using PdfRpt.Core.Contracts;
 using PdfRpt.FluentInterface;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -277,6 +281,44 @@ namespace KoronavirusMvc.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public void ExportToExcel()
+        {
+            List<StanjaViewModel> emplist = ctx.Stanje.Select(x => new StanjaViewModel
+            {
+                SifraStanja = x.SifraStanja,
+                NazivStanja = x.NazivStanja
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Stanje");
+
+            ws.Cells["A1"].Value = "Stanje";
+
+            ws.Cells["A3"].Value = "Date";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra stanja";
+            ws.Cells["B6"].Value = "Naziv stanja";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraStanja;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.NazivStanja;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
         }
     }
 }
