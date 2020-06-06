@@ -5,6 +5,11 @@
 }
 
 <h4>Osoba</h4>
+<br />
+
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcelOsoba")">Export Excel</a>
+
 <hr />
 
 <div class="podaci">
@@ -50,8 +55,8 @@
 
 @if (Model.Zarazena == true)
 {
-<div class="zarazena">
-    <table class="table table-sm table-striped table-hover" id="tablekontakti">
+    <div class="zarazena">
+        <table class="table table-sm table-striped table-hover" id="tablekontakti">
             <thead>
                 <tr>
                     <th>
@@ -78,7 +83,7 @@
                 </tr>
             </tbody>
         </table>
-</div>
+    </div>
 }
 else
 {

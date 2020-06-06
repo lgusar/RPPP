@@ -18,6 +18,7 @@ namespace KoronavirusMvc.ViewModels
         public bool Zarazena { get; set; }
         public string Zarazenastring { get; set; }
         public string NazivStanja { get; set; }
+        public int BrojKontakta { get; set; }
 
         public List<KontaktViewModel> Kontakti;
         public PagingInfo PagingInfo;
