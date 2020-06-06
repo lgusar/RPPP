@@ -617,7 +617,7 @@ namespace KoronavirusMvc.Controllers
                 DatRod = x.DatRod,
                 Zanimanje = x.Zanimanje,
                 Zarazenastring = x.ZarazenaOsoba.IdentifikacijskiBroj.Equals(x.IdentifikacijskiBroj) == true ? "Da" : "Ne",
-                BrojKontakta = x.KontaktIdKontaktNavigation.Count()
+                BrojKontakta = x.KontaktIdKontaktNavigation.Count() + x.KontaktIdOsobaNavigation.Count()
             }).ToList();
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
