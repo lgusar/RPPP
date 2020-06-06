@@ -46,6 +46,15 @@ namespace KoronavirusMvc.Controllers
                 try
                 {
                     _context.Add(putovanje);
+                    foreach (var item in putovanje.Lokacije)
+                    {
+                        _context.Add(new PutovanjeLokacija
+                        {
+                            SifraPutovanja = putovanje.SifraPutovanja,
+                            SifraGrada = item
+                        });
+
+                    }
                     _context.SaveChanges();
                     TempData[Constants.Message] = $"Putovanje {putovanje.SifraPutovanja} uspjesno dodano.";
                     TempData[Constants.ErrorOccurred] = false;

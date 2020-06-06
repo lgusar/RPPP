@@ -1,0 +1,49 @@
+﻿@model KoronavirusMvc.ViewModels.MasterPetraViewModel
+
+@{
+    ViewData["Title"] = "Master država";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4" id="sidebar">
+            <div class="form-group">
+                <label asp-for="OdabranaDrzava.SifraDrzave"> Šifra države</label>
+                <div><span asp-validation-for="OdabranaDrzava.SifraDrzave" class="text-danger"></span></div>
+                <select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
+                    <option selected value="" disabled>Odaberite državu</option>
+                </select>
+            </div>
+
+            <div class="dropdown-divider"></div>
+            <div id="lokacije" style="display: flex; flex-direction: column">
+
+            </div>
+        </div>
+
+        <div class="col-8" id="content">
+            <div id="add-edit" class="row"></div>
+            <div id="location-content" class="row"></div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script type="text/javascript">
+        var registerButtons = function () {
+            $(".lokacija-button").click(function () {
+            $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                $("#location-content").html(result);
+            })
+        })
+        }
+
+        $("#selectedCountry").change(function () {
+            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: $(this).val() }).then(function (result) {
+                $("#lokacije").html(result);
+
+                setTimeout(function () {
+                    registerButtons();
+                })
+            })
+        });
+    </script>
+}

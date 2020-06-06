@@ -65,11 +65,15 @@ namespace KoronavirusMvc.Controllers
                 return View(statistika);
             }
         }
-        public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Index(int page = 1, int sort = 1, bool ascending = true, int? cityCode = null)
         {
             int pagesize = _appSettings.PageSize;
             //var query = _context.Putovanje.AsNoTracking();
             var query = _context.Statistika.Include(p => p.SifraOrganizacijeNavigation).Include(s => s.SifraGradaNavigation).AsNoTracking();
+            if (cityCode.HasValue)
+            {
+                query = query.Where(s => s.SifraGrada == cityCode.Value);
+            }
             int count = query.Count();
             var pagingInfo = new PagingInfo
             {

@@ -447,11 +447,13 @@ namespace KoronavirusMvc.Models
                     .HasForeignKey<Putovanje>(d => d.IdentifikacijskiBroj)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_PUTOVANJE_OSOBA");
+
+                entity.Ignore(d => d.Lokacije);
             });
 
             modelBuilder.Entity<PutovanjeLokacija>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.SifraGrada, e.SifraPutovanja });
 
                 entity.ToTable("PUTOVANJE_LOKACIJA");
 

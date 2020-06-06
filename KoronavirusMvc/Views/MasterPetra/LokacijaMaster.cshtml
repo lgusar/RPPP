@@ -1,0 +1,7 @@
+﻿@model List<Lokacija>
+
+@{ foreach (var item in Model)
+    {
+        <div class="btn btn-outline-primary lokacija-button" sifra="@item.SifraGrada">@item.ImeGrada</div>
+    }
+}
