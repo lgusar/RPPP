@@ -258,9 +258,28 @@ namespace KoronavirusMvc.Controllers
                                  PrezimeKontakt = k.IdKontaktNavigation.Prezime
                              })
                              .ToList();
+            var kontakt2 = ctx.Kontakt
+                              .Where(k => k.IdKontakt == id)
+                              .Select(k => new KontaktViewModel
+                              {
+                                  IdOsobe = k.IdKontakt,
+                                  IdKontakt = k.IdOsoba,
+                                  ImeOsoba = k.IdKontaktNavigation.Ime,
+                                  PrezimeOsoba = k.IdKontaktNavigation.Prezime,
+                                  ImeKontakt = k.IdOsobaNavigation.Ime,
+                                  PrezimeKontakt = k.IdOsobaNavigation.Prezime
+                              })
+                              .ToList();
             if (kontakt.Count != 0)
             {
                 foreach (KontaktViewModel k in kontakt)
+                {
+                    kontakti.Add(k);
+                }
+            }
+            if (kontakt2.Count != 0)
+            {
+                foreach (KontaktViewModel k in kontakt2)
                 {
                     kontakti.Add(k);
                 }
