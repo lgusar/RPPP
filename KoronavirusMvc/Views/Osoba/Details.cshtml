@@ -123,9 +123,9 @@ else
                         <td class="text-left">@osoba.ImeKontakt</td>
                         <td class="text-left">@osoba.PrezimeKontakt</td>
                         <td class="btn-group">
-                            <form asp-action="DeleteZarazenaOsoba" method="post">
+                            <form asp-action="DeleteKontakt" method="post">
                                 <input type="hidden" name="id" value="@osoba.IdOsobe" />
-                                <button data-idosobe="@osoba.IdOsobe" data-idkontakt="@osoba.IdKontakt" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                                <button data-idosobe="@osoba.IdOsobe" data-idkontakt="@osoba.IdKontakt" type="submit" class="btn btn-sm btn-danger deleteajaxkontakt" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                             </form>
                         </td>
                     </tr>
@@ -146,6 +146,7 @@ else
         $(function () {
             SetDeleteAjax(".deleteajax", '@Url.Action("DeleteZarazenaOsoba")', 'idzarazene');
             SetEditAjax(".editajax", '@Url.Action("EditZarazenaOsoba")', 'idzarazene');
+            DeleteKontakt(".deleteajaxkontakt", '@Url.Action("DeleteKontakt")', 'idosobe', 'idkontakt');
         });
     </script>
 }

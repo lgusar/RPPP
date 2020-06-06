@@ -661,5 +661,47 @@ namespace KoronavirusMvc.Controllers
             Response.CompleteAsync();
 
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteKontakt(string idOsobe, string idKontakt)
+        {
+            var kontakt = ctx.Kontakt
+                             .AsNoTracking()
+                             .Where(m => (m.IdOsoba == idOsobe && m.IdKontakt == idKontakt) || (m.IdKontakt == idOsobe && m.IdOsoba == idKontakt))
+                             .SingleOrDefault();
+            logger.LogTrace(JsonSerializer.Serialize(kontakt));
+            if (kontakt != null)
+            {
+                try
+                {
+
+                    ctx.Remove(kontakt);
+                    ctx.SaveChanges();
+                    var result = new
+                    {
+                        message = $"Zaražena osoba obrisana.",
+                        successful = true
+
+                    };
+                    logger.LogInformation($"Osoba obrisana");
+                    return Json(result);
+                }
+                catch (Exception exc)
+                {
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja kontakta : " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    logger.LogError($"Pogreška prilikom brisanja kontakta {exc.CompleteExceptionMessage()}");
+                    return Json(result);
+                }
+            }
+            else
+            {
+                return NotFound($"Kontakt s identifikacijskim brojem {idKontakt} ne postoji");
+            }
+        }
     }
 }
