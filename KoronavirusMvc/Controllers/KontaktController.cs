@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 using PdfRpt.Core.Contracts;
 using PdfRpt.FluentInterface;
 
@@ -268,6 +270,56 @@ namespace KoronavirusMvc.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public void ExportToExcel()
+        {
+            List<KontaktViewModel> emplist = ctx.Kontakt.Select(x => new KontaktViewModel
+            {
+                IdOsobe = x.IdOsoba,
+                ImeOsoba = x.IdOsobaNavigation.Ime,
+                PrezimeOsoba = x.IdOsobaNavigation.Prezime,
+                IdKontakt = x.IdKontakt,
+                ImeKontakt = x.IdKontaktNavigation.Ime,
+                PrezimeKontakt = x.IdKontaktNavigation.Prezime
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Kontakti");
+
+            ws.Cells["A1"].Value = "Kontakti";
+
+            ws.Cells["A3"].Value = "Date";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Identifikacijski broj osobe";
+            ws.Cells["B6"].Value = "Ime";
+            ws.Cells["C6"].Value = "Prezime";
+            ws.Cells["D6"].Value = "Identifikacijski broj kontakta";
+            ws.Cells["E6"].Value = "Ime";
+            ws.Cells["F6"].Value = "Prezime";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.IdOsobe;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.ImeOsoba;
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.PrezimeOsoba;
+                ws.Cells[string.Format("D{0}", rowStart)].Value = item.IdKontakt;
+                ws.Cells[string.Format("E{0}", rowStart)].Value = item.ImeKontakt;
+                ws.Cells[string.Format("F{0}", rowStart)].Value = item.PrezimeKontakt;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
         }
     }
 }
