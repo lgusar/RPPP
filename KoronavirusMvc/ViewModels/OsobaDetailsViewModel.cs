@@ -20,6 +20,7 @@ namespace KoronavirusMvc.ViewModels
         public string NazivStanja { get; set; }
         public int BrojKontakta { get; set; }
 
+        public Kontakt Kontakt;
         public List<KontaktViewModel> Kontakti;
         public PagingInfo PagingInfo;
         public ZarazenaOsoba ZarazenaOsoba;
