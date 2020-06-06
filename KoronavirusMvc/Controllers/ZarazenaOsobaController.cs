@@ -381,8 +381,8 @@ namespace KoronavirusMvc.Controllers
 
             ws.Cells["A1"].Value = "Zaražene osobe";
 
-            ws.Cells["A3"].Value = "Date";
-            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd.MM.yyyy}", DateTimeOffset.Now);
 
             ws.Cells["A6"].Value = "Identifikacijski broj osobe";
             ws.Cells["B6"].Value = "Ime";
@@ -397,7 +397,7 @@ namespace KoronavirusMvc.Controllers
                 ws.Cells[string.Format("A{0}", rowStart)].Value = item.IdentifikacijskiBroj;
                 ws.Cells[string.Format("B{0}", rowStart)].Value = item.Ime;
                 ws.Cells[string.Format("C{0}", rowStart)].Value = item.Prezime;
-                ws.Cells[string.Format("D{0}", rowStart)].Value = string.Format("{0:dd MMMM yyyy}", item.DatZaraze);
+                ws.Cells[string.Format("D{0}", rowStart)].Value = string.Format("{0:dd.MM.yyyy}", item.DatZaraze);
                 ws.Cells[string.Format("E{0}", rowStart)].Value = item.NazivStanja;
                 rowStart++;
             }

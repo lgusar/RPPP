@@ -290,8 +290,8 @@ namespace KoronavirusMvc.Controllers
 
             ws.Cells["A1"].Value = "Kontakti";
 
-            ws.Cells["A3"].Value = "Date";
-            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd.MM.yyyy} u {0:H: mm tt}", DateTimeOffset.Now);
 
             ws.Cells["A6"].Value = "Identifikacijski broj osobe";
             ws.Cells["B6"].Value = "Ime";

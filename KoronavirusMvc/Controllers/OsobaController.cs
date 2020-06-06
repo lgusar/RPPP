@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using OfficeOpenXml;
 using PdfRpt.Core.Contracts;
 using PdfRpt.FluentInterface;
 
@@ -533,6 +535,56 @@ namespace KoronavirusMvc.Controllers
             {
                 return PartialView("ErrorMessageRow", $"Neispravan identifikacijski broj osobe.");
             }
+        }
+
+        public void ExportToExcel()
+        {
+            List<Osoba> emplist = ctx.Osoba.Select(x => new Osoba
+            {
+                IdentifikacijskiBroj = x.IdentifikacijskiBroj,
+                Ime = x.Ime,
+                Prezime = x.Prezime,
+                Adresa = x.Adresa,
+                DatRod = x.DatRod,
+                Zanimanje = x.Zanimanje
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Osobe");
+
+            ws.Cells["A1"].Value = "Osobe";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd.MM.yyyy} u {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Identifikacijski broj osobe";
+            ws.Cells["B6"].Value = "Ime";
+            ws.Cells["C6"].Value = "Prezime";
+            ws.Cells["D6"].Value = "Adresa";
+            ws.Cells["E6"].Value = "Datum rođenja";
+            ws.Cells["F6"].Value = "Zanimanje";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.IdentifikacijskiBroj;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.Ime;
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.Prezime;
+                ws.Cells[string.Format("D{0}", rowStart)].Value = item.Adresa;
+                ws.Cells[string.Format("E{0}", rowStart)].Value = string.Format("{0:dd.MM.yyyy}", item.DatRod);
+                ws.Cells[string.Format("F{0}", rowStart)].Value = item.Zanimanje;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
         }
     }
 }
