@@ -45,12 +45,6 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Zanimanje)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayName("Zaražen/a?")
-        </dt>
-        <dd class="col-sm-10" id="zarazenostanje">
-            @Html.DisplayFor(model => model.Zarazenastring)
-        </dd>
     </dl>
 </div>
 
@@ -88,6 +82,10 @@
         </table>
     </div>
 }
+else
+{
+    <h6>Osoba nije zaražena.</h6>
+}
 
 
 <br />
@@ -122,9 +120,6 @@ else
                         <td class="text-left">@osoba.ImeKontakt</td>
                         <td class="text-left">@osoba.PrezimeKontakt</td>
                         <td class="btn-group">
-                            <a data-idzarazene="@Model.IdentifikacijskiBroj" class="btn btn-sm editajax" title="Ažuriraj">
-                                <i class="fas fa-edit"></i>
-                            </a>
                             <form asp-action="DeleteZarazenaOsoba" method="post">
                                 <input type="hidden" name="id" value="@osoba.IdOsobe" />
                                 <button data-idosobe="@osoba.IdOsobe" data-idkontakt="@osoba.IdKontakt" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
