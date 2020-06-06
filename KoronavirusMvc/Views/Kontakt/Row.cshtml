@@ -8,14 +8,6 @@
         <td class="text-left">@Model.ImeKontakt</td>
         <td class="text-left">@Model.PrezimeKontakt</td>
         <td>
-            <a asp-action="Edit"
-               asp-route-idOsoba="@Model.IdOsobe"
-               asp-route-idKontakt="@Model.IdKontakt"
-               class="btn btn-sm" title="Ažuriraj">
-                <i class="fas fa-edit"></i>
-            </a>
-        </td>
-        <td>
             <form asp-action="Delete" method="post"
                   asp-route-idOsoba="@Model.IdOsobe"
                   asp-route-idKontakt="@Model.IdKontakt">

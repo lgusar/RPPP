@@ -16,6 +16,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
 
 
 namespace KoronavirusMvc.Controllers
@@ -344,6 +346,116 @@ namespace KoronavirusMvc.Controllers
         {
             var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
             ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
+        }
+
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis osoba";
+            var osobe = await ctx.Osoba
+                .AsNoTracking()
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(osobe));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.IdentifikacijskiBroj);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.Adresa);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Adresa", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.DatRod);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(4);
+                    column.Width(2);
+                    column.HeaderCell("Datum rođenja", horizontalAlignment: HorizontalAlignment.Center);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Osoba>(o => o.Zanimanje);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(5);
+                    column.Width(2);
+                    column.HeaderCell("Zanimanje", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=putovanja.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }

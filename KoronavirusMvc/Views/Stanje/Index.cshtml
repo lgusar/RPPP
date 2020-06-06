@@ -2,7 +2,8 @@
 
 @{ ViewData["Title"] = "Popis stanja"; }
 
-<a asp-action="Create">Dodaj novo stanje</a>
+<a asp-action="Create" class="btn btn-primary">Dodaj novo stanje</a>
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
        class="float-right">

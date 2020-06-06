@@ -4,7 +4,8 @@
     ViewData["Title"] = "Popis osoba";
     }
 
-<a asp-action="Create">Dodaj novu osobu</a>
+<a asp-action="Create" class="btn btn-primary">Dodaj novu osobu</a>
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
 
 <pager page-info="@Model.PagingInfo" page-title="Unesite željenu stranicu"
        page-action="Index" class="float-right">

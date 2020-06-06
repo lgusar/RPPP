@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -171,58 +173,101 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Edit(string idOsoba, string idKontakt)
-        //{
-        //    Kontakt kontakt = await ctx.Kontakt
-        //                     .AsNoTracking()
-        //                     .Where(m => (m.IdOsoba == idOsoba && m.IdKontakt == idKontakt) || (m.IdOsoba == idKontakt && m.IdKontakt == idOsoba))
-        //                     .FirstOrDefaultAsync();
-        //    if (kontakt != null)
-        //    {
-        //        return PartialView(kontakt);
-        //    }
-        //    else
-        //    {
-        //        return NotFound($"Neispravan id osobe: {idOsoba}");
-        //    }
-        //}
 
-        //[HttpPost, ActionName("Edit")]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Update(Kontakt kontakt)
-        //{
-        //    logger.LogTrace(JsonSerializer.Serialize(kontakt));
-        //    if (kontakt == null)
-        //    {
-        //        return NotFound("Nema poslanih podataka");
-        //    }
-        //    bool checkId = ctx.Kontakt.Any(m => m.IdOsoba == kontakt.IdOsoba && m.IdKontakt == kontakt.IdKontakt || m.IdOsoba == kontakt.IdKontakt && m.IdKontakt == kontakt.IdOsoba);
-        //    if (!checkId)
-        //    {
-        //        return NotFound($"Neispravan identifikacijski broj zarazene osobe: {kontakt?.IdOsoba}");
-        //    }
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis osoba u kontaktu";
+            var kontkat = await ctx.Kontakt
+                .Include(o => o.IdKontaktNavigation)
+                .Include(o => o.IdOsobaNavigation)
+                .AsNoTracking()
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(kontkat));
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            ctx.Update(kontakt);
-        //            ctx.SaveChanges();
-        //            logger.LogInformation($"Osoba ažurirana");
-        //            return View(nameof(Index), new { idOsoba = kontakt.IdOsoba, idKontakt = kontakt.IdKontakt });
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-        //            logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
-        //            return View(kontakt);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        return View(kontakt);
-        //    }
-        //}
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdOsoba);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj osobe", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdOsobaNavigation.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(2);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdOsobaNavigation.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdKontakt);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj kontakta", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdKontaktNavigation.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(4);
+                    column.Width(2);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Kontakt>(o => o.IdKontaktNavigation.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(5);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=putovanja.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }

@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -248,8 +250,6 @@ namespace KoronavirusMvc.Controllers
                                 DatZaraze = z.DatZaraze,
                                 NazivStanja = z.SifraStanjaNavigation.NazivStanja
                             })
-                            .Skip((page - 1) * pagesize)
-                           .Take(pagesize)
                            .ToList();
             var model = new ZarazeneOsobeViewModel
             {
@@ -257,6 +257,109 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis zaraženih osoba";
+            var zarazeneOsobe = await ctx.ZarazenaOsoba
+                .Include(o => o.IdentifikacijskiBrojNavigation)
+                .Include(o => o.SifraStanjaNavigation)
+                .AsNoTracking()
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(zarazeneOsobe));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBroj);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBrojNavigation.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBrojNavigation.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.SifraStanjaNavigation.NazivStanja);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Stanje osobe", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.DatZaraze);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(4);
+                    column.Width(2);
+                    column.HeaderCell("Datum zaraze", horizontalAlignment: HorizontalAlignment.Center);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                });
+
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=putovanja.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
         }
     }
 }
