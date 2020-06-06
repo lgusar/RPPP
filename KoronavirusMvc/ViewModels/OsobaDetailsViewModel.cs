@@ -22,6 +22,7 @@ namespace KoronavirusMvc.ViewModels
         public List<KontaktViewModel> Kontakti;
         public PagingInfo PagingInfo;
         public ZarazenaOsoba ZarazenaOsoba;
+        public ZarazenaOsobaViewModel ZarazeneOsobe;
 
     }
 }
