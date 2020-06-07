@@ -4,32 +4,68 @@
     ViewBag.Title = "Ažuriranje sastanka";
 }
 
-<form asp-action="Edit"
-      asp-route-id="@Model.SifraSastanka"
-      asp-route-page="@ViewBag.Page"
-      asp-route-sort="@ViewBag.Sort"
-      asp-route-ascending="@ViewBag.Ascending"
-      method="post">
-    <div asp-validation-summary="All"></div>
-    <div class="form-group">
-        <label asp-for="SifraStozera"></label>
-        <div><span asp-validation-for="SifraStozera" class="text-danger"></span></div>
-        <select class="form-control" asp-for="SifraStozera" asp-items="ViewBag.Stozeri">
+<tr>
+    <td>
+        <select class="form-control" asp-for="SifraStozera" asp-items="ViewBag.Stozeri" data-save="">
             <option disabled selected value="">Odaberite stožer</option>
         </select>
-    </div>
-    <div class="form-group">
-        <label asp-for="Datum"></label>
-        <div><span asp-validation-for="Datum" class="text-danger"></span></div>
-        <input asp-for="Datum" class="form-control" />
-    </div>
-    </div>
-    <div class="text-center">
-        <button class="btn btn-primary" type="submit">Spremi</button>
-        <a asp-action="Index"
-           asp-route-page="@ViewBag.Page"
-           asp-route-sort="@ViewBag.Sort"
-           asp-route-ascending="@ViewBag.Ascending"
-           class="btn btn-secondary">Odustani</a>
-    </div>
-</form>
+    </td>
+    <td>
+        <input asp-for="Datum" class="form-control" data-save="" />
+    </td>
+
+    <td>
+        <button type="submit" class="btn btn-sm btn-primary save" title="Spremi"><i class="fas fa-save"></i></button>
+    </td>
+    <td>
+        <button class="btn btn-sm cancel" title="Odustani"><i class="fas fa-undo-alt"></i></button>
+    </td>
+</tr>
+<tr>
+    <td colspan="6">
+        <div asp-validation-summary="All"></div>
+        <input type="hidden" asp-for="SifraSastanka" data-save="" />
+    </td>
+</tr>
+
+
+@*<div class="form-group">
+        <label asp-for="IdPredsjednika"></label>
+        <div><span asp-validation-for="IdPredsjednika" class="text-danger"></span></div>
+        <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe">
+            <option disabled selected value="">Odaberite osobu</option>
+        </select>
+    </div>*@
+
+
+
+
+@*<form asp-action="Edit"
+          asp-route-id="@Model.SifraSastanka"
+          asp-route-page="@ViewBag.Page"
+          asp-route-sort="@ViewBag.Sort"
+          asp-route-ascending="@ViewBag.Ascending"
+          method="post">
+        <div asp-validation-summary="All"></div>
+        <div class="form-group">
+            <label asp-for="SifraStozera"></label>
+            <div><span asp-validation-for="SifraStozera" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraStozera" asp-items="ViewBag.Stozeri">
+                <option disabled selected value="">Odaberite stožer</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Datum"></label>
+            <div><span asp-validation-for="Datum" class="text-danger"></span></div>
+            <input asp-for="Datum" class="form-control" />
+        </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Spremi</button>
+            <a asp-action="Index"
+               asp-route-page="@ViewBag.Page"
+               asp-route-sort="@ViewBag.Sort"
+               asp-route-ascending="@ViewBag.Ascending"
+               class="btn btn-secondary">Odustani</a>
+        </div>
+    </form>*@

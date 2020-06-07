@@ -17,9 +17,9 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        private readonly ILogger<DrzavaController> logger;
+        private readonly ILogger<StozerController> logger;
 
-        public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<DrzavaController> logger)
+        public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<StozerController> logger)
         {
             this.ctx = ctx;
             this.logger = logger;
@@ -34,6 +34,9 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void PrepareDropDownLists()
         {
             var osobe = ctx.Osoba
