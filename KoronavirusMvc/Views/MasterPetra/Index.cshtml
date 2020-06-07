@@ -206,7 +206,8 @@
         }
 
         $("#selectedCountry").autocomplete({
-            source: "/MasterPetra/GetDrzava",
+            //source: "/MasterPetra/GetDrzava",
+            source: '@Url.Action("GetDrzava")',
             select: function (event, ui) {
                 event.preventDefault();
                 $("#selectedCountry").val(ui.item.label);
