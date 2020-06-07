@@ -18,6 +18,7 @@ namespace KoronavirusMvc.Controllers
 {
     /// <summary>
     /// Razred za backend rad sa terapijama
+    /// Napravio Lovre Gusar
     /// </summary>
     public class TerapijaController : Controller
     {

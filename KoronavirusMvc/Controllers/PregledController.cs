@@ -21,6 +21,7 @@ namespace KoronavirusMvc.Controllers
 {   
     /// <summary>
     /// Razred za backend rad s pregledima i tablicama vezanim tablicu pregled
+    /// Napravio Lovre Gusar
     /// </summary>
     public class PregledController : Controller
     {
@@ -102,7 +103,6 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(PregledCreateViewModel pregledCreate)
         {
-            logger.LogTrace(JsonSerializer.Serialize(pregledCreate), new JsonSerializerOptions { IgnoreNullValues = true});
             if (ModelState.IsValid)
             {
                 try
@@ -645,6 +645,8 @@ namespace KoronavirusMvc.Controllers
                         {
                             ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                             logger.LogError($"Greška prilikom ažuriranja pregleda {exc.CompleteExceptionMessage()}");
+                            prepareDropDownTerapije();
+                            prepareDropDownSimptomi();
                             return View(pc);
                         }
                     }
@@ -652,6 +654,8 @@ namespace KoronavirusMvc.Controllers
                     {
                         ModelState.AddModelError(string.Empty, "Ne postoji osoba s tim identifikacijskim brojem.");
                         logger.LogError($"Greška prilikom ažuriranja pregleda. Ne postoji osoba s tim identifikacijskim brojem.");
+                        prepareDropDownTerapije();
+                        prepareDropDownSimptomi();
                         return View(pc);
                     }
                 }
@@ -659,6 +663,8 @@ namespace KoronavirusMvc.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Podatke o pregledu nije moguće povezati s forme.");
                     logger.LogError($"Greška prilikom ažuriranja pregleda. Podatke o pregledu nije moguće povezati s forme.");
+                    prepareDropDownTerapije();
+                    prepareDropDownSimptomi();
                     return View(pc);
                 }
             }
