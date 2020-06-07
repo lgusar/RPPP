@@ -724,7 +724,7 @@ namespace KoronavirusMvc.Controllers
                     DatZaraze = o.ZarazenaOsoba.DatZaraze,
                     NazivStanja = o.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja
                 })
-                .SingleOrDefaultAsync();
+                .ToListAsync();
             PdfReport report = Constants.CreateBasicReport(naslov);
             report.PagesFooter(footer =>
             {
