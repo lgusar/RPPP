@@ -1,11 +1,13 @@
 ﻿using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -658,6 +660,48 @@ namespace KoronavirusMvc.Controllers
             logger.LogInformation($"Terapije uspješno dodane.");
 
             return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
+        }
+
+        public void exportToExcel()
+        {
+            List<PregledExcelViewModel> lista = ctx.Pregled.Select(p => new PregledExcelViewModel
+            {
+                SifraPregleda = p.SifraPregleda,
+                Datum = p.Datum,
+                Anamneza = p.Anamneza,
+                Dijagnoza = p.Dijagnoza
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Pregledi");
+
+            ws.Cells["A1"].Value = "Pregledi";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra Pregleda";
+            ws.Cells["B6"].Value = "Datum";
+            ws.Cells["C6"].Value = "Anamneza";
+            ws.Cells["D6"].Value = "Dijagnoza";
+
+            int rowStart = 7;
+            foreach (var item in lista)
+            {
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraPregleda;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", item.Datum);
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.Anamneza;
+                ws.Cells[string.Format("D{0}", rowStart)].Value = item.Dijagnoza;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
         }
 
         private decimal NewId()

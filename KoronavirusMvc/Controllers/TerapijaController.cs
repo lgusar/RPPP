@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -226,6 +229,42 @@ namespace KoronavirusMvc.Controllers
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
+        }
+
+        public void exportToExcel()
+        {
+            List<TerapijaExcelViewModel> lista = ctx.Terapija.Select(t => new TerapijaExcelViewModel
+            {
+                SifraTerapije = t.SifraTerapije,
+                OpisTerapije = t.OpisTerapije
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Terapije");
+
+            ws.Cells["A1"].Value = "Terapije";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra terapije";
+            ws.Cells["B6"].Value = "Opis terapije";
+
+            int rowStart = 7;
+            foreach (var item in lista)
+            {
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraTerapije;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.OpisTerapije;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
         }
         private decimal NewId()
         {
