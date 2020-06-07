@@ -691,19 +691,59 @@ namespace KoronavirusMvc.Controllers
         /// <summary>
         /// Metoda koja generira izvješće u Excelu. Stvara tablicu sa svim podacima u detaljima osobe.
         /// </summary>
-        public void ExportToExcelOsoba()
+        public void ExportToExcelOsoba(string id)
         {
-            List<OsobaDetailsViewModel> emplist = ctx.Osoba.Include(o => o.ZarazenaOsoba).Select(x => new OsobaDetailsViewModel
+            var osoba = ctx.Osoba.Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
+
+            var zarazenaOsoba = ctx.ZarazenaOsoba.Include(o => o.SifraStanjaNavigation).AsNoTracking().Where(o => o.IdentifikacijskiBroj == id).FirstOrDefault();
+
+            bool zarazena = false;
+
+            if(zarazenaOsoba != null)
             {
-                IdentifikacijskiBroj = x.IdentifikacijskiBroj,
-                Ime = x.Ime,
-                Prezime = x.Prezime,
-                Adresa = x.Adresa,
-                DatRod = x.DatRod,
-                Zanimanje = x.Zanimanje,
-                Zarazenastring = x.ZarazenaOsoba.IdentifikacijskiBroj.Equals(x.IdentifikacijskiBroj) == true ? "Da" : "Ne",
-                BrojKontakta = x.KontaktIdKontaktNavigation.Count() + x.KontaktIdOsobaNavigation.Count()
-            }).ToList();
+                zarazena = true;
+            }
+
+            List<KontaktViewModel> kontakti = new List<KontaktViewModel>();
+            var kontakt = ctx.Kontakt
+                             .Where(k => k.IdOsoba == id)
+                             .Select(k => new KontaktViewModel
+                             {
+                                 IdOsobe = k.IdOsoba,
+                                 IdKontakt = k.IdKontakt,
+                                 ImeOsoba = k.IdOsobaNavigation.Ime,
+                                 PrezimeOsoba = k.IdOsobaNavigation.Prezime,
+                                 ImeKontakt = k.IdKontaktNavigation.Ime,
+                                 PrezimeKontakt = k.IdKontaktNavigation.Prezime
+                             })
+                             .ToList();
+            var kontakt2 = ctx.Kontakt
+                              .Where(k => k.IdKontakt == id)
+                              .Select(k => new KontaktViewModel
+                              {
+                                  IdOsobe = k.IdKontakt,
+                                  IdKontakt = k.IdOsoba,
+                                  ImeOsoba = k.IdKontaktNavigation.Ime,
+                                  PrezimeOsoba = k.IdKontaktNavigation.Prezime,
+                                  ImeKontakt = k.IdOsobaNavigation.Ime,
+                                  PrezimeKontakt = k.IdOsobaNavigation.Prezime
+                              })
+                              .ToList();
+            if (kontakt.Count != 0)
+            {
+                foreach (KontaktViewModel k in kontakt)
+                {
+                    kontakti.Add(k);
+                }
+            }
+            if (kontakt2.Count != 0)
+            {
+                foreach (KontaktViewModel k in kontakt2)
+                {
+                    kontakti.Add(k);
+                }
+            }
+
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage pck = new ExcelPackage();
@@ -723,25 +763,58 @@ namespace KoronavirusMvc.Controllers
             ws.Cells["G6"].Value = "Zaražena?";
             ws.Cells["H6"].Value = "Broj osoba u kontaktu";
 
-            int rowStart = 7;
-            foreach (var item in emplist)
-            {
+            ws.Cells["A7"].Value = osoba.IdentifikacijskiBroj;
+            ws.Cells["B7"].Value = osoba.Ime;
+            ws.Cells["C7"].Value = osoba.Prezime;
+            ws.Cells["D7"].Value = osoba.Adresa;
+            ws.Cells["E7"].Value = osoba.DatRod;
+            ws.Cells["F7"].Value = osoba.Zanimanje;
+            ws.Cells["G7"].Value = zarazena.Equals(true) ? "Da" : "Ne";
+            ws.Cells["H7"].Value = kontakti.Count();
 
-                ws.Cells[string.Format("A{0}", rowStart)].Value = item.IdentifikacijskiBroj;
-                ws.Cells[string.Format("B{0}", rowStart)].Value = item.Ime;
-                ws.Cells[string.Format("C{0}", rowStart)].Value = item.Prezime;
-                ws.Cells[string.Format("D{0}", rowStart)].Value = item.Adresa;
-                ws.Cells[string.Format("E{0}", rowStart)].Value = string.Format("{0:dd.MM.yyyy}", item.DatRod);
-                ws.Cells[string.Format("F{0}", rowStart)].Value = item.Zanimanje;
-                ws.Cells[string.Format("G{0}", rowStart)].Value = item.Zarazenastring;
-                ws.Cells[string.Format("H{0}", rowStart)].Value = item.BrojKontakta;
-                rowStart++;
+            int rowStart = 11;
+            if (zarazenaOsoba != null)
+            {
+                ws.Cells["I6"].Value = "Datum zaraze";
+                ws.Cells["J6"].Value = "Stanje osobe";
+
+                ws.Cells["I7"].Value = string.Format("{0:dd.MM.yyyy}", zarazenaOsoba.DatZaraze);
+                ws.Cells["J7"].Value = zarazenaOsoba.SifraStanjaNavigation.NazivStanja;
+
+                ws.Cells["A10"].Value = "Kontakti";
+
+                rowStart = 11;
+                if (kontakti.Count != 0)
+                {
+                    foreach (KontaktViewModel s in kontakti)
+                    {
+                        ws.Cells[string.Format("A{0}", rowStart)].Value = s.IdKontakt;
+                        ws.Cells[string.Format("B{0}", rowStart)].Value = s.ImeKontakt;
+                        ws.Cells[string.Format("C{0}", rowStart)].Value = s.PrezimeKontakt;
+                        rowStart++;
+                    }
+                }
+            }
+            else
+            {
+                ws.Cells["A10"].Value = "Kontakti";
+                rowStart = 11;
+                if (kontakti.Count != 0)
+                {
+                    foreach (KontaktViewModel s in kontakti)
+                    {
+                        ws.Cells[string.Format("A{0}", rowStart)].Value = s.IdKontakt;
+                        ws.Cells[string.Format("B{0}", rowStart)].Value = s.ImeKontakt;
+                        ws.Cells[string.Format("C{0}", rowStart)].Value = s.PrezimeKontakt;
+                        rowStart++;
+                    }
+                }
             }
 
             ws.Cells["A:AZ"].AutoFitColumns();
             Response.Clear();
             Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Headers.Add("content-disposition", $"attachment; filename=osoba{osoba.IdentifikacijskiBroj}.xlsx");
             Response.Body.WriteAsync(pck.GetAsByteArray());
             Response.CompleteAsync();
 
