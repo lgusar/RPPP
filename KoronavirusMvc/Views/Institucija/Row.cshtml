@@ -1,0 +1,23 @@
+﻿@model InstitucijaViewModel
+
+    <tr>
+        <td class="text-center">@Model.NazivInstitucije</td>
+        <td class="text-center">@Model.RadnoVrijeme</td>
+        <td class="text-center">@Model.Kontakt</td>
+        <td class="text-center">@Model.NazivOrganizacije</td>
+        <td>
+            <a data-idinstitucije="@Model.SifraInstitucije" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+        </td>
+        <td>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" name="id" value="@Model.SifraInstitucije" />
+                <button data-idinstitucije="@Model.SifraInstitucije" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Detail" method="get">
+                <input type="hidden" name="id" value="@Model.SifraInstitucije" />
+                <button class="btn btn-sm" title="Detalji"><i class="fa fa-info"></i></button>
+            </form>
+        </td>
+    </tr>

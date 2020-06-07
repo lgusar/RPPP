@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="bootstrap" Version="4.5.0" />
+    <PackageReference Include="EPPlus" Version="5.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -16,7 +18,21 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.3" />
+    <PackageReference Include="Nlog.Web.AspNetCore" Version="4.9.2" />
+    <PackageReference Include="PdfRpt.Core" Version="1.4.2" />
   </ItemGroup>
+
+
+	<ItemGroup>
+		<Content Update="nlog.config">
+	    		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	
+	</ItemGroup>
+	
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>		
+	</PropertyGroup>
 
 </Project>

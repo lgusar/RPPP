@@ -1,0 +1,90 @@
+﻿@model KoronavirusMvc.ViewModels.InstitucijaOpremaViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+}
+
+
+<h2>MD Forma za Instituciju i Opremu</h2>
+
+<div>
+    <h4>Institucija</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Naziv institucije:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Institucija.NazivInstitucije
+        </dd>
+        <dt class="col-sm-2">
+            Radno vrijeme:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Institucija.RadnoVrijeme
+        </dd>
+        <dt class="col-sm-2">
+            Kontakt broj:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Institucija.Kontakt
+        </dd>
+        <dt class="col-sm-2">
+            Organizacija:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Institucija.NazivOrganizacije
+        </dd>
+    </dl>
+</div>
+
+
+<h5>Oprema</h5>
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            @{
+                string[] nazivi = { "Naziv institucije", "Naziv opreme", "Količina opreme" };
+                for (int i = 1; i <= nazivi.Length; i++)
+                {
+                    <th class="text-center">
+                        @nazivi[i - 1]
+                    </th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var oprema in Model.Oprema.Opremas)
+        {
+            <partial name="RowOprema" model="oprema" />
+        }
+
+    </tbody>
+</table>
+
+<form asp-action="ExportMDToExcel" method="get">
+    <input type="hidden" name="id" value="@Model.Institucija.SifraInstitucije" />
+    <button class="btn btn-primary" title="Excel">Generiraj MD Excel<i class="fas fa-file-excel"></i></button>
+</form>
+
+
+
+
+<div>
+    <a asp-action="Index">Nazad na institucije</a>
+</div>
+
+@section styles{
+
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            SetEditAjax(".editajax", '@Url.Action("EditOprema")','idopreme');
+            SetDeleteAjax(".deleteajax", "@Url.Action("DeleteOprema")", "idopreme");
+        });
+    </script>
+}

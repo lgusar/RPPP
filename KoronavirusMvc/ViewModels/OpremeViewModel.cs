@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace KoronavirusMvc.ViewModels
 {
-    public class PreporukeViewModel
+    public class OpremeViewModel
     {
-        public IEnumerable<PreporukaViewModel> Preporuke { get; set; }
+        public IEnumerable<OpremaViewModel> Opremas { get; set; }
 
         public PagingInfo PagingInfo { get; set; }
     }
