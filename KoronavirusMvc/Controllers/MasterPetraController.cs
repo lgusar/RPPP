@@ -49,8 +49,10 @@ namespace KoronavirusMvc.Controllers
         public async Task<IActionResult> GetContentForLocation(int sifraGrada)
         {
             var statistike = await _context.Statistika.Include(st => st.SifraOrganizacijeNavigation).Where(s => s.SifraGrada == sifraGrada).ToListAsync();
-            var putovanja = await _context.PutovanjeLokacija.Include(pl => pl.SifraPutovanjaNavigation.IdentifikacijskiBrojNavigation).Where(s => s.SifraGrada == sifraGrada)
-                .Select(pl => pl.SifraPutovanjaNavigation).ToListAsync();
+            var putovanjaIds = _context.PutovanjeLokacija.Where(s => s.SifraGrada == sifraGrada)
+                .Select(pl => pl.SifraPutovanja);
+            var putovanja = await _context.Putovanje.Include(p => p.IdentifikacijskiBrojNavigation).Join(putovanjaIds, p => p.SifraPutovanja, pi => pi, (p, pi) => p).ToListAsync();
+            
             
             return PartialView("ContentMaster", (Statistike: statistike, Putovanja: putovanja ));
         }

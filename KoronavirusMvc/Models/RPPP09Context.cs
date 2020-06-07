@@ -444,9 +444,9 @@ namespace KoronavirusMvc.Models
                     .IsFixedLength();
 
                 entity.HasOne(d => d.IdentifikacijskiBrojNavigation)
-                    .WithOne(p => p.Putovanje)
-                    .HasForeignKey<Putovanje>(d => d.IdentifikacijskiBroj)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .WithMany(p => p.Putovanja)
+                    .HasForeignKey(d => d.IdentifikacijskiBroj)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_PUTOVANJE_OSOBA");
 
                 entity.Ignore(d => d.Lokacije);
