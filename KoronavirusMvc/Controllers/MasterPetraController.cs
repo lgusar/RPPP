@@ -298,5 +298,33 @@ namespace KoronavirusMvc.Controllers
 
             return Ok(new { Success = true });
         }
+
+        [HttpGet]
+        public IEnumerable<object> Get(string term)
+        {
+            var query = _context.Lokacija.Where(l => l.ImeGrada.Contains(term))
+                               .Select(s => new
+                               {
+                                   Id = s.SifraGrada,
+                                   Label = s.ImeGrada.Trim()
+                               });
+            var list = query.OrderBy(l => l.Label)
+                            .ToList();
+            return list;
+        }
+
+        [HttpGet]
+        public IEnumerable<object> GetDrzava(string term)
+        {
+            var query = _context.Drzava.Where(l => l.ImeDrzave.StartsWith(term))
+                               .Select(s => new
+                               {
+                                   value = s.SifraDrzave,
+                                   label = s.ImeDrzave.Trim()
+                               });
+            var list = query.OrderBy(l => l.label)
+                            .ToList();
+            return list;
+        }
     }
 }

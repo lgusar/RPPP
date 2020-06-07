@@ -14,9 +14,12 @@
                     </button>
                 </div>
                 <div style="display: flex;">
-                    <select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
+                    @*<select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
                         <option selected value="" disabled>Odaberite državu</option>
-                    </select>
+                    </select>*@
+                    <div class="form-group ui-widget">
+                        <input id="selectedCountry"/>
+                    </div>
                     <div class="btn btn-sm drzava-edit" title="Ažuriraj">
                         <i class="fas fa-edit"></i>
                     </div>
@@ -52,8 +55,10 @@
     </div>
 </div>
 @section scripts {
+    <script src="~/lib/jqueryui/jquery-ui.js"></script>
     <script type="text/javascript">
         var selectedCity;
+        var selectedCountry;
         var registerCityButtons = function () {
             $(".lokacija-button").click(function () {
                 selectedCity = $(this).attr("sifra");
@@ -187,7 +192,11 @@
         }
 
         var loadLocation = function () {
-            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: $("#selectedCountry").val() }).then(function (result) {
+            if (!selectedCountry) {
+                $("#lokacije").empty();
+            }
+
+            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: selectedCountry }).then(function (result) {
                 $("#lokacije").html(result);
 
                 setTimeout(function () {
@@ -196,13 +205,34 @@
             })
         }
 
+        $("#selectedCountry").autocomplete({
+            source: "/MasterPetra/GetDrzava",
+            select: function (event, ui) {
+                event.preventDefault();
+                $("#selectedCountry").val(ui.item.label);
+                selectedCountry = ui.item.value;
+
+                loadLocation();
+            },
+            change: function (event, ui) {
+                if (!$(this).val()) {
+                    selectedCountry = null;
+                    loadLocation();
+                }
+            },
+            focus: function (event, ui) {
+                event.preventDefault();
+                $("#selectedCountry").val(ui.item.label);
+            }
+        })
+
         $("#closeModal").click(function () {
             closeAddEditModal();
         })
 
-        $("#selectedCountry").change(function () {
-            loadLocation();
-        });
+        //$("#selectedCountry").change(function () {
+        //    loadLocation();
+        //});
 
         $(".drzava-edit, .drzava-add").click(function () {
             var sifra = $("#selectedCountry").val();
