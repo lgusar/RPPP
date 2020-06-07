@@ -274,7 +274,7 @@ namespace KoronavirusMvc.Controllers
 
             if (pdf != null)
             {
-                Response.Headers.Add("content-disposition", "inline; filename=putovanja.pdf");
+                Response.Headers.Add("content-disposition", "inline; filename=stanja.pdf");
                 return File(pdf, "application/pdf");
             }
             else
