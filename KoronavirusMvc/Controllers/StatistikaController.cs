@@ -6,6 +6,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,9 +24,18 @@ namespace KoronavirusMvc.Controllers
             _appSettings = appSettings.Value;
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PrepareDropdownLists();
             return View();
+        }
+        private async Task PrepareDropdownLists()
+        {
+            var grad = await _context.Lokacija.OrderBy(d => d.ImeGrada).Select(d => new { d.ImeGrada, d.SifraGrada }).ToListAsync();
+            ViewBag.Gradovi = new SelectList(grad, nameof(Lokacija.SifraGrada), nameof(Lokacija.ImeGrada));
+            var organizacija = await _context.Organizacija.OrderBy(d => d.Naziv).Select(d => new { d.Naziv, d.SifraOrganizacije }).ToListAsync();
+            ViewBag.Organizacije = new SelectList(organizacija, nameof(Organizacija.SifraOrganizacije), nameof(Organizacija.Naziv));
+
         }
 
         [HttpPost]
@@ -38,7 +48,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     _context.Add(statistika);
                     _context.SaveChanges();
-                    TempData[Constants.Message] = $"Putovanje {statistika.SifraObjave} uspjesno dodano.";
+                    TempData[Constants.Message] = $"Statistika {statistika.SifraObjave} uspjesno dodano.";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -55,11 +65,15 @@ namespace KoronavirusMvc.Controllers
                 return View(statistika);
             }
         }
-        public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Index(int page = 1, int sort = 1, bool ascending = true, int? cityCode = null)
         {
             int pagesize = _appSettings.PageSize;
             //var query = _context.Putovanje.AsNoTracking();
             var query = _context.Statistika.Include(p => p.SifraOrganizacijeNavigation).Include(s => s.SifraGradaNavigation).AsNoTracking();
+            if (cityCode.HasValue)
+            {
+                query = query.Where(s => s.SifraGrada == cityCode.Value);
+            }
             int count = query.Count();
             var pagingInfo = new PagingInfo
             {
@@ -116,6 +130,77 @@ namespace KoronavirusMvc.Controllers
             };
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var statistika = _context.Statistika
+                .AsNoTracking()
+                .Where(d => d.SifraObjave == id)
+                .FirstOrDefault();
+
+            if (statistika == null)
+            {
+                return NotFound($"Ne postoji statistika s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                await PrepareDropdownLists();
+                return View(statistika);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Statistika statistika = await _context.Statistika.FindAsync(id);
+                if (statistika == null)
+                {
+                    return NotFound($"Ne postoji statistika s identifikacijskom oznakom {id}");
+                }
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Statistika>(statistika, "", z => z.SifraGrada, z => z.SifraOrganizacije, z => z.BrojSlucajeva, 
+                                                                            z => z.BrojUmrlih, z => z.BrojIzlijecenih, z => z.BrojAktivnih, z => z.Datum);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o statistici uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
+                        return View(statistika);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o statistici nije moguće povezati s forme");
+                    await PrepareDropdownLists();
+                    return View(statistika);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -1,0 +1,19 @@
+﻿@model (Lokacija Lokacija, SelectList drzave)
+
+    <div class="form-group @(Model.Lokacija.SifraGrada > 0 ? "d-none" : "")">
+        <label asp-for="Lokacija.SifraGrada"> Šifra objave</label>
+        <input asp-for="Lokacija.SifraGrada" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Lokacija.ImeGrada"></label>
+        <div><span asp-validation-for="Lokacija.ImeGrada" class="text-danger"></span></div>
+        <input asp-for="Lokacija.ImeGrada" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Lokacija.SifraDrzave"></label>
+        <div><span asp-validation-for="Lokacija.SifraDrzave" class="text-danger"></span></div>
+        <select class="form-control" asp-for="Lokacija.SifraDrzave" asp-items="Model.drzave">
+            <option selected value="" disabled>Odaberite državu</option>
+        </select>
+    </div>

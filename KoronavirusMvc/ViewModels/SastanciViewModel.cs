@@ -5,7 +5,7 @@ namespace KoronavirusMvc.ViewModels
 {
     public class SastanciViewModel
     {
-        public IEnumerable<Sastanak> Sastanci { get; set; }
+        public IEnumerable<SastanakViewModel> Sastanci { get; set; }
         public PagingInfo PagingInfo { get; set; }
     }
 }

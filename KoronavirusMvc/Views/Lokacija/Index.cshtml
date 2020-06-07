@@ -39,6 +39,14 @@
                 <td class="text-left">@item.ImeGrada</td>
                 <td class="text-left">@item.SifraDrzaveNavigation.ImeDrzave</td>
                 <td class=" btn-group">
+                    <a asp-action="Edit"
+                       asp-route-id="@item.SifraGrada"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </a>
                     <form asp-action="Delete" method="POST"
                           asp-route-page="@Model.PagingInfo.CurrentPage"
                           asp-route-sort="@Model.PagingInfo.Sort"

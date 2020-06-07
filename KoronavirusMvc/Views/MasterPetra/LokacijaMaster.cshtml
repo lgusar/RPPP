@@ -1,0 +1,21 @@
+﻿@model List<Lokacija>
+
+@{ foreach (var item in Model)
+    {
+    <div style="display: flex; margin-bottom: 5px;">
+        <div style="flex: auto;" class="btn btn-outline-primary lokacija-button" sifra="@item.SifraGrada">@item.ImeGrada </div>
+        <div class="btn btn-sm lokacija-edit" lokacija="@item.SifraGrada" sifra="@item.SifraGrada" title="Ažuriraj">
+            <i class="fas fa-edit"></i>
+        </div>
+        <button class="btn btn-sm btn-danger lokacija-delete" sifra="@item.SifraGrada" title="Obriši">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+    }
+}
+<div>
+    <button class="btn btn-sm btn-success lokacija-add" title="Dodaj novu lokaciju">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
+

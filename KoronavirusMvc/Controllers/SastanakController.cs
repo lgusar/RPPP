@@ -8,6 +8,13 @@ using KoronavirusMvc.Extensions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using PdfRpt.FluentInterface;
+using System.Collections.Generic;
+using PdfRpt.Core.Contracts;
+using OfficeOpenXml;
+using Microsoft.AspNetCore.Http;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -15,10 +22,13 @@ namespace KoronavirusMvc.Controllers
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
+        private readonly ILogger<SastanakController> logger;
 
-        public SastanakController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+
+        public SastanakController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<SastanakController> logger)
         {
             this.ctx = ctx;
+            this.logger = logger;
             appSettings = optionsSnapshot.Value;
         }
 
@@ -44,12 +54,14 @@ namespace KoronavirusMvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Sastanak sastanak)
         {
+            logger.LogTrace(JsonSerializer.Serialize(sastanak), new JsonSerializerOptions { IgnoreNullValues = true });
             if (ModelState.IsValid)
             {
                 try
                 {
                     ctx.Add(sastanak);
                     ctx.SaveChanges();
+                    logger.LogInformation(new EventId(2000), $"Sastanak {sastanak.SifraSastanka} dodan.");
                     TempData[Constants.Message] = $"Sastanak dodan. Šifra sastanka = {sastanak.SifraSastanka}";
                     TempData[Constants.ErrorOccurred] = false;
 
@@ -57,6 +69,7 @@ namespace KoronavirusMvc.Controllers
                 }
                 catch (Exception exc)
                 {
+                    logger.LogError("Pogreška prilikom dodavanje novog sastanka: {0}", exc.CompleteExceptionMessage());
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
                     PrepareDropDownLists();
                     return View(sastanak);
@@ -69,100 +82,212 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        //[HttpGet]
+        //public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        //{
+        //    var sastanak = ctx.Sastanak.AsNoTracking().Where(d => d.SifraSastanka == id).SingleOrDefault();
+        //    if (sastanak == null)
+        //    {
+        //        return NotFound("Ne postoji sastanak s oznakom: " + id);
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Page = page;
+        //        ViewBag.Sort = sort;
+        //        ViewBag.Ascending = ascending;
+        //        PrepareDropDownLists();
+        //        return View(sastanak);
+        //    }
+        //}
+
         [HttpGet]
-        public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Edit(int id)
         {
-            var sastanak = ctx.Sastanak.AsNoTracking().Where(d => d.SifraSastanka == id).SingleOrDefault();
-            if (sastanak == null)
+            var sastanak = ctx.Sastanak
+                             .AsNoTracking()
+                             .Where(m => m.SifraSastanka == id)
+                             .SingleOrDefault();
+            if (sastanak != null)
             {
-                return NotFound("Ne postoji sastanak s oznakom: " + id);
+                PrepareDropDownLists();
+                return PartialView(sastanak);
             }
             else
             {
-                ViewBag.Page = page;
-                ViewBag.Sort = sort;
-                ViewBag.Ascending = ascending;
-                PrepareDropDownLists();
-                return View(sastanak);
+                return NotFound($"Neispravna šifra sastanka: {id}");
             }
         }
 
 
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
-        {
-            try
-            {
-                Sastanak sastanak = await ctx.Sastanak
-                                  .Where(d => d.SifraSastanka == id)
-                                  .FirstOrDefaultAsync();
-                if (sastanak == null)
-                {
-                    return NotFound("Neispravna šifra sastanka: " + id);
-                }
+        //[HttpPost, ActionName("Edit")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        //{
+        //    try
+        //    {
+        //        Sastanak sastanak = await ctx.Sastanak
+        //                          .Where(d => d.SifraSastanka == id)
+        //                          .FirstOrDefaultAsync();
+        //        if (sastanak == null)
+        //        {
+        //            return NotFound("Neispravna šifra sastanka: " + id);
+        //        }
 
-                if (await TryUpdateModelAsync<Sastanak>(sastanak, "",
-                    d => d.SifraStozera, d => d.Datum
-                ))
-                {
-                    ViewBag.Page = page;
-                    ViewBag.Sort = sort;
-                    ViewBag.Ascending = ascending;
-                    try
-                    {
-                        await ctx.SaveChangesAsync();
-                        TempData[Constants.Message] = "Sastanak ažuriran.";
-                        TempData[Constants.ErrorOccurred] = false;
-                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-                    }
-                    catch (Exception exc)
-                    {
-                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                        PrepareDropDownLists();
-                        return View(sastanak);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Podatke o sastanku nije moguće povezati s forme");
-                    PrepareDropDownLists();
-                    return View(sastanak);
-                }
-            }
-            catch (Exception exc)
-            {
-                TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccurred] = true;
-                return RedirectToAction(nameof(Edit), id);
-            }
-        }
-
+        //        if (await TryUpdateModelAsync<Sastanak>(sastanak, "",
+        //            d => d.SifraStozera, d => d.Datum
+        //        ))
+        //        {
+        //            ViewBag.Page = page;
+        //            ViewBag.Sort = sort;
+        //            ViewBag.Ascending = ascending;
+        //            try
+        //            {
+        //                await ctx.SaveChangesAsync();
+        //                TempData[Constants.Message] = "Sastanak ažuriran.";
+        //                TempData[Constants.ErrorOccurred] = false;
+        //                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+        //            }
+        //            catch (Exception exc)
+        //            {
+        //                ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+        //                PrepareDropDownLists();
+        //                return View(sastanak);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            ModelState.AddModelError(string.Empty, "Podatke o sastanku nije moguće povezati s forme");
+        //            PrepareDropDownLists();
+        //            return View(sastanak);
+        //        }
+        //    }
+        //    catch (Exception exc)
+        //    {
+        //        TempData[Constants.Message] = exc.CompleteExceptionMessage();
+        //        TempData[Constants.ErrorOccurred] = true;
+        //        return RedirectToAction(nameof(Edit), id);
+        //    }
+        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraSastanka, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Edit(Sastanak sastanak)
         {
-            var sastanak = ctx.Sastanak.Find(SifraSastanka);
             if (sastanak == null)
             {
-                return NotFound();
+                return NotFound("Nema poslanih podataka");
+            }
+            bool checkId = ctx.Sastanak.Any(m => m.SifraSastanka == sastanak.SifraSastanka);
+            if (!checkId)
+            {
+                return NotFound($"Neispravna šifra sastanka: {sastanak?.SifraSastanka}");
+            }
+
+            PrepareDropDownLists();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Update(sastanak);
+                    ctx.SaveChanges();
+                    return StatusCode(302, Url.Action(nameof(Row), new { id = sastanak.SifraSastanka }));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    return PartialView(sastanak);
+                }
             }
             else
+            {
+                return PartialView(sastanak);
+            }
+        }
+
+        public PartialViewResult Row(int id)
+        {
+            var sastanak = ctx.Sastanak
+                             .Where(m => m.SifraSastanka == id)
+                             .Select(m => new SastanakViewModel
+                             {
+                                 NazivStozera = m.SifraStozeraNavigation.Naziv,
+                                 Datum = m.Datum,
+                                 SifraSastanka = m.SifraSastanka
+                             })
+                             .SingleOrDefault();
+            if (sastanak != null)
+            {
+                return PartialView(sastanak);
+            }
+            else
+            {
+                //vratiti prazan sadržaj?
+                return PartialView("ErrorMessageRow", $"Neispravan id sastanka: {id}");
+            }
+        }
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public IActionResult Delete(int SifraSastanka, int page = 1, int sort = 1, bool ascending = true)
+        //{
+        //    var sastanak = ctx.Sastanak.Find(SifraSastanka);
+        //    if (sastanak == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    else
+        //    {
+        //        try
+        //        {
+        //            ctx.Remove(sastanak);
+        //            ctx.SaveChanges();
+        //            TempData[Constants.Message] = $"Sastanak {sastanak.SifraSastanka} uspješno obrisan";
+        //            TempData[Constants.ErrorOccurred] = false;
+        //        }
+        //        catch (Exception exc)
+        //        {
+        //            TempData[Constants.Message] = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage();
+        //            TempData[Constants.ErrorOccurred] = true;
+        //        }
+        //        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+        //    }
+        //}
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var sastanak = ctx.Sastanak
+                             .AsNoTracking() //ima utjecaj samo za Update, za brisanje možemo staviti AsNoTracking
+                             .Where(m => m.SifraSastanka == id)
+                             .SingleOrDefault();
+            if (sastanak != null)
             {
                 try
                 {
                     ctx.Remove(sastanak);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Sastanak {sastanak.SifraSastanka} uspješno obrisan";
-                    TempData[Constants.ErrorOccurred] = false;
+                    var result = new
+                    {
+                        message = $"Sastanak sa šifrom {id} obrisan.",
+                        successful = true
+                    };
+                    return Json(result);
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccurred] = true;
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    return Json(result);
                 }
-                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+            else
+            {
+                return NotFound($"Sastanak sa šifrom {id} ne postoji");
             }
         }
 
@@ -192,10 +317,7 @@ namespace KoronavirusMvc.Controllers
             switch (sort)
             {
                 case 1:
-                    orderSelector = d => d.SifraSastanka;
-                    break;
-                case 2:
-                    orderSelector = d => d.SifraStozera;
+                    orderSelector = d => d.SifraStozeraNavigation.Naziv;
                     break;
                 case 3:
                     orderSelector = d => d.Datum;
@@ -208,6 +330,12 @@ namespace KoronavirusMvc.Controllers
             }
 
             var sastanci = query
+                      .Select(m => new SastanakViewModel
+                      {
+                          NazivStozera = m.SifraStozeraNavigation.Naziv,
+                          Datum = m.Datum,
+                          SifraSastanka = m.SifraSastanka
+                      })
                       .Skip((page - 1) * pagesize)
                       .Take(pagesize)
                       .ToList();
@@ -221,6 +349,129 @@ namespace KoronavirusMvc.Controllers
 
             return View(model);
         }
+
+        public void ExportToExcel()
+        {
+            List<SastanakViewModel> emplist = ctx.Sastanak.Select(x => new SastanakViewModel
+            {
+                SifraSastanka = x.SifraSastanka,
+                Datum = x.Datum,
+                NazivStozera = x.SifraStozeraNavigation.Naziv.Trim()
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Sastanci");
+
+            ws.Cells["A1"].Value = "Sastanci";
+
+            ws.Cells["A3"].Value = "Date";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra sastanka";
+            ws.Cells["B6"].Value = "Datum";
+            ws.Cells["C6"].Value = "Naziv stozera";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraSastanka;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", item.Datum);
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.NazivStozera;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
+        }
+
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis sastanaka";
+            var sastanci = await ctx.Sastanak
+                .Include(o => o.SifraStozeraNavigation)
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(sastanci));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Sastanak>(o => o.SifraSastanka);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Sifra sastanka", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Sastanak>(o => o.Datum);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Datum sastanka", horizontalAlignment: HorizontalAlignment.Left);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                    columns.AddColumn(column =>
+                    {
+                        column.PropertyName<Sastanak>(o => o.SifraStozeraNavigation.Naziv);
+                        column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                        column.IsVisible(true);
+                        column.Order(2);
+                        column.Width(2);
+                        column.HeaderCell("Naziv stozera", horizontalAlignment: HorizontalAlignment.Center);
+                    });
+                });
+            });
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=stozeri.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
 
     }
 }
