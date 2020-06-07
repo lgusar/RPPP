@@ -1,12 +1,17 @@
 ﻿using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -354,5 +359,123 @@ namespace KoronavirusMvc.Controllers
 
             return View(model);
         }
+
+        public void ExportToExcel()
+        {
+            List<StozerViewModel> emplist = ctx.Stozer.Select(x => new StozerViewModel
+            {
+                SifraStozera = x.SifraStozera,
+                Naziv = x.Naziv,
+                ImePredsjednika = x.IdPredsjednikaNavigation.Prezime.ToString().Trim() + " " + x.IdPredsjednikaNavigation.Ime.ToString().Trim()
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Stozeri");
+
+            ws.Cells["A1"].Value = "Stozeri";
+
+            ws.Cells["A3"].Value = "Date";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra Stozera";
+            ws.Cells["B6"].Value = "Naziv stozera";
+            ws.Cells["C6"].Value = "Ime predsjednika";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraStozera;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.Naziv;
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.ImePredsjednika;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
+        }
+
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis stozera";
+            var stozeri = await ctx.Stozer
+                .Include(o => o.IdPredsjednikaNavigation)
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(stozeri));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stozer>(o => o.SifraStozera);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Sifra stozera", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stozer>(o => o.Naziv);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Naziv stozera", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stozer>(o => o.IdPredsjednikaNavigation.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Ime predsjednika", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stozer>(o => o.IdPredsjednikaNavigation.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Prezime predsjednika", horizontalAlignment: HorizontalAlignment.Left);
+                });
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=stozeri.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
     }
 }

@@ -1,0 +1,33 @@
+﻿@model Stozer
+
+<tr>
+    <td>
+        <input asp-for="Naziv" class="form-control" data-save="" />
+    </td>
+    <td>
+        <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe" data-save="">
+            <option disabled selected value="">Odaberite predsjednika</option>
+        </select>
+    </td>
+    <td>
+        <button type="submit" class="btn btn-sm btn-primary save" title="Spremi"><i class="fas fa-save"></i></button>
+    </td>
+    <td>
+        <button class="btn btn-sm cancel" title="Odustani"><i class="fas fa-undo-alt"></i></button>
+    </td>
+</tr>
+<tr>
+    <td colspan="6">
+        <div asp-validation-summary="All"></div>
+        <input type="hidden" asp-for="SifraStozera" data-save="" />
+    </td>
+</tr>
+
+
+@*<div class="form-group">
+    <label asp-for="IdPredsjednika"></label>
+    <div><span asp-validation-for="IdPredsjednika" class="text-danger"></span></div>
+    <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe">
+        <option disabled selected value="">Odaberite osobu</option>
+    </select>
+</div>*@

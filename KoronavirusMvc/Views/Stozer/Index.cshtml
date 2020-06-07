@@ -7,6 +7,10 @@
 
 
 <a asp-action="Create">Unos novog stožera</a>
+<br>
+<a href="@Url.Action("ExportToExcel")">Izvoz u Excel</a>
+<br>
+<a href="@Url.Action("PDFReport")">Izvjestaj u PDF</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
        class="float-right">

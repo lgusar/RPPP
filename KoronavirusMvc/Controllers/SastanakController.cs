@@ -10,6 +10,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using PdfRpt.FluentInterface;
+using System.Collections.Generic;
+using PdfRpt.Core.Contracts;
+using OfficeOpenXml;
+using Microsoft.AspNetCore.Http;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -344,6 +349,129 @@ namespace KoronavirusMvc.Controllers
 
             return View(model);
         }
+
+        public void ExportToExcel()
+        {
+            List<SastanakViewModel> emplist = ctx.Sastanak.Select(x => new SastanakViewModel
+            {
+                SifraSastanka = x.SifraSastanka,
+                Datum = x.Datum,
+                NazivStozera = x.SifraStozeraNavigation.Naziv.Trim()
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Sastanci");
+
+            ws.Cells["A1"].Value = "Sastanci";
+
+            ws.Cells["A3"].Value = "Date";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra sastanka";
+            ws.Cells["B6"].Value = "Datum";
+            ws.Cells["C6"].Value = "Naziv stozera";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraSastanka;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", item.Datum);
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.NazivStozera;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
+        }
+
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis sastanaka";
+            var sastanci = await ctx.Sastanak
+                .Include(o => o.SifraStozeraNavigation)
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(sastanci));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Sastanak>(o => o.SifraSastanka);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Sifra sastanka", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Sastanak>(o => o.Datum);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Datum sastanka", horizontalAlignment: HorizontalAlignment.Left);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                    columns.AddColumn(column =>
+                    {
+                        column.PropertyName<Sastanak>(o => o.SifraStozeraNavigation.Naziv);
+                        column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                        column.IsVisible(true);
+                        column.Order(2);
+                        column.Width(2);
+                        column.HeaderCell("Naziv stozera", horizontalAlignment: HorizontalAlignment.Center);
+                    });
+                });
+            });
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=stozeri.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
 
     }
 }

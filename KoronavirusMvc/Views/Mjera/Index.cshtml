@@ -1,0 +1,58 @@
+﻿@model KoronavirusMvc.ViewModels.MjereViewModel
+@{
+    ViewData["Title"] = "Popis mjera";
+}
+
+<h2>Popis mjera</h2>
+
+
+<a asp-action="Create">Unos nove mjere</a>
+<br>
+<a href="@Url.Action("ExportToExcel")">Izvoz u Excel</a>
+<br>
+<a href="@Url.Action("PDFReport")">Izvjestaj u PDF</a>
+
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
+<table class="table table-sm table-striped table-hover">
+    <thead>
+        <tr>
+            @{
+                string[] nazivi = { "Sifra mjere", "Sifra sastanka", "Sifra prethodne mjere", "Opis", "Datum", "Vrijedi do" };
+                for (int i = 1; i <= nazivi.Length; i++)
+                {
+                    <th>
+                        <a asp-route-sort="@i"
+                           asp-route-page="@Model.PagingInfo.CurrentPage"
+                           asp-route-ascending="@(Model.PagingInfo.Sort == i ? !Model.PagingInfo.Ascending : true)">
+                            @nazivi[i - 1]
+                        </a>
+                    </th>
+                }
+            }
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var mjera in Model.Mjere)
+        {
+            <partial name="Row" model="mjera" />
+        }
+    </tbody>
+</table>
+
+
+
+@section styles{
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            SetEditAjax(".editajax", '@Url.Action("Edit")','sifrastozera');
+            SetDeleteAjax(".deleteajax", '@Url.Action("Delete")', 'sifrastozera');
+        });
+    </script>
+}
