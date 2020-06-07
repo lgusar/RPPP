@@ -1,0 +1,33 @@
+﻿@model Oprema
+
+<tr>
+    <td>
+        <select class="form-control" asp-for="SifraInstitucije" asp-items="ViewBag.Institucije" data-save="">
+            <option selected value="" disabled>Odaberite Instituciju</option>
+        </select>
+    </td>
+    <td>
+        <input asp-for="NazivOpreme" data-save="" class="form-control" />
+    </td>
+    <td>
+        <input asp-for="KolicinaOpreme" data-save="" class="form-control" />
+    </td>
+    <td>
+        <button type="submit" class="btn btn-sm btn-primary save" title="Spremi">
+            <i class="fas fa-save"></i>
+        </button>
+    </td>
+    <td>
+        <button class="btn btn-sm cancel" title="Odustani">
+            <i class="fas fa-undo-alt"></i>
+        </button>
+    </td>
+</tr>
+<tr>
+    <td colspan="6">
+        <div asp-validation-summary="All"></div>
+        <input type="hidden" asp-for="SifraOpreme" data-save="" />
+    </td>
+
+</tr>
+

@@ -8,11 +8,6 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="SifraInstitucije"></label>
-        <div><span asp-validation-for="SifraInstitucije" class="text-danger"></span></div>
-        <input asp-for="SifraInstitucije" class="form-control" />
-    </div>
-    <div class="form-group">
         <label asp-for="NazivInstitucije"></label>
         <div><span asp-validation-for="NazivInstitucije" class="text-danger"></span></div>
         <input asp-for="NazivInstitucije" class="form-control" />
@@ -31,7 +26,7 @@
         <label asp-for="SifraOrganizacije"></label>
         <div><span asp-validation-for="SifraOrganizacije" class="text-danger"></span></div>
         <select class="form-control" asp-for="SifraOrganizacije" asp-items="ViewBag.Organizacije">
-            <option selected value="" disabled>Odaberite šifru organizacije</option>
+            <option selected value="" disabled>Odaberite organizaciju</option>
         </select>
     </div>
     <div class="text-center">
