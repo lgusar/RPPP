@@ -695,11 +695,14 @@ namespace KoronavirusMvc.Controllers
 
                 if (simptom != null)
                 {
-                    ctx.Add(new PregledSimptom
+                    if (ctx.PregledSimptom.Find(simptom.SifraSimptoma, SifraPregleda) == null)
                     {
-                        SifraPregleda = SifraPregleda,
-                        SifraSimptoma = simptom.SifraSimptoma
-                    });
+                        ctx.Add(new PregledSimptom
+                        {
+                            SifraPregleda = SifraPregleda,
+                            SifraSimptoma = simptom.SifraSimptoma
+                        });
+                    }
                 }
                 else
                 {
@@ -737,11 +740,13 @@ namespace KoronavirusMvc.Controllers
 
                 if (terapija != null)
                 {
-                    ctx.Add(new PregledTerapija
-                    {
-                        SifraPregleda = SifraPregleda,
-                        SifraTerapije = terapija.SifraTerapije
-                    });
+                    if (ctx.PregledTerapija.Find(SifraPregleda, terapija.SifraTerapije) == null) {
+                        ctx.Add(new PregledTerapija
+                        {
+                            SifraPregleda = SifraPregleda,
+                            SifraTerapije = terapija.SifraTerapije
+                        });
+                    }
                 }
                 else
                 {
