@@ -36,18 +36,13 @@
             <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            ...
+                        @*<div class="modal-header" id="addEditHeader">
+                        </div>*@
+                        <div class="modal-body" id="addEditBody">
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-secondary" id="closeModal">Odustani</button>
+                            <button type="button" class="btn btn-primary" id="saveModal">Spremi</button>
                         </div>
                     </div>
                 </div>
@@ -67,6 +62,36 @@
 
                     setTimeout(function () {
                         registerContentButtons();
+                    })
+                })
+
+            })
+
+            $(".lokacija-edit, .lokacija-add").click(function () {
+                var isAdd = $(this).attr("sifra") == 0;
+                $.get('@Url.Action("GetLokacijaAddEdit")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SaveLokacija")',
+                            {
+                                isAdd: isAdd,
+                                sifraGrada: $("#addEditBody").find("#Item1_SifraGrada").val(),
+                                imeGrada: $("#addEditBody").find("#Item1_ImeGrada").val(),
+                                sifraDrzave: $("#addEditBody").find("#Item1_SifraDrzave").val()
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    loadLocation();
+                                    $("#location-content").empty();
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
                     })
                 })
 
@@ -159,16 +184,25 @@
 
         var closeAddEditModal = function () {
             $("#addEditModal").modal("hide");
+            $("#saveModal").off("click");
         }
 
-        $("#selectedCountry").change(function () {
-            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: $(this).val() }).then(function (result) {
+        var loadLocation = function () {
+            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: $("#selectedCountry").val() }).then(function (result) {
                 $("#lokacije").html(result);
 
                 setTimeout(function () {
                     registerCityButtons();
                 })
             })
+        }
+
+        $("#closeModal").click(function () {
+            closeAddEditModal();
+        })
+
+        $("#selectedCountry").change(function () {
+            loadLocation();
         });
     </script>
 }

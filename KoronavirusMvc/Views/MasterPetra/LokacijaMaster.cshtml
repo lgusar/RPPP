@@ -4,10 +4,10 @@
     {
     <div style="display: flex; margin-bottom: 5px;">
         <div style="flex: auto;" class="btn btn-outline-primary lokacija-button" sifra="@item.SifraGrada">@item.ImeGrada </div>
-        <div class="btn btn-sm putovanje-edit" lokacija="@item.SifraGrada" title="Ažuriraj">
+        <div class="btn btn-sm lokacija-edit" lokacija="@item.SifraGrada" sifra="@item.SifraGrada" title="Ažuriraj">
             <i class="fas fa-edit"></i>
         </div>
-        <button class="btn btn-sm btn-danger putovanje-delete" lokacija="@item.SifraGrada" title="Obriši">
+        <button class="btn btn-sm btn-danger lokacija-delete" sifra="@item.SifraGrada" title="Obriši">
             <i class="fas fa-trash-alt"></i>
         </button>
     </div>

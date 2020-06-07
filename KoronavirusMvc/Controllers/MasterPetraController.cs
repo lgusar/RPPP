@@ -81,5 +81,120 @@ namespace KoronavirusMvc.Controllers
 
             return await GetLocationForCountry(sifraDrzave);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDrzavaAddEdit(string sifraDrzave)
+        {
+            Drzava drzava;
+            if (!string.IsNullOrWhiteSpace(sifraDrzave))
+            {
+                drzava = await _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);
+            }
+            else
+            {
+                drzava = new Drzava();
+            }
+
+            return PartialView("DrzaveMasterEdit", drzava);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetLokacijaAddEdit(int sifraGrada)
+        {
+            Lokacija lokacija;
+            if(sifraGrada > 0)
+            {
+                lokacija = await _context.Lokacija.FirstAsync(g => g.SifraGrada == sifraGrada);
+            }
+            else
+            {
+                lokacija = new Lokacija();
+            }
+
+            var drzave = await _context.Drzava.OrderBy(d => d.ImeDrzave).Select(d => new { d.ImeDrzave, d.SifraDrzave }).ToListAsync();
+
+            return PartialView("LocationEditMaster", (Lokacija: lokacija, drzave: new SelectList(drzave, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave))));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>SaveLokacija(bool isAdd, int sifraGrada, string imeGrada, string sifraDrzave)
+        {
+            var lokacija = await _context.Lokacija.FirstOrDefaultAsync(g => g.SifraGrada == sifraGrada);
+            if (isAdd)
+            {
+                if (lokacija != null)
+                {
+                    return await GetLokacijaAddEdit(0);
+                }
+                else lokacija = new Lokacija
+                {
+                    SifraGrada = sifraGrada
+                };
+            }
+
+            lokacija.ImeGrada = imeGrada;
+            lokacija.SifraDrzave = sifraDrzave;
+
+            if (isAdd)
+            {
+                _context.Add(lokacija);
+            }
+
+            await _context.SaveChangesAsync();
+
+           return Ok(new { Success = true });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPutovanjeAddEdit(int sifraPutovanja)
+        {
+            Putovanje putovanje;
+            if(sifraPutovanja > 0)
+            {
+                putovanje = await _context.Putovanje.FirstAsync(p => p.SifraPutovanja == sifraPutovanja);
+            }
+            else
+            {
+                putovanje = new Putovanje();
+            }
+
+            var lokacije = await _context.Lokacija.OrderBy(d => d.ImeGrada).Select(d => new { d.ImeGrada, d.SifraGrada }).ToListAsync();
+            var osobe = await _context.Osoba.OrderBy(d => d.Ime).Select(d => new { d.Ime, d.IdentifikacijskiBroj }).ToListAsync();
+
+            var viewModel = new MasterPutovanjeEditViewModel
+            {
+                Putovanje = putovanje,
+                Lokacije = new SelectList(lokacije, nameof(Lokacija.SifraGrada), nameof(Lokacija.ImeGrada)),
+                Osobe = new SelectList(osobe, nameof(Osoba.IdentifikacijskiBroj), nameof(Osoba.Ime))
+            };
+
+            return PartialView("PutovanjeEditMaster", viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetStatistikaAddEdit(int sifraStatistike)
+        {
+            Statistika statistika;
+            if(sifraStatistike > 0)
+            {
+                statistika = await _context.Statistika.FirstAsync(s => s.SifraObjave == sifraStatistike);
+            }
+            else
+            {
+                statistika = new Statistika();
+            }
+
+            var lokacije = await _context.Lokacija.OrderBy(d => d.ImeGrada).Select(d => new { d.ImeGrada, d.SifraGrada }).ToListAsync();
+            var organizacije = await _context.Organizacija.OrderBy(d => d.Naziv).Select(d => new { d.Naziv, d.SifraOrganizacije }).ToListAsync();
+
+            var viewModel = new MasterStatistikaEditViewModel
+            {
+                Statistika = statistika,
+                Lokacije = new SelectList(lokacije, nameof(Lokacija.SifraGrada), nameof(Lokacija.ImeGrada)),
+                Organizacije = new SelectList(organizacije, nameof(Organizacija.SifraOrganizacije), nameof(Organizacija.Naziv))
+            };
+
+            return PartialView("StatistikaEditMaster", viewModel);
+        }
     }
 }
