@@ -1,0 +1,74 @@
+﻿@model KoronavirusMvc.ViewModels.TerapijeViewModel
+
+@{
+    ViewData["Title"] = "Popis terapija";
+}
+
+<a asp-action="Create">Unos nove terapije</a>
+
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
+<a asp-action="exportToExcel" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj Excel</a>
+
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+
+<table class="table table-sm table-striped table-hover" id="tableterapije">
+    <thead>
+        <tr>
+            <th>
+                <a asp-route-sort="1"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                    Šifra terapije
+                </a>
+            </th>
+            <th>
+                <a asp-route-sort="2"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                    Ime terapije
+                </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var terapija in Model.Terapije)
+        {
+            <tr>
+                <td class="text-left">@terapija.SifraTerapije</td>
+                <td class="text-left">@terapija.OpisTerapije</td>
+                <td class="btn-group">
+                    <a asp-action="Edit"
+                       asp-route-id="@terapija.SifraTerapije"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="post"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraTerapije" value="@terapija.SifraTerapije" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+@section styles{
+
+}
+
+@section scripts{
+
+}

@@ -10,20 +10,85 @@ $(function () {
 });
 
 function clearOldMessage() {
-    $("#tempmessage").siblings().remove();
-    $("#tempmessage").removeClass("alert-success");
-    $("#tempmessage").removeClass("alert-danger");
-    $("#tempmessage").html('');
+    $('#tempmessage').siblings().remove();
+    $('#tempmessage').removeClass("alert-success");
+    $('#tempmessage').removeClass("alert-danger");
+    $('#tempmessage').html('');
 }
+
+function SetDeleteSimptom(selector, url, sifraSimptoma, sifraPregleda) {
+    $(document).on('click', selector, function (event) {
+        event.preventDefault();
+        var sifraSimptomaval = $(this).data(sifraSimptoma);
+        var sifraPregledaval = $(this).data(sifraPregleda);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data("aktivan");
+        if (aktivan !== true) {
+            $(tr).data("aktivan", true);
+
+            if (confirm("Ukloniti zapis?")) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { SifraPregleda: sifraPregledaval, SifraSimptoma: sifraSimptomaval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $('#tempmessage').addClass(data.successful ? "alert-success" : "alert-danger");
+                    $('#tempmessage').html(data.message);
+
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data("aktivan", false);
+                })
+            }
+            else {
+                $(tr).data("aktivan", false);
+            }
+        }
+    });
+}
+
+function SetDeleteTerapija(selector, url, sifraTerapije, sifraPregleda) {
+    $(document).on('click', selector, function (event) {
+        event.preventDefault();
+        var sifraTerapijeval = $(this).data(sifraTerapije);
+        var sifraPregledaval = $(this).data(sifraPregleda);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data("aktivan");
+        if (aktivan !== true) {
+            $(tr).data("aktivan", true);
+
+            if (confirm("Ukloniti zapis?")) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { SifraPregleda: sifraPregledaval, SifraTerapije: sifraTerapijeval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $('#tempmessage').addClass(data.successful ? "alert-success" : "alert-danger");
+                    $('#tempmessage').html(data.message);
+
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data("aktivan", false);
+                })
+            }
+            else {
+                $(tr).data("aktivan", false);
+            }
+        }
+    });
+}
+
 
 function SetDeleteAjax(selector, url, paramname) {
     $(document).on('click', selector, function (event) {
 
-        event.preventDefault();     
+        event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno        
         var paramval = $(this).data(paramname);
         var tr = $(this).parents("tr");
         var aktivan = $(tr).data('aktivan');
-        if (aktivan != true) { 
+        if (aktivan != true) { //da spriječimo dva brza klika...
             $(tr).data('aktivan', true);
             if (confirm('Obrisati zapis?')) {
                 var token = $('input[name="__RequestVerificationToken"]').first().val();
@@ -48,16 +113,16 @@ function SetDeleteAjax(selector, url, paramname) {
 
 function SetEditAjax(selector, url, paramname) {
     $(document).on('click', selector, function (event) {
-        event.preventDefault();    
+        event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno        
         var paramval = $(this).data(paramname);
         var tr = $(this).parents("tr");
         var aktivan = $(tr).data('aktivan');
-        if (aktivan != true) { 
+        if (aktivan != true) { //da spriječimo dva brza klika...
             $(tr).data('aktivan', true);
             clearOldMessage();
             $.get(url, { id: paramval }, function (data) {
-                tr.toggle(); 
-                var inserted = $(data).insertAfter(tr); 
+                tr.toggle(); //sakrij trenutni redak
+                var inserted = $(data).insertAfter(tr); //iza skrivenog retka dodaj redak koji je došao sa servera
                 SetCancelAndSaveBehaviour(tr, inserted, url);
             })
                 .fail(function (jqXHR) {
@@ -69,17 +134,22 @@ function SetEditAjax(selector, url, paramname) {
 }
 
 function SetCancelAndSaveBehaviour(hiddenRow, insertedData, url) {
+    //nađi cancel button 
     insertedData.find(".cancel").click(function (event) {
-        insertedData.remove(); 
-        hiddenRow.toggle(); 
+        insertedData.remove(); //ukloni umetnuti redak
+        hiddenRow.toggle(); //vrati vidljivost originalnom retku
         $(hiddenRow).data('aktivan', false);
     });
 
+    //nađi save button 
     insertedData.find(".save").click(function (event) {
-        event.preventDefault(); 
+        event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno
 
+        //pripremi podatke i spremi ih u json
         var formData = new FormData();
+        //pronađi sve elemente koji imaju data-save (mogli bi tražiti i data-val='true', ali što kao ASP.Net promijeni način označavanja
         insertedData.find("[data-save]").each(function (index, element) {
+            //dodaj vrijednost elementa u object data koji će kasnije biti poslan na server 
             if ($(element).is(':checkbox')) {
                 formData.append($(element).attr('name'), $(element).is(':checked'));
             }
@@ -96,6 +166,7 @@ function SetCancelAndSaveBehaviour(hiddenRow, insertedData, url) {
                 }
             }
         });
+        //find antiforgery token
         var token = $('input[name="__RequestVerificationToken"]').first().val();
         formData.append("__RequestVerificationToken", token);
 
@@ -112,7 +183,7 @@ function SetCancelAndSaveBehaviour(hiddenRow, insertedData, url) {
             },
             error: function (jqXHR) {
 
-                if (jqXHR.status == 302) {
+                if (jqXHR.status == 302) { //data saved and redirect
                     insertedData.remove();
                     $.get(jqXHR.responseText, {}, function (refreshedRow) {
                         $(hiddenRow).replaceWith(refreshedRow);
@@ -123,5 +194,36 @@ function SetCancelAndSaveBehaviour(hiddenRow, insertedData, url) {
                 }
             }
         });
+    });
+}
+
+function DeleteKontakt(selector, url, idosobe, idkontakt) {
+    $(document).on('click', selector, function (event) {
+
+        event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno        
+        var osobaval = $(this).data(idosobe);
+        var kontaktval = $(this).data(idkontakt);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data('aktivan');
+        if (aktivan != true) { //da spriječimo dva brza klika...
+            $(tr).data('aktivan', true);
+            if (confirm('Obrisati zapis?')) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { idosobe: osobaval, idkontakt: kontaktval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $("#tempmessage").addClass(data.successful ? "alert-success" : "alert-danger");
+                    $("#tempmessage").html(data.message);
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data('aktivan', false);
+                });
+            }
+            else {
+                $(tr).data('aktivan', false);
+            }
+        }
     });
 }

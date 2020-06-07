@@ -44,18 +44,20 @@ namespace KoronavirusMvc
             app.UseStaticFiles();
             app.UseRouting();
 
+
             app.UseEndpoints(endpoints =>
             {
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}"
+                );
 
                 endpoints.MapControllerRoute(
-                            "AutoCompleteRoute",
-                            "autocomplete/{controller}/{action=Get}",
-                            new { area = "AutoComplete" }
-                        );
+                    name: "AutoCompleteRoute",
+                    pattern: "autocomplete/{controller}/{action=Get}",
+                    new { area = "AutoComplete" }
+                    );
             });
         }
     }

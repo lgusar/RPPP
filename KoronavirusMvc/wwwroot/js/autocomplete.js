@@ -1,6 +1,5 @@
-﻿var AUTO_COMPLETE_PREFIX = "/autocomplete";
+﻿$(function () {
 
-$(function () {
 
     $("[data-autocomplete]").each(function (index, element) {
         var url = $(element).data('autocomplete');
@@ -17,7 +16,7 @@ $(function () {
         });
 
         $(element).autocomplete({
-            source: AUTO_COMPLETE_PREFIX + '/' + url,
+            source: "/autocomplete/" + url,
             autoFocus: true,
             minLength: 1,
             select: function (event, ui) {
@@ -25,9 +24,8 @@ $(function () {
                 var dest = $("[data-autocomplete-placeholder='" + resultplaceholder + "']");
                 $(dest).val(ui.item.id);
                 $(dest).data('selected-label', ui.item.label);
-
-                }
             }
-        });
+        }
+        );
     });
-});
+})

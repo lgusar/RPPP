@@ -6,6 +6,9 @@
 
 <h1>Države</h1>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
 <div>
     <h4>Države</h4>
     <hr />
@@ -25,6 +28,7 @@
                    asp-route-page="@Model.PagingInfo.CurrentPage"
                    asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Ime države: </a>
             </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -33,7 +37,17 @@
             <tr>
                 <td class="text-left">@item.SifraDrzave</td>
                 <td class="text-left">@item.ImeDrzave</td>
-
+                <td class=" btn-group">
+                    <form asp-action="Delete" method="POST"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraDrzave" value="@item.SifraDrzave"/>
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

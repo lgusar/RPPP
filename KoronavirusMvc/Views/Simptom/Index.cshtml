@@ -6,6 +6,14 @@
 
 <a asp-action="Create">Unos novog simptoma</a>
 
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
+
+<a asp-action="exportToExcel" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj Excel</a>
+
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+
 <table class="table table-sm table-striped table-hover" id="tablesimptomi">
     <thead>
         <tr>
@@ -31,6 +39,26 @@
             <tr>
                 <td class="text-left">@simptom.SifraSimptoma</td>
                 <td class="text-left">@simptom.Opis</td>
+                <td class="btn-group">
+                    <a asp-action="Edit"
+                       asp-route-id="@simptom.SifraSimptoma"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </a>
+
+                    <form asp-action="Delete" method="post"
+                          asp-route-page="@Model.PagingInfo.CurrentPage"
+                          asp-route-sort="@Model.PagingInfo.Sort"
+                          asp-route-ascending="@Model.PagingInfo.Ascending">
+                        <input type="hidden" name="SifraSimptoma" value="@simptom.SifraSimptoma" />
+                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
             </tr>
 
         }
