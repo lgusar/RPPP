@@ -326,5 +326,69 @@ namespace KoronavirusMvc.Controllers
                             .ToList();
             return list;
         }
+
+        public void exportToExcelDetail(string sifraDrzave)
+        {
+            var drzava =  _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);
+
+            List<Lokacija> lokacije = _context.Lokacija.Where( l => l.SifraDrzave == sifraDrzave).ToList();
+
+            List<Statistika> statistike = new List<Statistika>();
+            List<Putovanje> putovanja = new List<Putovanje>();
+            foreach (var item in lokacije)
+            {
+                statistike.AddRange(_context.Statistika.Where(s => s.SifraGrada == item.SifraGrada).ToList());
+                var dodajPutovanja = _context.PutovanjeLokacija.Where(s => s.SifraGrada == item.SifraGrada).ToList();
+                foreach (var it in dodajPutovanja)
+                {
+                    putovanja.AddRange(_context.Putovanje.Where(p => p.SifraPutovanja == it.SifraPutovanja));
+                }
+            }
+
+
+            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            //ExcelPackage pck = new ExcelPackage();
+            //ExcelWorksheet ws = pck.Workbook.Worksheets.Add($"Pregled {pregled.SifraPregleda}");
+
+            //ws.Cells["A1"].Value = $"Pregled {pregled.SifraPregleda}";
+
+            //ws.Cells["A3"].Value = "Datum";
+            //ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            //ws.Cells["A6"].Value = "Sifra Pregleda";
+            //ws.Cells["B6"].Value = "Datum";
+            //ws.Cells["C6"].Value = "Anamneza";
+            //ws.Cells["D6"].Value = "Dijagnoza";
+
+            //ws.Cells["A7"].Value = pregled.SifraPregleda;
+            //ws.Cells["B7"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", pregled.Datum);
+            //ws.Cells["C7"].Value = pregled.Anamneza;
+            //ws.Cells["D7"].Value = pregled.Dijagnoza;
+
+            //ws.Cells["A10"].Value = "Simptomi";
+
+            //int rowStart = 11;
+            //foreach (Simptom s in simptomi)
+            //{
+            //    ws.Cells[string.Format("A{0}", rowStart)].Value = s.Opis;
+            //    rowStart++;
+            //}
+
+            //ws.Cells["C10"].Value = "Terapije";
+
+            //rowStart = 11;
+            //foreach (Terapija t in terapije)
+            //{
+            //    ws.Cells[string.Format("C{0}", rowStart)].Value = t.OpisTerapije;
+            //    rowStart++;
+            //}
+
+            //ws.Cells["A:AZ"].AutoFitColumns();
+            //Response.Clear();
+            //Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            //Response.Headers.Add("content-disposition", $"attachment; filename=pregled{pregled.SifraPregleda}.xlsx");
+            //Response.Body.WriteAsync(pck.GetAsByteArray());
+            //Response.CompleteAsync();
+        }
     }
 }
