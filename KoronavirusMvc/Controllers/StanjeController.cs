@@ -19,11 +19,20 @@ using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa stanjima i tablicama vezanih u tablicu stanje
+    /// </summary>
     public class StanjeController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<StanjeController> logger;
+        /// <summary>
+        /// Konstruktor razreda stanja
+        /// </summary>
+        /// <param name="ctx">Kontekst baze</param>
+        /// <param name="optionsSnapshot">Opcije app</param>
+        /// <param name="logger">Logger za ispis logova prilikom dodavanja, brisanja i ažuriranja stanja u bazi podataka</param>
         public StanjeController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<StanjeController> logger)
         {
             this.ctx = ctx;
@@ -31,12 +40,21 @@ namespace KoronavirusMvc.Controllers
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Metoda koja dohvaća stranicu Create.cshtml za stvaranje novog stanja
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda koja služi za stvaranje novog stanja u bazi podataka
+        /// </summary>
+        /// <param name="stanje">Model koji sadži sve atribute tablice stanje koji se dodaju u bazu podataka</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stanje stanje)
@@ -69,6 +87,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// MEtoda koja dohvaća stranicu Edit.cshtml za ažuriranje stanja
+        /// </summary>
+        /// <param name="id">šifra stanja koje želimo ažurirati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -86,6 +112,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja ažurira stanje u bazi podataka
+        /// </summary>
+        /// <param name="id">Šifra stanja koje ažuriramo</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
@@ -135,6 +169,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za brisanje stanja iz baze podataka
+        /// </summary>
+        /// <param name="sifrastanja">Sifra stanja kojeg želimo obrisati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int sifrastanja, int page = 1, int sort = 1, bool ascending = true)
@@ -167,6 +209,13 @@ namespace KoronavirusMvc.Controllers
         }
 
 
+        /// <summary>
+        /// Metoda za tablični prikaz svih stanja koja postoje u bazi podataka sa njezinim atributima
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -215,6 +264,11 @@ namespace KoronavirusMvc.Controllers
             };
             return View(model);
         }
+
+        /// <summary>
+        /// Metoda koja sama generira novu šifru stanja kako bi šifre stanja išle po redu
+        /// </summary>
+        /// <returns></returns>
         private decimal NewId()
         {
             var maxId = ctx.Stanje
@@ -225,6 +279,10 @@ namespace KoronavirusMvc.Controllers
             return maxId + 1;
         }
 
+        /// <summary>
+        /// Metoda koja generira Pdf dokument. Stvara se tablica svih stanja s njezinim atributima
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis stanja";
@@ -283,6 +341,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// MEtoda koja služi za generiranje Excel izvješća. Stvara se Excel tablica sa svih stanjima.
+        /// </summary>
         public void ExportToExcel()
         {
             List<StanjaViewModel> emplist = ctx.Stanje.Select(x => new StanjaViewModel

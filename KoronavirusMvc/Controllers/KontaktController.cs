@@ -19,11 +19,20 @@ using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad s kontaktima i tablicama vezanim za tablicu kontakt
+    /// </summary>
     public class KontaktController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<KontaktController> logger;
+        /// <summary>
+        /// Konstruktor razreda KontaktController
+        /// </summary>
+        /// <param name="ctx">Kontekst baze</param>
+        /// <param name="optionsSnapshot">Opcije app</param>
+        /// <param name="logger">Logger za ispis logova prilikom dodavanja, ažuriranja i brisanja u bazi podataka</param>
         public KontaktController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<KontaktController> logger)
         {
             this.ctx = ctx;
@@ -31,12 +40,21 @@ namespace KoronavirusMvc.Controllers
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Metoda koja vraća stranicu Create.cshtml za stvaranje novog kontakta
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda koja stvara novi kontakt u bazi podataka
+        /// </summary>
+        /// <param name="kontakt">Model koji sadrži sve atribute tablice Kontakt za dodavanje u bazu podataka</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Kontakt kontakt)
@@ -70,6 +88,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja vraća tablični prikaz svih kontakata
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -142,6 +167,12 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda koja briše kontakt iz baze podataka
+        /// </summary>
+        /// <param name="idOsoba">Identifikacijski broj osobe</param>
+        /// <param name="idKontakt">Identifikacijski broj osobe s kojom je osoba bila u kontaktu</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string idOsoba, string idKontakt)
@@ -175,7 +206,10 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Metoda koja služi za generiranje pdf izvješća. Stvara se tablica sa svim kontaktima koji su u bazi podataka
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis osoba u kontaktu";
@@ -272,6 +306,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za generiranje Excel izvješća. Stvara se tablica svih kontakata u Excelu.
+        /// </summary>
         public void ExportToExcel()
         {
             List<KontaktViewModel> emplist = ctx.Kontakt.Select(x => new KontaktViewModel

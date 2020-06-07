@@ -18,11 +18,21 @@ using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa zaraženim osobama i tablicama koje uključuju tablicu zaražena osoba
+    /// </summary>
     public class ZarazenaOsobaController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<ZarazenaOsobaController> logger;
+
+        /// <summary>
+        /// Konstruktor Controllera zaražene osobe
+        /// </summary>
+        /// <param name="ctx">kontekst baze</param>
+        /// <param name="optionsSnapshot">opcije app</param>
+        /// <param name="logger">logger za ispis logova prilikom brisanja, dodavanja i ažuriranja zaražene osobe</param>
         public ZarazenaOsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<ZarazenaOsobaController> logger)
         {
             this.ctx = ctx;
@@ -30,6 +40,10 @@ namespace KoronavirusMvc.Controllers
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje strannice Create.cshtml za stvaranje novog pogleda
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -37,12 +51,20 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Metoda koja stvara padajuću listu za stanja koja nudi tablica stanje
+        /// </summary>
         private void PrepareDropDownLists()
         {
             var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
             ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
 
+        /// <summary>
+        /// HttpPost metoda koja stvara novi pogled u bazi podataka
+        /// </summary>
+        /// <param name="zarazenaOsoba">Model zaražene osobe sa svim podacima koji se spremaju u bazu podataka kod stvaranja nove zaražene osobe</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(ZarazenaOsoba zarazenaOsoba)
@@ -76,6 +98,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za dohvaćanje stranice Edit.cshtml za ažuriranje zaražene osobe
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe koju želimo ažurirati</param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(string id)
         {
@@ -95,6 +122,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za uređivanje zaražene osobe u bazi podataka
+        /// </summary>
+        /// <param name="zarazenaOsoba">Model zaražene osobe sa svim atributima koje ima tablica zaražena osoba u bazi podataka</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(ZarazenaOsoba zarazenaOsoba)
@@ -133,6 +165,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za stvaranje parcijalnog pogleda
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe za koju se radi parcijalni pogled</param>
+        /// <returns></returns>
         public PartialViewResult Row(string id)
         {
             var zarazenaOsoba = ctx.ZarazenaOsoba
@@ -156,6 +193,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za brisanje zaražene osobe iz baze podataka
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe koju želimo ukloniti iz baze</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string id)
@@ -197,6 +239,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za tablični ispis svih zaraženih osoba
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -261,6 +310,10 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda koja generira Pdf tablice zaraženih osoba
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis zaraženih osoba";
@@ -364,6 +417,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja stvara Excel datoteku iz tabličnog prikaza svih zaraženih osoba
+        /// </summary>
         public void ExportToExcel()
         {
             List<ZarazenaOsobaViewModel> emplist = ctx.ZarazenaOsoba.Select(x => new ZarazenaOsobaViewModel

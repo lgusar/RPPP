@@ -24,11 +24,20 @@ using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad s osobama i tablicama vezanim uz tablicu osoba
+    /// </summary>
     public class OsobaController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<OsobaController> logger;
+        /// <summary>
+        /// Kontruktor razreda OsobaContorller
+        /// </summary>
+        /// <param name="ctx">Kontekst baze</param>
+        /// <param name="optionsSnapshot">Opcije app</param>
+        /// <param name="logger">Logger za ispis logova prilikom dodavanja, brisanja i ažuriranja u bazi podataka</param>
         public OsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<OsobaController> logger)
         {
             this.ctx = ctx;
@@ -36,12 +45,21 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
+        /// <summary>
+        /// Metoda koja služi za dohvaćanje Create.cshtml stranice za stvaranje nove osobe
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda koja stvara novu osobu u bazi podataka
+        /// </summary>
+        /// <param name="osoba">Model osobe sa svim atributima iz tablice osoba</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Osoba osoba)
@@ -73,6 +91,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za dohvaćanje Edit.cshtml stranice za ažuriranje osobe
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe koju želimo ažurirati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -90,6 +116,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja ažurira podatke osobe
+        /// </summary>
+        /// <param name="id">Identidikacijski broj osobe koju ažuriramo</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
@@ -138,6 +172,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za brisanje osobe iz baze podataka
+        /// </summary>
+        /// <param name="id">IIdentifikacijski broj osobe koju brišemo iz baze podataka</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string id, int page = 1, int sort = 1, bool ascending = true)
@@ -176,6 +218,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za tablični prikaz osoba u bazi podataka
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -237,6 +286,11 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda koja vraća prikaz detalja neke osobe sa svim ostalim podacima kojih nema u tablici Osoba
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe</param>
+        /// <returns></returns>
         public async Task<IActionResult> Details(string id)
         {
             if (id == null)
@@ -319,7 +373,11 @@ namespace KoronavirusMvc.Controllers
         }
 
 
-
+        /// <summary>
+        /// Metoda koja dinamički briše osobu koja je označena kao zaražena
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteZarazenaOsoba(string id)
@@ -362,13 +420,19 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Metoda koja priprema padajuću listu za stanja koja su u bazi podataka
+        /// </summary>
         private void PrepareDropDownLists()
         {
             var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
             ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
 
+        /// <summary>
+        /// Metoda koja generira izvješće u pdf formatu. Stvara tablični prikaz svih osoba u bazi podataka
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis osoba";
@@ -479,6 +543,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za dohvaćanje EditZarazenaOsoba.cshtml za ažuriranje zaražene osobe
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe</param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult EditZarazenaOsoba(string id)
         {
@@ -498,6 +567,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja dinamički ažurira podatke zaražene osobe u detaljima osobe
+        /// </summary>
+        /// <param name="zarazenaOsoba">Model zaražene osobe koja se onda ažurira</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult EditZarazenaOsoba(ZarazenaOsoba zarazenaOsoba)
@@ -536,6 +610,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja vraća parcijalni pogled za zaraženu osobu
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe</param>
+        /// <returns></returns>
         public PartialViewResult Row(string id)
         {
             var zarazenaOsoba = ctx.ZarazenaOsoba
@@ -556,6 +635,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja generira izvješće u Excelu. Vraća tablični popis osoba u bazi podataka
+        /// </summary>
         public void ExportToExcel()
         {
             List<Osoba> emplist = ctx.Osoba.Select(x => new Osoba
@@ -606,6 +688,9 @@ namespace KoronavirusMvc.Controllers
 
         }
 
+        /// <summary>
+        /// Metoda koja generira izvješće u Excelu. Stvara tablicu sa svim podacima u detaljima osobe.
+        /// </summary>
         public void ExportToExcelOsoba()
         {
             List<OsobaDetailsViewModel> emplist = ctx.Osoba.Include(o => o.ZarazenaOsoba).Select(x => new OsobaDetailsViewModel
@@ -662,6 +747,12 @@ namespace KoronavirusMvc.Controllers
 
         }
 
+        /// <summary>
+        /// Metoda koja služi za dinamičko brisanje kontakta.
+        /// </summary>
+        /// <param name="idOsobe">Identifikacijski broj osobe</param>
+        /// <param name="idKontakt">Identifikacijski broj kontakta</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteKontakt(string idOsobe, string idKontakt)
@@ -704,6 +795,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja generira pdf izvješće za detalje neke osobe.
+        /// </summary>
+        /// <param name="id">Identifikacijski broj osobe</param>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReportOsoba(string id)
         {
             string naslov = "Detalji osobe";
