@@ -1,0 +1,38 @@
+﻿@model Putovanje
+
+@{
+    ViewBag.Title = "Ažuriranje podataka o putovanju";
+}
+    <form asp-route-page="@ViewBag.Page"
+          asp-route-sort="@ViewBag.Sort"
+          asp-route-ascending="@ViewBag.Ascending"
+          asp-action="Edit"
+          method="post">
+        <div asp-validation-summary="All"></div>
+
+        <div class="form-group">
+            <label asp-for="DatumPolaska"></label>
+            <div><span asp-validation-for="DatumPolaska" class="text-danger"></span></div>
+            <input asp-for="DatumPolaska" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="DatumVracanja"></label>
+            <div><span asp-validation-for="DatumVracanja" class="text-danger"></span></div>
+            <input asp-for="DatumVracanja" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="IdentifikacijskiBroj"></label>
+            <div><span asp-validation-for="IdentifikacijskiBroj" class="text-danger"></span></div>
+            <select class="form-control" asp-for="IdentifikacijskiBroj" asp-items="ViewBag.Osobe">
+                <option selected value="" disabled>Odaberite osobu</option>
+            </select>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Spremi</button>
+        </div>
+        <a asp-action="Index"
+           asp-route-page="@ViewBag.Page"
+           asp-route-sort="@ViewBag.Sort"
+           asp-route-ascending="@ViewBag.Ascending"
+           class="btn btn-secondary">Odustani</a>
+    </form>

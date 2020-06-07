@@ -6,6 +6,7 @@ using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -23,14 +24,22 @@ namespace KoronavirusMvc.Controllers
             _appSettings = appSettings.Value;
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await PrepareDropdownLists();
             return View();
         }
 
+        private async Task PrepareDropdownLists()
+        {
+            var drzava = await _context.Drzava.OrderBy(d => d.ImeDrzave).Select(d => new { d.ImeDrzave, d.SifraDrzave }).ToListAsync();
+            ViewBag.Drzave = new SelectList(drzava, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave));
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Lokacija lokacija)
+        public async Task<IActionResult> Create(Lokacija lokacija)
         {
             if (ModelState.IsValid)
             {
@@ -47,11 +56,13 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.CompleteExceptionMessage());
+                    await PrepareDropdownLists();
                     return View(lokacija);
                 }
             }
             else
             {
+                await PrepareDropdownLists();
                 return View(lokacija);
             }
         }
@@ -104,6 +115,76 @@ namespace KoronavirusMvc.Controllers
             };
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            var lokacija = _context.Lokacija
+                .AsNoTracking()
+                .Where(d => d.SifraGrada == id)
+                .FirstOrDefault();
+
+            if (lokacija == null)
+            {
+                return NotFound($"Ne postoji lokacija s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                await PrepareDropdownLists();
+                return View(lokacija);
+            }
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
+        {
+            try
+            {
+                Lokacija lokacija = await _context.Lokacija.FindAsync(id);
+                if (lokacija == null)
+                {
+                    return NotFound($"Ne postoji lokacija s identifikacijskom oznakom {id}");
+                }
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Lokacija>(lokacija, "", z => z.ImeGrada, z => z.SifraDrzave);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o putovanju uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        await PrepareDropdownLists();
+                        return View(lokacija);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o gradu nije moguće povezati s forme");
+                    await PrepareDropdownLists();
+                    return View(lokacija);
+                }
+            }
+            catch (Exception exc)
+            {
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
+            }
+        }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

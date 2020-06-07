@@ -45,6 +45,14 @@
             <td class="text-left">@item.SifraPutovanja</td>
             <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
             <td class=" btn-group">
+                <a asp-action="Edit"
+                   asp-route-id="@item.SifraPutovanja"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-sort="@Model.PagingInfo.Sort"
+                   asp-route-ascending="@Model.PagingInfo.Ascending"
+                   class="btn btn-sm" title="Ažuriraj">
+                    <i class="fas fa-edit"></i>
+                </a>
                 <form asp-action="Delete" method="POST"
                       asp-route-page="@Model.PagingInfo.CurrentPage"
                       asp-route-sort="@Model.PagingInfo.Sort"

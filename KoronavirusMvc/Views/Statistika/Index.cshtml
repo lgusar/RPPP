@@ -56,7 +56,7 @@
         @foreach (var item in Model.Statistika)
         {
         <tr>
-            <td class="text-left">@item.SifraOrganizacije</td>
+            <td class="text-left">@item.SifraObjave</td>
             <td class="text-left">@item.SifraGradaNavigation.ImeGrada</td>
             <td class="text-left">@item.SifraOrganizacijeNavigation.Naziv</td>
             <td class="text-left">@item.BrojSlucajeva</td>
@@ -64,6 +64,14 @@
             <td class="text-left">@item.BrojUmrlih</td>
             <td class="text-left">@item.BrojIzlijecenih</td>
             <td class=" btn-group">
+                <a asp-action="Edit"
+                   asp-route-id="@item.SifraObjave"
+                   asp-route-page="@Model.PagingInfo.CurrentPage"
+                   asp-route-sort="@Model.PagingInfo.Sort"
+                   asp-route-ascending="@Model.PagingInfo.Ascending"
+                   class="btn btn-sm" title="Ažuriraj">
+                    <i class="fas fa-edit"></i>
+                </a>
                 <form asp-action="Delete" method="POST"
                       asp-route-page="@Model.PagingInfo.CurrentPage"
                       asp-route-sort="@Model.PagingInfo.Sort"

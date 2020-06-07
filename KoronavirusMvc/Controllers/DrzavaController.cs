@@ -42,7 +42,7 @@ namespace KoronavirusMvc.Controllers
                 {
                     _context.Add(drzava);
                     _context.SaveChanges();
-                    TempData[Constants.Message] = $"Putovanje {drzava.SifraDrzave} uspjesno dodano.";
+                    TempData[Constants.Message] = $"Država {drzava.SifraDrzave} uspjesno dodano.";
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -62,30 +62,76 @@ namespace KoronavirusMvc.Controllers
 
 
         // GET: Drzava/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public ActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
         {
-            return View();
+            var drzava = _context.Drzava
+                .AsNoTracking()
+                .Where(d => d.SifraDrzave == id)
+                .FirstOrDefault();
+
+            if (drzava == null)
+            {
+                return NotFound($"Ne postoji drzava s tom šifrom: {id}");
+            }
+            else
+            {
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.ascending = ascending;
+                return View(drzava);
+            }
         }
 
-        // POST: Drzava/Edit/5
-        [HttpPost]
+
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
         {
             try
             {
-                // TODO: Add update logic here
+                Drzava drzava = await _context.Drzava.FindAsync(id);
+                if (drzava == null)
+                {
+                    return NotFound($"Ne postoji drzava s identifikacijskom oznakom {id}");
+                }
 
-                return RedirectToAction(nameof(Index));
+                ViewBag.Page = page;
+                ViewBag.Sort = sort;
+                ViewBag.Ascending = ascending;
+                bool ok = await TryUpdateModelAsync<Drzava>(drzava, "", z => z.ImeDrzave);
+                if (ok)
+                {
+                    try
+                    {
+                        TempData[Constants.Message] = $"Podaci o državi uspješno su ažurirani.";
+                        TempData[Constants.ErrorOccurred] = false;
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
+                    }
+                    catch (Exception exc)
+                    {
+                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        return View(drzava);
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Podatke o drzavi nije moguće povezati s forme");
+                    return View(drzava);
+                }
             }
-            catch
+            catch (Exception exc)
             {
-                return View();
+                TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                TempData[Constants.ErrorOccurred] = true;
+
+                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
             }
         }
 
-        // GET: Drzava/Delete/5
-        public ActionResult Delete(int id)
+            // GET: Drzava/Delete/5
+            public ActionResult Delete(int id)
         {
             return View();
         }

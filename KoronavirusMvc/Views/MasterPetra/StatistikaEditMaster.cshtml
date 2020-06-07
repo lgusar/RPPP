@@ -1,0 +1,51 @@
+﻿@model KoronavirusMvc.ViewModels.MasterStatistikaEditViewModel
+
+@{
+    ViewBag.Title = "Ažuriranje podataka o statistici";
+}
+
+<div class="form-group @(Model.Statistika.SifraObjave > 0 ? "d-none" : "")">
+    <label asp-for="Statistika.SifraObjave"> Šifra objave</label>
+    <input asp-for="Statistika.SifraObjave" class="form-control" id="id" />
+</div>
+
+<div class="form-group">
+    <label asp-for="Statistika.BrojSlucajeva"></label>
+    <div><span asp-validation-for="Statistika.BrojSlucajeva" class="text-danger"></span></div>
+    <input asp-for="Statistika.BrojSlucajeva" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.BrojUmrlih"></label>
+    <div><span asp-validation-for="Statistika.BrojUmrlih" class="text-danger"></span></div>
+    <input asp-for="Statistika.BrojUmrlih" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.BrojIzlijecenih"></label>
+    <div><span asp-validation-for="Statistika.BrojIzlijecenih" class="text-danger"></span></div>
+    <input asp-for="Statistika.BrojIzlijecenih" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.BrojAktivnih"></label>
+    <div><span asp-validation-for="Statistika.BrojAktivnih" class="text-danger"></span></div>
+    <input asp-for="Statistika.BrojAktivnih" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.Datum"></label>
+    <div><span asp-validation-for="Statistika.Datum" class="text-danger"></span></div>
+    <input asp-for="Statistika.Datum" class="form-control" />
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.SifraGrada"></label>
+    <div><span asp-validation-for="Statistika.SifraGrada" class="text-danger"></span></div>
+    <select class="form-control" asp-for="Statistika.SifraGrada" asp-items="Model.Lokacije">
+        <option selected value="" disabled>Odaberite osobu</option>
+    </select>
+</div>
+<div class="form-group">
+    <label asp-for="Statistika.SifraOrganizacije"></label>
+    <div><span asp-validation-for="Statistika.SifraOrganizacije" class="text-danger"></span></div>
+    <select class="form-control" asp-for="Statistika.SifraOrganizacije" asp-items=" Model.Organizacije">
+        <option selected value="" disabled>Odaberite osobu</option>
+    </select>
+</div>
+

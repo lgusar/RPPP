@@ -1,0 +1,33 @@
+﻿@model Lokacija
+
+@{
+    ViewBag.Title = "Ažuriranje podataka o lokaciji";
+}
+<form asp-route-page="@ViewBag.Page"
+      asp-route-sort="@ViewBag.Sort"
+      asp-route-ascending="@ViewBag.Ascending"
+      asp-action="Edit"
+      method="post">
+    <div asp-validation-summary="All"></div>
+
+    <div class="form-group">
+        <label asp-for="ImeGrada"></label>
+        <div><span asp-validation-for="ImeGrada" class="text-danger"></span></div>
+        <input asp-for="ImeGrada" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="SifraDrzave"></label>
+        <div><span asp-validation-for="SifraDrzave" class="text-danger"></span></div>
+        <select class="form-control" asp-for="SifraDrzave" asp-items="ViewBag.Drzave">
+            <option selected value="" disabled>Odaberite osobu</option>
+        </select>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Spremi</button>
+    </div>
+    <a asp-action="Index"
+       asp-route-page="@ViewBag.Page"
+       asp-route-sort="@ViewBag.Sort"
+       asp-route-ascending="@ViewBag.Ascending"
+       class="btn btn-secondary">Odustani</a>
+</form>
