@@ -4,7 +4,7 @@
     ViewData["Title"] = "Detalji pregleda";
 }
 
-
+    <a asp-action="ExportToExcelDetail" asp-route-id="@Model.Pregled.SifraPregleda" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj Excel</a>
 
 <div>
     <h4>Pregled @Model.Pregled.SifraPregleda</h4>

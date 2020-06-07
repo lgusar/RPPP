@@ -759,6 +759,83 @@ namespace KoronavirusMvc.Controllers
         }
 
         /// <summary>
+        /// Metoda za generiranje izvješća za MD pregleda.
+        /// </summary>
+        /// <param name="id">Šifra pregleda za koji se generira MD excel tablica</param>
+        public void ExportToExcelDetail(int id)
+        {
+            var pregled = ctx.Pregled.Find(id);
+
+            pregled.PregledSimptom = ctx.PregledSimptom.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Simptom> simptomi = new List<Simptom>();
+
+            foreach (PregledSimptom ps in pregled.PregledSimptom)
+            {
+                var simptom = ctx.Simptom.FirstOrDefault(p => p.SifraSimptoma == ps.SifraSimptoma);
+                simptomi.Add(simptom);
+            }
+
+            pregled.PregledTerapija = ctx.PregledTerapija.AsNoTracking()
+                                                       .Where(p => p.SifraPregleda == id)
+                                                       .ToList();
+
+            List<Terapija> terapije = new List<Terapija>();
+
+            foreach (PregledTerapija pt in pregled.PregledTerapija)
+            {
+                var terapija = ctx.Terapija.FirstOrDefault(p => p.SifraTerapije == pt.SifraTerapije);
+                terapije.Add(terapija);
+            }
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add($"Pregled {pregled.SifraPregleda}");
+
+            ws.Cells["A1"].Value = $"Pregled {pregled.SifraPregleda}";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra Pregleda";
+            ws.Cells["B6"].Value = "Datum";
+            ws.Cells["C6"].Value = "Anamneza";
+            ws.Cells["D6"].Value = "Dijagnoza";
+
+            ws.Cells["A7"].Value = pregled.SifraPregleda;
+            ws.Cells["B7"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", pregled.Datum);
+            ws.Cells["C7"].Value = pregled.Anamneza;
+            ws.Cells["D7"].Value = pregled.Dijagnoza;
+
+            ws.Cells["A10"].Value = "Simptomi";
+
+            int rowStart = 11;
+            foreach (Simptom s in simptomi)
+            {
+                ws.Cells[string.Format("A{0}", rowStart)].Value = s.Opis;
+                rowStart++;
+            }
+
+            ws.Cells["C10"].Value = "Terapije";
+
+            rowStart = 11;
+            foreach (Terapija t in terapije)
+            {
+                ws.Cells[string.Format("C{0}", rowStart)].Value = t.OpisTerapije;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", $"attachment; filename=pregled{pregled.SifraPregleda}.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+        }
+
+        /// <summary>
         /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim pregledima
         /// </summary>
         public void exportToExcel()
