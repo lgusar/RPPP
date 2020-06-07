@@ -7,7 +7,7 @@
 <h4>Osoba</h4>
 <br />
 
-<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a asp-action="PDFReportOsoba" name="id" value="@Model.IdentifikacijskiBroj" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
 <a class="btn btn-primary" href="@Url.Action("ExportToExcelOsoba")">Export Excel</a>
 
 <hr />

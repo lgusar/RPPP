@@ -703,5 +703,140 @@ namespace KoronavirusMvc.Controllers
                 return NotFound($"Kontakt s identifikacijskim brojem {idKontakt} ne postoji");
             }
         }
+
+        public async Task<IActionResult> PDFReportOsoba(string id)
+        {
+            string naslov = "Detalji osobe";
+            var osobe = await ctx.Osoba
+                .Include(o => o.KontaktIdKontaktNavigation)
+                .Include(o => o.ZarazenaOsoba)
+                .Where(o => o.IdentifikacijskiBroj == id)
+                .Select(o => new OsobaDetailsViewModel
+                {
+                    IdentifikacijskiBroj = o.IdentifikacijskiBroj,
+                    Ime = o.Ime,
+                    Prezime = o.Prezime,
+                    Adresa = o.Adresa,
+                    DatRod = o.DatRod,
+                    Zanimanje = o.Zanimanje,
+                    Zarazena = o.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? true : false,
+                    Zarazenastring = o.ZarazenaOsoba.IdentifikacijskiBroj.Equals(id) ? "Da" : "Ne",
+                    DatZaraze = o.ZarazenaOsoba.DatZaraze,
+                    NazivStanja = o.ZarazenaOsoba.SifraStanjaNavigation.NazivStanja
+                })
+                .SingleOrDefaultAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(osobe));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.IdentifikacijskiBroj);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(2);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.Adresa);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Adresa", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.DatRod);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(4);
+                    column.Width(2);
+                    column.HeaderCell("Datum rođenja", horizontalAlignment: HorizontalAlignment.Center);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.Zanimanje);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(5);
+                    column.Width(2);
+                    column.HeaderCell("Zanimanje", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<OsobaDetailsViewModel>(o => o.Zarazenastring);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(5);
+                    column.Width(2);
+                    column.HeaderCell("Zaražena?", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                
+
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=putovanja.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }
