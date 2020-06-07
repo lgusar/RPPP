@@ -7,11 +7,23 @@
     <div class="row">
         <div class="col-4" id="sidebar">
             <div class="form-group">
-                <label asp-for="OdabranaDrzava.SifraDrzave"> Šifra države</label>
-                <div><span asp-validation-for="OdabranaDrzava.SifraDrzave" class="text-danger"></span></div>
-                <select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
-                    <option selected value="" disabled>Odaberite državu</option>
-                </select>
+                <div>
+                    <label asp-for="OdabranaDrzava.SifraDrzave"><h1> Države</h1></label>
+                    <button class="btn btn-sm btn-success " title="DodajDrzavu">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div style="display: flex;">
+                    <select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
+                        <option selected value="" disabled>Odaberite državu</option>
+                    </select>
+                    <div class="btn btn-sm drzava-edit" drzava="OdabranaDrzava.SifraDrzave" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <button class="btn btn-sm btn-danger drzava-delete" drzava="OdabranaDrzava.SifraDrzave" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="dropdown-divider"></div>
@@ -21,19 +33,132 @@
         </div>
 
         <div class="col-8" id="content">
-            <div id="add-edit" class="row"></div>
+            <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="location-content" class="row"></div>
         </div>
     </div>
 </div>
 @section scripts {
     <script type="text/javascript">
-        var registerButtons = function () {
+        var selectedCity;
+        var registerCityButtons = function () {
             $(".lokacija-button").click(function () {
-            $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
-                $("#location-content").html(result);
+                selectedCity = $(this).attr("sifra");
+                $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                    $("#location-content").html(result);
+
+                    setTimeout(function () {
+                        registerContentButtons();
+                    })
+                })
+
             })
-        })
+
+            $(".lokacija-delete").click(function () {
+                selectedCity = $(this).attr("sifra");
+                if (confirm("Obrisati zapis?")) {
+                      $.ajax({
+                          url: '@Url.Action("DeleteLocation")',
+                          type: 'DELETE',
+                          data: {
+                              sifraGrada: $(this).attr("sifra"),
+                              sifraDrzave: $("#selectedCountry").val()
+                          }
+                      }).then(function (result) {
+                          $("#lokacije").html(result);
+
+                          setTimeout(function () {
+                              registerCityButtons();
+                          })
+
+                          if (selectedCity === $(this).attr("sifra")) {
+                              selectedCity = null;
+                              $("#location-content").empty();
+                          }
+                      });
+                  }
+            })
+        };
+
+        var registerContentButtons = function () {
+             $(".putovanje-edit").click(function () {
+                 $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                     $("#location-content").html(result);
+
+                 });
+             });
+
+             $(".putovanje-delete").click(function () {
+                 if (confirm("Obrisati zapis?")) {
+                     $.ajax({
+                         url: '@Url.Action("DeletePutovanje")',
+                         type: 'DELETE',
+                         data: {
+                             sifraPutovanja: $(this).attr("putovanje"),
+                             sifraGrada: selectedCity
+                         }
+                     }).then(function (result) {
+                         $("#location-content").html(result);
+
+                         setTimeout(function () {
+                             registerContentButtons();
+                         })
+                     });
+                 }
+             });
+
+             $(".statistika-edit").click(function () {
+                 $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                     $("#location-content").html(result);
+
+                 });
+             });
+             $(".statistika-delete").click(function () {
+                 if (confirm("Obrisati zapis?")) {
+                     $.ajax({
+                         url: '@Url.Action("DeleteStatistika")',
+                         type: 'DELETE',
+                         data: {
+                             sifraStatistike: $(this).attr("statistika"),
+                             sifraGrada: selectedCity
+                         }
+                     }).then(function (result) {
+                         $("#location-content").html(result);
+
+                         setTimeout(function () {
+                             registerContentButtons();
+                         })
+                     });
+                 }
+             });
+        }
+
+        var openAddEditModal = function () {
+            //To be called once content is inserted
+
+            $("#addEditModal").modal("show");
+        }
+
+        var closeAddEditModal = function () {
+            $("#addEditModal").modal("hide");
         }
 
         $("#selectedCountry").change(function () {
@@ -41,7 +166,7 @@
                 $("#lokacije").html(result);
 
                 setTimeout(function () {
-                    registerButtons();
+                    registerCityButtons();
                 })
             })
         });

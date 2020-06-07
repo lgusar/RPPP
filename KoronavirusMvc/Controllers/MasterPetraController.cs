@@ -45,11 +45,41 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public async Task<IActionResult> GetContentForLocation(int sifraGrada)
         {
-            var statistike = await _context.Statistika.Where(s => s.SifraGrada == sifraGrada).ToListAsync();
-            var putovanja = await _context.PutovanjeLokacija.Where(s => s.SifraGrada == sifraGrada)
+            var statistike = await _context.Statistika.Include(st => st.SifraOrganizacijeNavigation).Where(s => s.SifraGrada == sifraGrada).ToListAsync();
+            var putovanja = await _context.PutovanjeLokacija.Include(pl => pl.SifraPutovanjaNavigation.IdentifikacijskiBrojNavigation).Where(s => s.SifraGrada == sifraGrada)
                 .Select(pl => pl.SifraPutovanjaNavigation).ToListAsync();
-
+            
             return PartialView("ContentMaster", (Statistike: statistike, Putovanja: putovanja ));
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeletePutovanje(int sifraPutovanja, int sifraGrada)
+        {
+            var putovanje = await _context.Putovanje.FirstAsync(p => p.SifraPutovanja == sifraPutovanja);
+            _context.Remove(putovanje);
+            await _context.SaveChangesAsync();
+
+            return await GetContentForLocation(sifraGrada);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteStatistika(int sifraStatistike, int sifraGrada)
+        {
+            var statistika = await _context.Statistika.FirstAsync(p => p.SifraObjave == sifraStatistike);
+            _context.Remove(statistika);
+            await _context.SaveChangesAsync();
+
+            return await GetContentForLocation(sifraGrada);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteLocation(int sifraGrada, string sifraDrzave)
+        {
+            var location = await _context.Lokacija.FirstAsync(p => p.SifraGrada == sifraGrada);
+            _context.Remove(location);
+            await _context.SaveChangesAsync();
+
+            return await GetLocationForCountry(sifraDrzave);
         }
     }
 }

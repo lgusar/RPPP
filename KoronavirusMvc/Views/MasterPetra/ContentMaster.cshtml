@@ -1,1 +1,91 @@
-﻿@model (IEnumerable<Statistika> Statistike, IEnumerable<Putovanje> Putovanja)
+﻿@model (List<Statistika> Statistike, List<Putovanje> Putovanja)
+
+<h1>Putovanja</h1>
+<table class="table table-sm table-striped table-hover" id="tablePutovanja">
+    <thead>
+        <tr>
+            <th>
+                <div>Datum polaska: </div>
+            </th>
+            <th>
+                <div>Datum Vraćanja: </div>
+            </th>
+            <th>
+                <div>Šifra putovanja: </div>
+            </th>
+            <th>
+                <div>Ime osobe: </div>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Putovanja)
+        {
+            <tr>
+                <td class="text-left">@item.DatumPolaska</td>
+                <td class="text-left">@item.DatumVracanja</td>
+                <td class="text-left">@item.SifraPutovanja</td>
+                <td class="text-left">@item.IdentifikacijskiBrojNavigation.Ime @item.IdentifikacijskiBrojNavigation.Prezime</td>
+                <td class=" btn-group">
+                    <div class="btn btn-sm putovanje-edit" putovanje="@item.SifraPutovanja" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <button  class="btn btn-sm btn-danger putovanje-delete" putovanje="@item.SifraPutovanja" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h1>Statistike</h1>
+
+<table class="table table-sm table-striped table-hover" id="tableStatistike">
+    <thead>
+        <tr>
+            <th>
+                <div>Šifra objave: </div>
+            </th>
+            <th>
+                <div>Ime organizacije: </div>
+            </th>
+            <th>
+                <div>Ukupni broj slučajeva: </div>
+            </th>
+            <th>
+                <div>Broj trenutno bolesnih </div>
+            </th>
+            <th>
+                <div>Broj umrlih u posljednji 24 sata:  </div>
+            </th>
+            <th>
+                <div>Broj izlječenih u posljednji 24 sata: </div>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Statistike)
+        {
+            <tr>
+                <td class="text-left">@item.SifraObjave</td>
+                <td class="text-left">@item.SifraOrganizacijeNavigation.Naziv</td>
+                <td class="text-left">@item.BrojSlucajeva</td>
+                <td class="text-left">@item.BrojAktivnih</td>
+                <td class="text-left">@item.BrojUmrlih</td>
+                <td class="text-left">@item.BrojIzlijecenih</td>
+                <td class=" btn-group">
+                    <div class="btn btn-sm statistike-edit"
+                         statistika="@item.SifraObjave" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <button class="btn btn-sm btn-danger statistika-delete" statistika="@item.SifraObjave" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
