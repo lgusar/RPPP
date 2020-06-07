@@ -1,13 +1,27 @@
-﻿@model Stozer
+﻿@model Mjera
 
 <tr>
     <td>
-        <input asp-for="Naziv" class="form-control" data-save="" />
+        <input asp-for="SifraMjere" class="form-control" data-save="" />
     </td>
     <td>
-        <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe" data-save="">
-            <option disabled selected value="">Odaberite predsjednika</option>
+        <select class="form-control" asp-for="SifraSastanka" asp-items="ViewBag.Sastanci" data-save="">
+            <option disabled selected value="">Odaberite šifru sastanka</option>
         </select>
+    </td>
+    <td>
+        <select class="form-control" asp-for="SifraPrethodneMjere" asp-items="ViewBag.Mjere" data-save="">
+            <option disabled selected value="">Odaberite šifru prethodne mjere</option>
+        </select>
+    </td>
+    <td>
+        <input asp-for="Opis" class="form-control" data-save="" />
+    </td>
+    <td>
+        <input asp-for="Datum" class="form-control" data-save="" />
+    </td>
+    <td>
+        <input asp-for="VrijediDo" class="form-control" data-save="" />
     </td>
     <td>
         <button type="submit" class="btn btn-sm btn-primary save" title="Spremi"><i class="fas fa-save"></i></button>
@@ -19,15 +33,6 @@
 <tr>
     <td colspan="6">
         <div asp-validation-summary="All"></div>
-        <input type="hidden" asp-for="SifraStozera" data-save="" />
+        <input type="hidden" asp-for="SifraMjere" data-save="" />
     </td>
 </tr>
-
-
-@*<div class="form-group">
-    <label asp-for="IdPredsjednika"></label>
-    <div><span asp-validation-for="IdPredsjednika" class="text-danger"></span></div>
-    <select class="form-control" asp-for="IdPredsjednika" asp-items="ViewBag.Osobe">
-        <option disabled selected value="">Odaberite osobu</option>
-    </select>
-</div>*@

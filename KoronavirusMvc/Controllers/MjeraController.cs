@@ -97,10 +97,18 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var mjera = ctx.Mjera
-                             .AsNoTracking()
-                             .Where(m => m.SifraMjere == id)
-                             .SingleOrDefault();
+            Mjera mjera = null;
+            try
+            {
+                 mjera = ctx.Mjera
+                .AsNoTracking()
+                .Where(m => m.SifraMjere == id)
+                .SingleOrDefault();
+            } catch
+            {
+                return NotFound("Ova mjera se namjerno ne može promijeniti");
+            }
+
             if (mjera != null)
             {
                 PrepareDropDownLists();
