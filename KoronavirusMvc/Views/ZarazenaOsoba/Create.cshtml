@@ -8,27 +8,39 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="IdentifikacijskiBroj"></label>
+        <label asp-for="IdentifikacijskiBroj">Identifikacijski broj</label>
         <div><span asp-validation-for="IdentifikacijskiBroj" class="text-danger"></span></div>
         <input asp-for="IdentifikacijskiBroj" class="form-control" />
     </div>
     <div class="form-group">
-        <label asp-for="DatZaraze"></label>
+        <label asp-for="DatZaraze">Datum zaraze</label>
         <div><span asp-validation-for="DatZaraze" class="text-danger"></span></div>
         <input asp-for="DatZaraze" class="form-control" />
     </div>
+    @*<div class="form-group">
+            <label asp-for="NazivStanja">Naziv stanja</label>
+            <div><span asp-validation-for="NazivStanja" class="text-danger"></span></div>
+            <input type="hidden" asp-for="NazivStanja" data-autocomplete-placeholder="stanjeosobe" />
+            <input type="text"  class="form-control" data-autocomplete-placeholder="zarazenaosoba" data-autocomplete-placeholder-name="stanjeosobe" />
+        </div>*@
     <div class="form-group">
-        <label asp-for="SifraStanja"></label>
-        <div><span asp-validation-for="SifraStanja" class="text-danger"></span></div>
-        <select class="form-control" asp-for="SifraStanja" asp-items="ViewBag.Stanja">
-            <option selected value="" disabled>Odaberite stanje</option>
-        </select>
-    </div>
+            <label asp-for="SifraStanja"></label>
+            <div><span asp-validation-for="SifraStanja" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraStanja" asp-items="ViewBag.Stanja">
+                <option selected value="" disabled>Odaberite stanje</option>
+            </select>
+        </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Dodaj</button>
     </div>
     <div class="text-center">
-        <button class="btn btn-secondary" type="submit">Odustani</button>
+        <a asp-action="Index" class="btn btn-secondary" type="button">Odustani</a>
     </div>
 </form>
+
+@section scripts{ 
+<script src="~/lib/jqueryui/jquery-ui.js"></script>
+<script src="~/js/autocomplete.js"></script>
+}
+
 

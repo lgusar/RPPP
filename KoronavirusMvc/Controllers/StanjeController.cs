@@ -1,45 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
+using LicenseContext = OfficeOpenXml.LicenseContext;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa stanjima i tablicama vezanih u tablicu stanje
+    /// </summary>
     public class StanjeController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        public StanjeController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<StanjeController> logger;
+        /// <summary>
+        /// Konstruktor razreda stanja
+        /// </summary>
+        /// <param name="ctx">Kontekst baze</param>
+        /// <param name="optionsSnapshot">Opcije app</param>
+        /// <param name="logger">Logger za ispis logova prilikom dodavanja, brisanja i ažuriranja stanja u bazi podataka</param>
+        public StanjeController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<StanjeController> logger)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
-
+            this.logger = logger;
         }
 
+        /// <summary>
+        /// Metoda koja dohvaća stranicu Create.cshtml za stvaranje novog stanja
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda koja služi za stvaranje novog stanja u bazi podataka
+        /// </summary>
+        /// <param name="stanje">Model koji sadži sve atribute tablice stanje koji se dodaju u bazu podataka</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stanje stanje)
         {
+            logger.LogTrace(JsonSerializer.Serialize(stanje));
             if (ModelState.IsValid)
             {
 
                 try
                 {
+                    stanje.SifraStanja = (int)NewId();
                     ctx.Add(stanje);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno dodano.";
+                    logger.LogInformation($"Stanje dodano");
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -47,6 +77,7 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom dodavanja stanja {exc.CompleteExceptionMessage()}");
                     return View(stanje);
                 }
             }
@@ -56,6 +87,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// MEtoda koja dohvaća stranicu Edit.cshtml za ažuriranje stanja
+        /// </summary>
+        /// <param name="id">šifra stanja koje želimo ažurirati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -73,6 +112,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja ažurira stanje u bazi podataka
+        /// </summary>
+        /// <param name="id">Šifra stanja koje ažuriramo</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
@@ -80,6 +127,7 @@ namespace KoronavirusMvc.Controllers
             try
             {
                 Stanje stanje = await ctx.Stanje.FindAsync(id);
+                logger.LogTrace(JsonSerializer.Serialize(stanje));
                 if (stanje == null)
                 {
                     return NotFound($"Ne postoji stanje sa šifrom {id}");
@@ -95,6 +143,7 @@ namespace KoronavirusMvc.Controllers
                     {
                         
                         TempData[Constants.Message] = $"Podaci stanja {stanje.NazivStanja} uspješno ažurirani.";
+                        logger.LogInformation($"Stanje ažurirano");
                         TempData[Constants.ErrorOccurred] = false;
                         await ctx.SaveChangesAsync();
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
@@ -102,6 +151,7 @@ namespace KoronavirusMvc.Controllers
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                        logger.LogError($"Pogreška prilikom ažuriranja stanja {exc.CompleteExceptionMessage()}");
                         return View(stanje);
                     }
                 }
@@ -119,11 +169,20 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za brisanje stanja iz baze podataka
+        /// </summary>
+        /// <param name="sifrastanja">Sifra stanja kojeg želimo obrisati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraStanja, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(int sifrastanja, int page = 1, int sort = 1, bool ascending = true)
         {
-            var stanje = ctx.Stanje.Find(SifraStanja);
+            var stanje = ctx.Stanje.Find(sifrastanja);
+            logger.LogTrace(JsonSerializer.Serialize(stanje));
             if (stanje == null)
             {
                 return NotFound();
@@ -132,21 +191,31 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    
+
                     ctx.Remove(stanje);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Stanje {stanje.NazivStanja} uspješno obrisana.";
+                    TempData[Constants.Message] = $"Stanje uspješno obrisano.";
                     TempData[Constants.ErrorOccurred] = false;
+                    logger.LogInformation($"Stanje {sifrastanja} obrisano");
                 }
                 catch (Exception exc)
                 {
                     TempData[Constants.Message] = $"Pogreška prilikom brisanja stanja: " + exc.CompleteExceptionMessage();
+                    logger.LogError($"Pogreška prilikom brisanja stanja {exc.CompleteExceptionMessage()}");
                     TempData[Constants.ErrorOccurred] = true;
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }
         }
 
+
+        /// <summary>
+        /// Metoda za tablični prikaz svih stanja koja postoje u bazi podataka sa njezinim atributima
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -194,6 +263,123 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        /// <summary>
+        /// Metoda koja sama generira novu šifru stanja kako bi šifre stanja išle po redu
+        /// </summary>
+        /// <returns></returns>
+        private decimal NewId()
+        {
+            var maxId = ctx.Stanje
+                      .Select(o => o.SifraStanja)
+                      .ToList()
+                      .Max();
+
+            return maxId + 1;
+        }
+
+        /// <summary>
+        /// Metoda koja generira Pdf dokument. Stvara se tablica svih stanja s njezinim atributima
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis stanja";
+            var stanja = await ctx.Stanje
+                .AsNoTracking()
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(stanja));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stanje>(o => o.SifraStanja);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Šifra stanja", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<Stanje>(o => o.NazivStanja);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Naziv stanja", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=stanja.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        /// <summary>
+        /// MEtoda koja služi za generiranje Excel izvješća. Stvara se Excel tablica sa svih stanjima.
+        /// </summary>
+        public void ExportToExcel()
+        {
+            List<StanjaViewModel> emplist = ctx.Stanje.Select(x => new StanjaViewModel
+            {
+                SifraStanja = x.SifraStanja,
+                NazivStanja = x.NazivStanja
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Stanje");
+
+            ws.Cells["A1"].Value = "Stanje";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd.MM.yyyy} u {0:H: mm tt}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Sifra stanja";
+            ws.Cells["B6"].Value = "Naziv stanja";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraStanja;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.NazivStanja;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
         }
     }
 }

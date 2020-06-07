@@ -1,0 +1,31 @@
+﻿@model Preporuka
+<tr>
+    <td>
+        <input asp-for="Opis" data-save="" class="form-control" />
+    </td>
+    <td>
+        <select class="form-control" asp-for="SifraOrganizacije" asp-items="ViewBag.Organizacije" data-save="">
+            <option selected value="" disabled>Odaberite organizaciju</option>
+        </select>
+    </td>
+    <td>
+        <input asp-for="VrijemeObjave" data-save="" class="form-control" />
+    </td>
+    <td>
+        <button type="submit" class="btn btn-sm btn-primary save" title="Spremi">
+            <i class="fas fa-save"></i>
+        </button>
+    </td>
+    <td>
+        <button class="btn btn-sm cancel" title="Odustani">
+            <i class="fas fa-undo-alt"></i>
+        </button>
+    </td>
+</tr>
+<tr>
+    <td colspan="6">
+        <div asp-validation-summary="All"></div>
+        <input type="hidden" asp-for="SifraPreporuke" data-save="" />
+    </td>
+
+</tr>

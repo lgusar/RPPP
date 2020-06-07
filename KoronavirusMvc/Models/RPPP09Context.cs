@@ -276,7 +276,7 @@ namespace KoronavirusMvc.Models
 
             modelBuilder.Entity<OsobaPregled>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.SifraPregleda);
 
                 entity.ToTable("OSOBA_PREGLED");
 
@@ -291,12 +291,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.IdentifikacijskiBrojNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.IdentifikacijskiBroj)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__OBAVLJA__identif__2A4B4B5E");
 
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany()
                     .HasForeignKey(d => d.SifraPregleda)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__OBAVLJA__sifra_p__2B3F6F97");
             });
 
@@ -338,13 +339,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany(p => p.PregledSimptom)
                     .HasForeignKey(d => d.SifraPregleda)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PREGLED_S__sifra__0E6E26BF");
 
                 entity.HasOne(d => d.SifraSimptomaNavigation)
                     .WithMany(p => p.PregledSimptom)
                     .HasForeignKey(d => d.SifraSimptoma)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_PREGLED_SIMPTOM_SIMPTOM");
             });
 
@@ -362,13 +363,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.SifraPregledaNavigation)
                     .WithMany(p => p.PregledTerapija)
                     .HasForeignKey(d => d.SifraPregleda)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PROPISUJE__sifra__276EDEB3");
 
                 entity.HasOne(d => d.SifraTerapijeNavigation)
                     .WithMany(p => p.PregledTerapija)
                     .HasForeignKey(d => d.SifraTerapije)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__PROPISUJE__sifra__286302EC");
             });
 

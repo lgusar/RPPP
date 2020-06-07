@@ -6,7 +6,9 @@
 <h2>Popis stožera</h2>
 
 
-<a asp-action="Create">Unos novog stožera</a>
+<a asp-action="Create" class="btn btn-primary">Dodaj novi stožer</a>
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Izvoz u PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Izvještaj u Excel</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
        class="float-right">
@@ -15,47 +17,26 @@
 <table class="table table-sm table-striped table-hover">
     <thead>
         <tr>
-            <th>
-                <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
-                    Šifra stožera
-                </a>
-            </th>
-            <th>
-                <a asp-route-sort="2" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">
-                    Naziv stožera
-                </a>
-            </th>
-            <th>
-                <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage" asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">
-                    Ime predsjednika
-                </a>
-            </th>
+            @{
+                string[] nazivi = { "Naziv stožera", "Ime predsjednika" };
+                for (int i = 1; i <= nazivi.Length; i++)
+                {
+                    <th>
+                        <a asp-route-sort="@i"
+                           asp-route-page="@Model.PagingInfo.CurrentPage"
+                           asp-route-ascending="@(Model.PagingInfo.Sort == i ? !Model.PagingInfo.Ascending : true)">
+                            @nazivi[i - 1]
+                        </a>
+                    </th>
+                }
+            }
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var stozer in Model.Stozeri)
         {
-            <tr>
-                <td class="text-left">@stozer.SifraStozera</td>
-                <td class="text-left">@stozer.Naziv</td>
-                <td class="text-left">@stozer.IdPredsjednikaNavigation.Ime @stozer.IdPredsjednikaNavigation.Prezime</td>
-                <td class="btn-group">
-                    <a asp-action="Edit"
-                       asp-route-id="@stozer.SifraStozera"
-                       asp-route-page="@Model.PagingInfo.CurrentPage"
-                       asp-route-sort="@Model.PagingInfo.Sort"
-                       asp-route-ascending="@Model.PagingInfo.Ascending"
-                       class="btn btn-sm" title="Ažuriraj"><i class="fas fa-edit"></i></a>
-                    <form asp-action="Delete" method="POST"
-                          asp-route-page="@Model.PagingInfo.CurrentPage"
-                          asp-route-sort="@Model.PagingInfo.Sort"
-                          asp-route-ascending="@Model.PagingInfo.Ascending">
-                        <input type="hidden" name="SifraStozera" value="@stozer.SifraStozera" />
-                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
-                    </form>
-                </td>
-            </tr>
+            <partial name="Row" model="stozer" />
         }
     </tbody>
 </table>
@@ -66,4 +47,10 @@
 }
 
 @section scripts{
+    <script type="text/javascript">
+        $(function () {
+            SetEditAjax(".editajax", '@Url.Action("Edit")','sifrastozera');
+            SetDeleteAjax(".deleteajax", '@Url.Action("Delete")', 'sifrastozera');
+        });
+    </script>
 }

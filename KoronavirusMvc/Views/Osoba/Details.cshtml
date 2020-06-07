@@ -1,81 +1,152 @@
-﻿@model KoronavirusMvc.Models.Osoba
+﻿@model KoronavirusMvc.ViewModels.OsobaDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
+<h4>Osoba</h4>
+<br />
 
+<a asp-action="PDFReportOsoba" name="id" value="@Model.IdentifikacijskiBroj" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcelOsoba")">Export Excel</a>
 
-<div>
-    <h4>Osoba</h4>
-    <hr />
+<hr />
+
+<div class="podaci">
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayName("Identifikacijski broj")
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdentifikacijskiBroj)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Ime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Ime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Prezime)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Prezime)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Adresa)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Adresa)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DatRod)
+        <dt class="col-sm-2">
+            @Html.DisplayName("Datum rođenja")
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.DatRod)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Zanimanje)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Zanimanje)
         </dd>
     </dl>
 </div>
 
-<h4>Osobe s kojima je bila u kontkatu</h4>
+@if (Model.Zarazena == true)
+{
+    <div class="zarazena">
+        <table class="table table-sm table-striped table-hover" id="tablekontakti">
+            <thead>
+                <tr>
+                    <th>
+                        <a>Datum zaraze</a>
+                    </th>
+                    <th>
+                        <a>Stanje</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="text-left">@Model.DatZaraze</td>
+                    <td class="text-left">@Model.NazivStanja</td>
+                    <td class="btn-group">
+                        <a data-idzarazene="@Model.IdentifikacijskiBroj" class="btn btn-sm editajax" title="Ažuriraj">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form asp-action="DeleteZarazenaOsoba" method="post">
+                            <input type="hidden" name="id" value="@Model.IdentifikacijskiBroj" />
+                            <button data-idzarazene="@Model.IdentifikacijskiBroj" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <h6>Osoba nije zaražena.</h6>
+}
 
-<table class="table table-sm table-striped table-hover" id="tableosobe">
-    <thead>
-        <tr>
-            <th>
-                Identifikacijski broj
-            </th>
-            <th>
-                Ime
-            </th>
-            <th>
-               Prezime
-            </th>
-            
-        </tr>
-    </thead>
-    @*<tbody>
-        @foreach (var osoba in @Model.Osoba)
-        {
-            <tr>
-                <td class="text-left">@osoba.IdentifikacijskiBroj</td>
-                <td class="text-left">@osoba.Ime</td>
-                <td class="text-left">@osoba.Prezime</td>
-                
-            </tr>
-        }
-    </tbody>*@
-</table>
+
+<br />
+<h5>Popis osoba s kojima je osoba @Model.Ime @Model.Prezime bila u kontaktu</h5>
+<br />
+@if (Model.Kontakti.Count == 0)
+{
+    <p>Osoba nije bila ni sa kim u kontaktu.</p>
+}
+else
+{
+    <div class="kontakti">
+        <table class="table table-sm table-striped table-hover" id="tablekontakti">
+            <thead>
+                <tr>
+                    <th>
+                        <a>Identifikacijski broj</a>
+                    </th>
+                    <th>
+                        <a>Ime</a>
+                    </th>
+                    <th>
+                        <a>Prezime</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var osoba in Model.Kontakti)
+                {
+                    <tr>
+                        <td class="text-left">@osoba.IdKontakt</td>
+                        <td class="text-left">@osoba.ImeKontakt</td>
+                        <td class="text-left">@osoba.PrezimeKontakt</td>
+                        <td class="btn-group">
+                            <form asp-action="DeleteKontakt" method="post">
+                                <input type="hidden" name="id" value="@osoba.IdOsobe" />
+                                <button data-idosobe="@osoba.IdOsobe" data-idkontakt="@osoba.IdKontakt" type="submit" class="btn btn-sm btn-danger deleteajaxkontakt" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
 <div>
-    
+
     <a asp-action="Index">Natrag na listu</a>
+    <a asp-action="Edit" asp-route-id="@Model.IdentifikacijskiBroj">Uredi</a>
 </div>
 
-
+@section scripts{
+    <script>
+        $(function () {
+            SetDeleteAjax(".deleteajax", '@Url.Action("DeleteZarazenaOsoba")', 'idzarazene');
+            SetEditAjax(".editajax", '@Url.Action("EditZarazenaOsoba")', 'idzarazene');
+            DeleteKontakt(".deleteajaxkontakt", '@Url.Action("DeleteKontakt")', 'idosobe', 'idkontakt');
+        });
+    </script>
+}

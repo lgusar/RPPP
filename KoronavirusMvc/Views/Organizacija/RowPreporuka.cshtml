@@ -1,0 +1,23 @@
+﻿@model PreporukaViewModel
+
+<tr>
+    <td class="text-center">@Model.Opis</td>
+    <td class="text-center">@Model.NazivOrganizacije</td>
+    <td class="text-center">@Model.NazivStozera</td>
+    <td class="text-center">@Model.OpisPrethodnePreporuke</td>
+    <td class="text-center">@Model.VrijemeObjave</td>
+    <td>
+        <a data-idpreporuke="@Model.SifraPreporuke" class="btn btn-sm editajax2" title="Ažuriraj">
+            <i class="fas fa-edit"></i>
+        </a>
+    </td>
+
+    <td>
+        <form asp-action="Delete" method="POST">
+            <input type="hidden" name="id" value="Model.SifraPreporuke" />
+            <button data-idpreporuke="@Model.SifraPreporuke" type="submit" class="btn btn-sm btn-danger deleteajax2" title="Obriši">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+    </td>
+</tr>

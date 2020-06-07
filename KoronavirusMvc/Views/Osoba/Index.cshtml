@@ -4,7 +4,9 @@
     ViewData["Title"] = "Popis osoba";
     }
 
-<a asp-action="Create">Dodaj novu osobu</a>
+<a asp-action="Create" class="btn btn-primary">Dodaj novu osobu</a>
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Export Excel</a>
 
 <pager page-info="@Model.PagingInfo" page-title="Unesite željenu stranicu"
        page-action="Index" class="float-right">
@@ -70,8 +72,8 @@
                           asp-route-page="@Model.PagingInfo.CurrentPage"
                           asp-route-sort="@Model.PagingInfo.Sort"
                           asp-route-ascending="@Model.PagingInfo.Ascending">
-                        <input type="hidden" name="IdentifikacijskiBroj" value="@osoba.IdentifikacijskiBroj" />
-                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+                        <input type="hidden" name="id" value="@osoba.IdentifikacijskiBroj" />
+                        <button data-idosobe="@osoba.IdentifikacijskiBroj" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                     </form>
                     <a asp-action="Details"
                        asp-route-id="@osoba.IdentifikacijskiBroj"
@@ -85,10 +87,15 @@
         </tbody>
     </table>
 
-    @section styles{
+@section styles{
 
-        }
+}
 
-    @section scripts{
-    }
+@section scripts{
+ <script>
+     $(function () {
+         SetDeleteAjax(".deleteajax", '@Url.Action("Delete")', 'idosobe');
+     });
+ </script>       
+}
 
