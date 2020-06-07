@@ -861,14 +861,19 @@ namespace KoronavirusMvc.Controllers
             ws.Cells["B6"].Value = "Datum";
             ws.Cells["C6"].Value = "Anamneza";
             ws.Cells["D6"].Value = "Dijagnoza";
+            ws.Cells["E6"].Value = "Identifikacijski broj osobe (podatak iz druge tablice)";
 
             int rowStart = 7;
             foreach (var item in lista)
             {
+                var osobaPregled = ctx.OsobaPregled.AsNoTracking().Where(op => op.SifraPregleda == item.SifraPregleda).FirstOrDefault();
+
                 ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraPregleda;
                 ws.Cells[string.Format("B{0}", rowStart)].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", item.Datum);
                 ws.Cells[string.Format("C{0}", rowStart)].Value = item.Anamneza;
                 ws.Cells[string.Format("D{0}", rowStart)].Value = item.Dijagnoza;
+                ws.Cells[string.Format("E{0}", rowStart)].Value = osobaPregled.IdentifikacijskiBroj;
+
                 rowStart++;
             }
 
