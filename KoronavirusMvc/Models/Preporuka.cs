@@ -18,7 +18,7 @@ namespace KoronavirusMvc.Models
         
         [Display(Name = "Šifra organizacije", Prompt = "Unesite šifru organizacije")]
         
-        public int? SifraOrganizacije { get; set; }
+        public int SifraOrganizacije { get; set; }
 
         [Display(Name = "Šifra stožera", Prompt = "Unesite šifru stožera")]
         

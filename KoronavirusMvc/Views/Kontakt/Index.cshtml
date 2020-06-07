@@ -4,49 +4,36 @@
     ViewData["Title"] = "Popis osoba s kojima su bile u kontaktu";
 }
 
-    <a asp-action="Create">Dodaj novi kontakt</a>
+    <a asp-action="Create" class="btn btn-primary">Dodaj novi kontakt</a>
+    <a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+    <a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Export Excel</a>
 
     <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
            class="float-right">
     </pager>
 
-<table class="table table-sm table-striped table-hover" id="tablekontakt">
-    <thead>
-        <tr>
-            <th>
-                <a asp-route-sort="1"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==1 ? !Model.PagingInfo.Ascending : true)">Identifikacijski broj osobe</a>
-            </th>
-            <th>
-                <a asp-route-sort="2"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Ime osobe s kojom je bila u kontaktu</a>
-            </th>
-            <th>
-                <a asp-route-sort="3"
-                   asp.route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@( Model.PagingInfo.Sort ==3 ? !Model.PagingInfo.Ascending : true)">Prezime osobe s kojom je bila u kontaktu</a>
-            </th>
-
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var kontakt in Model.Kontakti)
-        {
-        <tr>
-            <td class="text-left">@kontakt.IdOsoba</td>
-            <td class="text-left">@kontakt.IdKontaktNavigation.Ime</td>
-            <td class="text-left">@kontakt.IdKontaktNavigation.Prezime</td>
-
-        </tr>
-        }
-    </tbody>
-</table>
+    <table class="table table-sm table-striped table-hover" id="tablezarazena">
+        <thead>
+            <tr>
+                @{ string[] nazivi = { "Identifikacijski broj osobe", "Ime osobe", "Prezime osobe", "Identifikacijski broj kontakta", "Ime", "Prezime"};
+                    for (int i = 1; i <= nazivi.Length; i++)
+                    {
+        <th>
+            <a asp-route-sort="@i"
+               asp.route-page="@Model.PagingInfo.CurrentPage"
+               asp-route-ascending="@( Model.PagingInfo.Sort ==i ? !Model.PagingInfo.Ascending : true)">@nazivi[i - 1]</a>
+        </th> } }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var kontakt in Model.Kontakti)
+            {
+    <partial name="Row" model="kontakt" />}
+        </tbody>
+    </table>
 
 @section styles{
 }
 
 @section scripts{
 }
-

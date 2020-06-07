@@ -9,7 +9,7 @@ namespace KoronavirusMvc.ViewModels
 {
     public class PreporukeViewModel
     {
-        public IEnumerable<Preporuka> Preporuke { get; set; }
+        public IEnumerable<PreporukaViewModel> Preporuke { get; set; }
 
         public PagingInfo PagingInfo { get; set; }
     }

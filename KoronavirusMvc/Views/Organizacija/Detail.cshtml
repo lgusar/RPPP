@@ -1,0 +1,103 @@
+﻿@model KoronavirusMvc.ViewModels.OrganizacijaInstitucijaPreporukaViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+}
+
+
+<h2>MD Forma Organizacija - Institucije i Preporuke</h2>
+
+<div>
+    <h4>Institucija</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Naziv organizacije:
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Organizacija.Naziv
+        </dd>
+        <dt class="col-sm-2">
+            URL link organizacije
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Organizacija.Url
+        </dd>
+    </dl>
+</div>
+
+
+<h5>Institucije</h5>
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            @{
+                string[] nazivi = { "Naziv institucije", "Radno vrijeme", "Kontakt", "Organizacija" };
+                for (int i = 1; i <= nazivi.Length; i++)
+                {
+                    <th class="text-center">
+                        @nazivi[i - 1]
+                    </th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var institucija in Model.Institucije.Institucije)
+        {
+            <partial name="RowInstitucija" model="institucija" />
+        }
+
+    </tbody>
+</table>
+
+<h5>Preporuke</h5>
+
+<table class="table table-sn table-striped table-hover">
+    <thead>
+        <tr>
+            @{
+                string[] imena = { "Opis preporuke", "Naziv organizacije", "Naziv stožera", "Opis prethodne preporuke", "Vrijeme Objave" };
+                for (int i = 1; i <= imena.Length; i++)
+                {
+                    <th class="text-center">
+                        @imena[i - 1]
+                    </th>
+                }
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var preporuka in Model.Preporuke.Preporuke)
+        {
+            <partial name="RowPreporuka" model="preporuka" />
+        }
+
+    </tbody>
+</table>
+
+
+<form asp-action="ExportMDToExcel" method="get">
+    <input type="hidden" name="id" value="@Model.Organizacija.SifraOrganizacije" />
+    <button class="btn btn-primary" title="Excel">Generiraj MD Excel<i class="fas fa-file-excel"></i></button>
+</form>
+
+<div>
+    <a asp-action="Index">Nazad na organizacije</a>
+</div>
+
+@section styles{
+
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            SetEditAjax(".editajax", '@Url.Action("EditInstitucija")','idinstitucije');
+            SetDeleteAjax(".deleteajax", "@Url.Action("DeleteInstitucija")", "idinstitucije");
+            SetEditAjax(".editajax2", '@Url.Action("EditPreporuka")','idpreporuke');
+            SetDeleteAjax(".deleteajax2", "@Url.Action("DeletePreporuka")", "idpreporuke");
+        });
+    </script>
+}

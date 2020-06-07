@@ -1,0 +1,60 @@
+﻿@model Statistika
+
+@{
+    ViewBag.Title = "Ažuriranje podataka o statistici";
+}
+    <form asp-route-page="@ViewBag.Page"
+          asp-route-sort="@ViewBag.Sort"
+          asp-route-ascending="@ViewBag.Ascending"
+          asp-action="Edit"
+          method="post">
+        <div asp-validation-summary="All"></div>
+
+        <div class="form-group">
+            <label asp-for="BrojSlucajeva"></label>
+            <div><span asp-validation-for="BrojSlucajeva" class="text-danger"></span></div>
+            <input asp-for="BrojSlucajeva" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojUmrlih"></label>
+            <div><span asp-validation-for="BrojUmrlih" class="text-danger"></span></div>
+            <input asp-for="BrojUmrlih" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojIzlijecenih"></label>
+            <div><span asp-validation-for="BrojIzlijecenih" class="text-danger"></span></div>
+            <input asp-for="BrojIzlijecenih" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BrojAktivnih"></label>
+            <div><span asp-validation-for="BrojAktivnih" class="text-danger"></span></div>
+            <input asp-for="BrojAktivnih" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Datum"></label>
+            <div><span asp-validation-for="Datum" class="text-danger"></span></div>
+            <input asp-for="Datum" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="SifraGrada"></label>
+            <div><span asp-validation-for="SifraGrada" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraGrada" asp-items="ViewBag.Gradovi">
+                <option selected value="" disabled>Odaberite osobu</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="SifraOrganizacije"></label>
+            <div><span asp-validation-for="SifraOrganizacije" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraOrganizacije" asp-items="ViewBag.Organizacije">
+                <option selected value="" disabled>Odaberite osobu</option>
+            </select>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-primary" type="submit">Spremi</button>
+        </div>
+        <a asp-action="Index"
+           asp-route-page="@ViewBag.Page"
+           asp-route-sort="@ViewBag.Sort"
+           asp-route-ascending="@ViewBag.Ascending"
+           class="btn btn-secondary">Odustani</a>
+    </form>

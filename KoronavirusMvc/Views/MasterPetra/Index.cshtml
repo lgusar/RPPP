@@ -1,0 +1,265 @@
+﻿@model KoronavirusMvc.ViewModels.MasterPetraViewModel
+
+@{
+    ViewData["Title"] = "Master država";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4" id="sidebar">
+            <div class="form-group">
+                <div>
+                    <label asp-for="OdabranaDrzava.SifraDrzave"><h1> Države</h1></label>
+                    <button class="btn btn-sm btn-success drzava-add" title="DodajDrzavu">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div style="display: flex;">
+                    @*<select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
+                        <option selected value="" disabled>Odaberite državu</option>
+                    </select>*@
+                    <div class="form-group ui-widget">
+                        <input id="selectedCountry"/>
+                    </div>
+                    <div class="btn btn-sm drzava-edit" title="Ažuriraj">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <button class="btn btn-sm btn-danger drzava-delete" title="Obriši">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dropdown-divider"></div>
+            <div id="lokacije" style="display: flex; flex-direction: column">
+
+            </div>
+        </div>
+
+        <div class="col-8" id="content">
+            <div class="modal fade" id="addEditModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        @*<div class="modal-header" id="addEditHeader">
+                        </div>*@
+                        <div class="modal-body" id="addEditBody">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="closeModal">Odustani</button>
+                            <button type="button" class="btn btn-primary" id="saveModal">Spremi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="location-content" class="row"></div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script src="~/lib/jqueryui/jquery-ui.js"></script>
+    <script type="text/javascript">
+        var selectedCity;
+        var selectedCountry;
+        var registerCityButtons = function () {
+            $(".lokacija-button").click(function () {
+                selectedCity = $(this).attr("sifra");
+                $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                    $("#location-content").html(result);
+
+                    setTimeout(function () {
+                        registerContentButtons();
+                    })
+                })
+
+            })
+
+            $(".lokacija-edit, .lokacija-add").click(function () {
+                var isAdd = !$(this).attr("sifra");
+                $.get('@Url.Action("GetLokacijaAddEdit")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SaveLokacija")',
+                            {
+                                isAdd: isAdd,
+                                sifraGrada: $("#addEditBody").find("#Item1_SifraGrada").val(),
+                                imeGrada: $("#addEditBody").find("#Item1_ImeGrada").val(),
+                                sifraDrzave: $("#addEditBody").find("#Item1_SifraDrzave").val()
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    loadLocation();
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
+                    })
+                })
+
+            })
+
+            $(".lokacija-delete").click(function () {
+                selectedCity = $(this).attr("sifra");
+                if (confirm("Obrisati zapis?")) {
+                      $.ajax({
+                          url: '@Url.Action("DeleteLocation")',
+                          type: 'DELETE',
+                          data: {
+                              sifraGrada: $(this).attr("sifra"),
+                              sifraDrzave: $("#selectedCountry").val()
+                          }
+                      }).then(function (result) {
+                          $("#lokacije").html(result);
+
+                          setTimeout(function () {
+                              registerCityButtons();
+                          })
+
+                          if (selectedCity === $(this).attr("sifra")) {
+                              selectedCity = null;
+                              $("#location-content").empty();
+                          }
+                      });
+                  }
+            })
+        };
+
+        var registerContentButtons = function () {
+             $(".putovanje-edit").click(function () {
+                 $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                     $("#location-content").html(result);
+
+                 });
+             });
+
+             $(".putovanje-delete").click(function () {
+                 if (confirm("Obrisati zapis?")) {
+                     $.ajax({
+                         url: '@Url.Action("DeletePutovanje")',
+                         type: 'DELETE',
+                         data: {
+                             sifraPutovanja: $(this).attr("putovanje"),
+                             sifraGrada: selectedCity
+                         }
+                     }).then(function (result) {
+                         $("#location-content").html(result);
+
+                         setTimeout(function () {
+                             registerContentButtons();
+                         })
+                     });
+                 }
+             });
+
+             $(".statistika-edit").click(function () {
+                 $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
+                     $("#location-content").html(result);
+
+                 });
+             });
+             $(".statistika-delete").click(function () {
+                 if (confirm("Obrisati zapis?")) {
+                     $.ajax({
+                         url: '@Url.Action("DeleteStatistika")',
+                         type: 'DELETE',
+                         data: {
+                             sifraStatistike: $(this).attr("statistika"),
+                             sifraGrada: selectedCity
+                         }
+                     }).then(function (result) {
+                         $("#location-content").html(result);
+
+                         setTimeout(function () {
+                             registerContentButtons();
+                         })
+                     });
+                 }
+             });
+        }
+
+        var openAddEditModal = function () {
+            //To be called once content is inserted
+
+            $("#addEditModal").modal("show");
+        }
+
+        var closeAddEditModal = function () {
+            $("#addEditModal").modal("hide");
+            $("#saveModal").off("click");
+        }
+
+        var loadLocation = function () {
+            if (!selectedCountry) {
+                $("#lokacije").empty();
+            }
+
+            $.get('@Url.Action("GetLocationForCountry")', { sifraDrzave: selectedCountry }).then(function (result) {
+                $("#lokacije").html(result);
+
+                setTimeout(function () {
+                    registerCityButtons();
+                })
+            })
+        }
+
+        $("#selectedCountry").autocomplete({
+            source: "/MasterPetra/GetDrzava",
+            select: function (event, ui) {
+                event.preventDefault();
+                $("#selectedCountry").val(ui.item.label);
+                selectedCountry = ui.item.value;
+
+                loadLocation();
+            },
+            change: function (event, ui) {
+                if (!$(this).val()) {
+                    selectedCountry = null;
+                    loadLocation();
+                }
+            },
+            focus: function (event, ui) {
+                event.preventDefault();
+                $("#selectedCountry").val(ui.item.label);
+            }
+        })
+
+        $("#closeModal").click(function () {
+            closeAddEditModal();
+        })
+
+        //$("#selectedCountry").change(function () {
+        //    loadLocation();
+        //});
+
+        $(".drzava-edit, .drzava-add").click(function () {
+            var sifra = $("#selectedCountry").val();
+            $.get('@Url.Action("GetDrzavaAddEdit")', { sifraDrzave: sifra }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SaveDrzava")',
+                            {
+                                isAdd: !sifra,
+                                sifraDrzave: $("#addEditBody").find("#SifraDrzave").val(),
+                                imeDrzave: $("#addEditBody").find("#ImeDrzave").val(),
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    $.get('@Url.Action("PrepareDropdownLists")');
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
+                    })
+                })
+
+            })
+    </script>
+}

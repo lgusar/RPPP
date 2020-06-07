@@ -1,0 +1,16 @@
+﻿@model Drzava
+
+@{
+    ViewBag.Title = "Ažuriranje podataka o Drzavi";
+}
+
+<div class="form-group @(!string.IsNullOrWhiteSpace(Model.SifraDrzave) ? "d-none" : "")">
+    <label asp-for="SifraDrzave"> Šifra države</label>
+    <input asp-for="SifraDrzave" class="form-control"/>
+</div>
+
+<div class="form-group">
+    <label asp-for="ImeDrzave"></label>
+    <div><span asp-validation-for="ImeDrzave" class="text-danger"></span></div>
+    <input asp-for="ImeDrzave" class="form-control" />
+</div>

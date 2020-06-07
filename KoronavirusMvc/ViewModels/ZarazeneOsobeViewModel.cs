@@ -8,7 +8,7 @@ namespace KoronavirusMvc.ViewModels
 {
     public class ZarazeneOsobeViewModel
     {
-        public IEnumerable<ZarazenaOsoba> ZarazeneOsobe { get; set; }
+        public IEnumerable<ZarazenaOsobaViewModel> ZarazeneOsobe { get; set; }
         public PagingInfo PagingInfo { get; set; }
     }
 }

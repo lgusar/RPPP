@@ -1,34 +1,38 @@
 ﻿@model ZarazenaOsoba
 
-@{
-    ViewBag.Title = "Ažuriranje zaražene osobe";
-}
-<form asp-route-page="@ViewBag.Page"
-      asp-route-sort="@ViewBag.Sort"
-      asp-route-ascending="@ViewBag.Ascending"
-      asp-action="Edit"
-      method="post">
-    <div asp-validation-summary="All"></div>
-
-    <div class="form-group">
-        <label asp-for="DatZaraze"></label>
-        <div><span asp-validation-for="DatZaraze" class="text-danger"></span></div>
-        <input asp-for="DatZaraze" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SifraStanja"></label>
-        <div><span asp-validation-for="SifraStanja" class="text-danger"></span></div>
-        <select class="form-control" asp-for="SifraStanja" asp-items="ViewBag.Stanja">
-            <option selected value="" disabled>Odaberite stanje</option>
-        </select>
-    </div>
-    <div class="text-center">
-        <button class="btn btn-primary" type="submit">Spremi</button>
-    </div>
-    <a asp-action="Index"
-       asp-route-page="@ViewBag.Page"
-       asp-route-sort="@ViewBag.Sort"
-       asp-route-ascending="@ViewBag.Ascending"
-       class="btn btn-secondary">Odustani</a>
-</form>
+    <tr>
+        <td>
+            <label id="id">@Model.IdentifikacijskiBroj</label>
+        </td>
+        <td>
+            <label id="ime">@Model.IdentifikacijskiBrojNavigation.Ime</label>
+        </td>
+        <td>
+            <label id="prezime">@Model.IdentifikacijskiBrojNavigation.Prezime</label>
+        </td>
+        <td>
+            <input asp-for="DatZaraze" data-save="" class="form-control" />
+        </td>
+        <td>
+            <select class="form-control" asp-for="SifraStanja" asp-items="ViewBag.Stanja" data-save="">
+                <option selected value="" disabled>Odaberite stanje</option>
+            </select>
+        </td>
+        <td>
+            <button type="submit" class="btn btn-sm btn-primary save" title="Spremi">
+                <i class="fas fa-save"></i>
+            </button>
+        </td>
+        <td>
+            <button type="submit" class="btn btn-sm cancel" title="Odustani">
+                <i class="fas fa-undo-alt"></i>
+            </button>
+        </td>
+    </tr>
+<tr>
+    <td colspan="6">
+        <div asp-validation-summary="All"></div>
+        <input type="hidden" asp-for="IdentifikacijskiBroj" data-save=""/>
+    </td>
+</tr>
 

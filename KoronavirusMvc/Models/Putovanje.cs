@@ -22,5 +22,6 @@ namespace KoronavirusMvc.Models
         public DateTime DatumVracanja { get; set; }
 
         public virtual Osoba IdentifikacijskiBrojNavigation { get; set; }
+        public List<int> Lokacije { get; set; }
     }
 }

@@ -7,12 +7,21 @@
             <input asp-for="SifraObjave" class="form-control" />
         </div>
         <div class="form-group">
-            <label asp-for="SifraGrada"> Šifra grada</label>
-            <input asp-for="SifraGrada" class="form-control" />
+            <label asp-for="SifraGrada"> Ime grada</label>
+            @*<input asp-for="SifraGrada" class="form-control" />*@
+            <div><span asp-validation-for="SifraGrada" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraGrada" asp-items="ViewBag.Gradovi">
+                <option selected value="" disabled>Odaberite grad</option>
+            </select>
+
         </div>
         <div class="form-group">
-            <label asp-for="SifraOrganizacije"> Šifra organizacije</label>
-            <input asp-for="SifraOrganizacije" class="form-control" />
+            <label asp-for="SifraOrganizacije"> Ime organizacije</label>
+            @*<input asp-for="SifraOrganizacije" class="form-control" />*@
+            <div><span asp-validation-for="SifraOrganizacije" class="text-danger"></span></div>
+            <select class="form-control" asp-for="SifraOrganizacije" asp-items="ViewBag.Organizacije">
+                <option selected value="" disabled>Odaberite organizaciju</option>
+            </select>
         </div>
         <div class="form-group">
             <label asp-for="BrojSlucajeva"> Ukupni broj slučajeva </label>

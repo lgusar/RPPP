@@ -1,45 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using KoronavirusMvc.Extensions;
 using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
+using PdfRpt.Core.Contracts;
+using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa zaraženim osobama i tablicama koje uključuju tablicu zaražena osoba
+    /// </summary>
     public class ZarazenaOsobaController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
-        public ZarazenaOsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot)
+        private readonly ILogger<ZarazenaOsobaController> logger;
+
+        /// <summary>
+        /// Konstruktor Controllera zaražene osobe
+        /// </summary>
+        /// <param name="ctx">kontekst baze</param>
+        /// <param name="optionsSnapshot">opcije app</param>
+        /// <param name="logger">logger za ispis logova prilikom brisanja, dodavanja i ažuriranja zaražene osobe</param>
+        public ZarazenaOsobaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<ZarazenaOsobaController> logger)
         {
             this.ctx = ctx;
             appSettings = optionsSnapshot.Value;
-
+            this.logger = logger;
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje strannice Create.cshtml za stvaranje novog pogleda
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
-            await PrepareDropdownLists();
+            PrepareDropDownLists();
             return View();
         }
 
-        private async Task PrepareDropdownLists()
+        /// <summary>
+        /// Metoda koja stvara padajuću listu za stanja koja nudi tablica stanje
+        /// </summary>
+        private void PrepareDropDownLists()
         {
-            var stanja = await ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToListAsync();
+            var stanja = ctx.Stanje.OrderBy(s => s.NazivStanja).Select(s => new { s.NazivStanja, s.SifraStanja }).ToList();
             ViewBag.Stanja = new SelectList(stanja, nameof(Stanje.SifraStanja), nameof(Stanje.NazivStanja));
         }
 
+        /// <summary>
+        /// HttpPost metoda koja stvara novi pogled u bazi podataka
+        /// </summary>
+        /// <param name="zarazenaOsoba">Model zaražene osobe sa svim podacima koji se spremaju u bazu podataka kod stvaranja nove zaražene osobe</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ZarazenaOsoba zarazenaOsoba)
+        public IActionResult Create(ZarazenaOsoba zarazenaOsoba)
         {
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
             if (ModelState.IsValid)
             {
 
@@ -48,6 +78,7 @@ namespace KoronavirusMvc.Controllers
                     ctx.Add(zarazenaOsoba);
                     ctx.SaveChanges();
                     TempData[Constants.Message] = $"Osoba {zarazenaOsoba.IdentifikacijskiBroj} uspješno dodana u listu zaraženih osoba. ";
+                    logger.LogInformation($"Osoba dodana");
                     TempData[Constants.ErrorOccurred] = false;
 
                     return RedirectToAction(nameof(Index));
@@ -55,116 +86,170 @@ namespace KoronavirusMvc.Controllers
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                    await PrepareDropdownLists();
+                    logger.LogError($"Pogreška prilikom dodavanja zaražene osobe {exc.CompleteExceptionMessage()}");
+                    PrepareDropDownLists();
                     return View(zarazenaOsoba);
                 }
             }
             else
             {
-                await PrepareDropdownLists();
+                PrepareDropDownLists();
                 return View(zarazenaOsoba);
             }
         }
 
+        /// <summary>
+        /// Metoda koja služi za dohvaćanje stranice Edit.cshtml za ažuriranje zaražene osobe
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe koju želimo ažurirati</param>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> Edit(string id, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Edit(string id)
         {
-            var zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
-            if (zarazenaOsoba == null)
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .Include(o => o.IdentifikacijskiBrojNavigation)
+                             .AsNoTracking()
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            if (zarazenaOsoba != null)
             {
-                return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
+                PrepareDropDownLists();
+                return PartialView(zarazenaOsoba);
             }
             else
             {
-                ViewBag.Page = page;
-                ViewBag.Sort = sort;
-                ViewBag.Ascending = ascending;
-                await PrepareDropdownLists();
-                
-                return View(zarazenaOsoba);
+                return NotFound($"Neispravan id osobe: {id}");
             }
         }
 
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
-        {
-            try
-            {
-                ZarazenaOsoba zarazenaOsoba = await ctx.ZarazenaOsoba.FindAsync(id);
-                if (zarazenaOsoba == null)
-                {
-                    return NotFound($"Ne postoji osoba s identifikacijskim brojem {id}");
-                }
-
-                ViewBag.Page = page;
-                ViewBag.Sort = sort;
-                ViewBag.Ascending = ascending;
-                bool ok = await TryUpdateModelAsync<ZarazenaOsoba>(zarazenaOsoba, "", z => z.DatZaraze, z => z.SifraStanja);
-                if (ok)
-                {
-                    try
-                    {
-                        
-                        TempData[Constants.Message] = $"Podaci osobe  uspješno ažurirani.";
-                        TempData[Constants.ErrorOccurred] = false;
-                        await ctx.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-                    }
-                    catch (Exception exc)
-                    {
-                        ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                        await PrepareDropdownLists();
-                        return View(zarazenaOsoba);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Podatke o osobi nije moguće povezati s forme");
-                    await PrepareDropdownLists();
-                    return View(zarazenaOsoba);
-                }
-            }
-            catch (Exception exc)
-            {
-                TempData[Constants.Message] = exc.CompleteExceptionMessage();
-                TempData[Constants.ErrorOccurred] = true;
-                return RedirectToAction(nameof(Edit), new { id, page, sort, ascending });
-            }
-        }
-
+        /// <summary>
+        /// Metoda za uređivanje zaražene osobe u bazi podataka
+        /// </summary>
+        /// <param name="zarazenaOsoba">Model zaražene osobe sa svim atributima koje ima tablica zaražena osoba u bazi podataka</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(string IdentifikacijskiBroj, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Edit(ZarazenaOsoba zarazenaOsoba)
         {
-            var zarazenaOsoba = ctx.ZarazenaOsoba.Find(IdentifikacijskiBroj);
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
             if (zarazenaOsoba == null)
             {
-                return NotFound();
+                return NotFound("Nema poslanih podataka");
+            }
+            bool checkId = ctx.ZarazenaOsoba.Any(m => m.IdentifikacijskiBroj == zarazenaOsoba.IdentifikacijskiBroj);
+            if (!checkId)
+            {
+                return NotFound($"Neispravan identifikacijski broj zarazene osobe: {zarazenaOsoba?.IdentifikacijskiBroj}");
+            }
+
+            PrepareDropDownLists();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Update(zarazenaOsoba);
+                    ctx.SaveChanges();
+                    logger.LogInformation($"Osoba ažurirana");
+                    return StatusCode(302, Url.Action(nameof(Row), new { id = zarazenaOsoba.IdentifikacijskiBroj }));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    logger.LogError($"Pogreška prilikom ažuriranja zaražene osobe {exc.CompleteExceptionMessage()}");
+                    return PartialView(zarazenaOsoba);
+                }
             }
             else
+            {
+                return PartialView(zarazenaOsoba);
+            }
+        }
+
+        /// <summary>
+        /// Metoda za stvaranje parcijalnog pogleda
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe za koju se radi parcijalni pogled</param>
+        /// <returns></returns>
+        public PartialViewResult Row(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                                    .Where(z => z.IdentifikacijskiBroj == id)
+                                    .Select(z => new ZarazenaOsobaViewModel
+                                    {
+                                        IdentifikacijskiBroj = z.IdentifikacijskiBroj,
+                                        Ime = z.IdentifikacijskiBrojNavigation.Ime,
+                                        Prezime = z.IdentifikacijskiBrojNavigation.Prezime,
+                                        DatZaraze = z.DatZaraze,
+                                        NazivStanja = z.SifraStanjaNavigation.NazivStanja
+                                    })
+                                    .SingleOrDefault();
+            if(zarazenaOsoba != null)
+            {
+                return PartialView(zarazenaOsoba);
+            }
+            else
+            {
+                return PartialView("ErrorMessageRow", $"Neispravan identifikacijski broj osobe.");
+            }
+        }
+
+        /// <summary>
+        /// Metoda koja služi za brisanje zaražene osobe iz baze podataka
+        /// </summary>
+        /// <param name="id">Identifikacijski broj zaražene osobe koju želimo ukloniti iz baze</param>
+        /// <returns></returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(string id)
+        {
+            var zarazenaOsoba = ctx.ZarazenaOsoba
+                             .AsNoTracking() 
+                             .Where(m => m.IdentifikacijskiBroj == id)
+                             .SingleOrDefault();
+            logger.LogTrace(JsonSerializer.Serialize(zarazenaOsoba));
+            if (zarazenaOsoba != null)
             {
                 try
                 {
                     
                     ctx.Remove(zarazenaOsoba);
                     ctx.SaveChanges();
-                    TempData[Constants.Message] = $"Osoba uspješno obrisana.";
-                    TempData[Constants.ErrorOccurred] = false;
+                    var result = new
+                    {
+                        message = $"Zaražena osoba obrisana.",
+                        successful = true
+                    };
+                    logger.LogInformation($"Osoba obrisana");
+                    return Json(result);
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom brisanja osobe: " + exc.CompleteExceptionMessage();
-                    TempData[Constants.ErrorOccurred] = true;
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja zaražene osobe: " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    logger.LogError($"Pogreška prilikom brisanja zaražene osobe {exc.CompleteExceptionMessage()}");
+                    return Json(result);
                 }
-                return RedirectToAction(nameof(Index), new { page, sort, ascending });
+            }
+            else
+            {
+                return NotFound($"Zaražena osoba s identifikacijskim brojem {id} ne postoji");
             }
         }
 
+        /// <summary>
+        /// Metoda za tablični ispis svih zaraženih osoba
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.ZarazenaOsoba.Include(z => z.SifraStanjaNavigation).Include(z => z.IdentifikacijskiBrojNavigation).AsNoTracking();
+            var query = ctx.ZarazenaOsoba.AsNoTracking();
 
             int count = query.Count();
 
@@ -208,8 +293,14 @@ namespace KoronavirusMvc.Controllers
             }
 
             var zarazeneOsobe = query
-                            .Skip((page - 1) * pagesize)
-                           .Take(pagesize)
+                            .Select(z => new ZarazenaOsobaViewModel
+                            {
+                                IdentifikacijskiBroj = z.IdentifikacijskiBroj,
+                                Ime = z.IdentifikacijskiBrojNavigation.Ime,
+                                Prezime = z.IdentifikacijskiBrojNavigation.Prezime,
+                                DatZaraze = z.DatZaraze,
+                                NazivStanja = z.SifraStanjaNavigation.NazivStanja
+                            })
                            .ToList();
             var model = new ZarazeneOsobeViewModel
             {
@@ -217,6 +308,163 @@ namespace KoronavirusMvc.Controllers
                 PagingInfo = pagingInfo
             };
             return View(model);
+        }
+
+        /// <summary>
+        /// Metoda koja generira Pdf tablice zaraženih osoba
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> PDFReport()
+        {
+            string naslov = "Popis zaraženih osoba";
+            var zarazeneOsobe = await ctx.ZarazenaOsoba
+                .Include(o => o.IdentifikacijskiBrojNavigation)
+                .Include(o => o.SifraStanjaNavigation)
+                .AsNoTracking()
+                .ToListAsync();
+            PdfReport report = Constants.CreateBasicReport(naslov);
+            report.PagesFooter(footer =>
+            {
+                footer.DefaultFooter(DateTime.Now.ToString("dd.MM.yyyy."));
+            })
+            .PagesHeader(header =>
+            {
+                header.DefaultHeader(defaultHeader =>
+                {
+                    defaultHeader.RunDirection(PdfRunDirection.LeftToRight);
+                    defaultHeader.Message(naslov);
+                });
+            });
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(zarazeneOsobe));
+
+            report.MainTableColumns(columns =>
+            {
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBroj);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(0);
+                    column.Width(4);
+                    column.HeaderCell("Identifikacijski broj", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBrojNavigation.Ime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(1);
+                    column.Width(4);
+                    column.HeaderCell("Ime", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.IdentifikacijskiBrojNavigation.Prezime);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(2);
+                    column.Width(2);
+                    column.HeaderCell("Prezime", horizontalAlignment: HorizontalAlignment.Center);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.SifraStanjaNavigation.NazivStanja);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Left);
+                    column.IsVisible(true);
+                    column.Order(3);
+                    column.Width(4);
+                    column.HeaderCell("Stanje osobe", horizontalAlignment: HorizontalAlignment.Left);
+                });
+                columns.AddColumn(column =>
+                {
+                    column.PropertyName<ZarazenaOsoba>(o => o.DatZaraze);
+                    column.CellsHorizontalAlignment(HorizontalAlignment.Center);
+                    column.IsVisible(true);
+                    column.Order(4);
+                    column.Width(2);
+                    column.HeaderCell("Datum zaraze", horizontalAlignment: HorizontalAlignment.Center);
+                    column.ColumnItemsTemplate(template =>
+                    {
+                        template.TextBlock();
+                        template.DisplayFormatFormula(obj =>
+                        {
+                            if (obj == null || string.IsNullOrEmpty(obj.ToString()))
+                            {
+                                return string.Empty;
+                            }
+                            else
+                            {
+                                DateTime date = (DateTime)obj;
+                                return date.ToString("dd.MM.yyyy");
+                            }
+                        });
+                    });
+                });
+
+            });
+
+
+            byte[] pdf = report.GenerateAsByteArray();
+
+            if (pdf != null)
+            {
+                Response.Headers.Add("content-disposition", "inline; filename=zarazeneosobe.pdf");
+                return File(pdf, "application/pdf");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        /// <summary>
+        /// Metoda koja stvara Excel datoteku iz tabličnog prikaza svih zaraženih osoba
+        /// </summary>
+        public void ExportToExcel()
+        {
+            List<ZarazenaOsobaViewModel> emplist = ctx.ZarazenaOsoba.Select(x => new ZarazenaOsobaViewModel
+            {
+                IdentifikacijskiBroj = x.IdentifikacijskiBroj,
+                Ime = x.IdentifikacijskiBrojNavigation.Ime,
+                Prezime = x.IdentifikacijskiBrojNavigation.Prezime,
+                DatZaraze = x.DatZaraze,
+                NazivStanja = x.SifraStanjaNavigation.NazivStanja
+            }).ToList();
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Zaražene osobe");
+
+            ws.Cells["A1"].Value = "Zaražene osobe";
+
+            ws.Cells["A3"].Value = "Datum";
+            ws.Cells["B3"].Value = string.Format("{0:dd.MM.yyyy}", DateTimeOffset.Now);
+
+            ws.Cells["A6"].Value = "Identifikacijski broj osobe";
+            ws.Cells["B6"].Value = "Ime";
+            ws.Cells["C6"].Value = "Prezime";
+            ws.Cells["D6"].Value = "Datum zaraze";
+            ws.Cells["E6"].Value = "Stanje osobe";
+
+            int rowStart = 7;
+            foreach (var item in emplist)
+            {
+
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.IdentifikacijskiBroj;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.Ime;
+                ws.Cells[string.Format("C{0}", rowStart)].Value = item.Prezime;
+                ws.Cells[string.Format("D{0}", rowStart)].Value = string.Format("{0:dd.MM.yyyy}", item.DatZaraze);
+                ws.Cells[string.Format("E{0}", rowStart)].Value = item.NazivStanja;
+                rowStart++;
+            }
+
+            ws.Cells["A:AZ"].AutoFitColumns();
+            Response.Clear();
+            Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            Response.Headers.Add("content-disposition", "attachment; filename=myfile.xlsx");
+            Response.Body.WriteAsync(pck.GetAsByteArray());
+            Response.CompleteAsync();
+
         }
     }
 }

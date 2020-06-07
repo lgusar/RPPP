@@ -1,0 +1,20 @@
+﻿@model OpremaViewModel
+
+<tr>
+    <td class="text-center">@Model.NazivInstitucije</td>
+    <td class="text-center">@Model.NazivOpreme</td>
+    <td class="text-center">@Model.KolicinaOpreme</td>
+    <td>
+        <a data-idopreme="@Model.SifraOpreme" class="btn btn-sm editajax" title="Ažuriraj">
+            <i class="fas fa-edit"></i>
+        </a>
+    </td>
+    <td>
+        <form asp-action="Delete" method="POST">
+            <input type ="hidden" name="id" value="Model.SifraOpreme" />
+            <button data-idopreme="@Model.SifraOpreme" type="submit" class="btn btn-sm btn-danger deleteajax" title="Obriši">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </form>
+    </td>
+</tr>

@@ -1,0 +1,21 @@
+﻿@model Organizacija
+
+    <tr>
+        <td class="text-center">@Model.Naziv</td>
+        <td class="text-center">@Model.Url</td>
+        <td>
+            <a data-idorganizacije="@Model.SifraOrganizacije" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+        </td>
+        <td>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" name="id" value="@Model.SifraOrganizacije" />
+                <button data-idorganizacije="@Model.SifraOrganizacije" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Detail" method="get">
+                <input type="hidden" name="id" value="@Model.SifraOrganizacije" />
+                <button class="btn btn-sm" title="Detalji"><i class="fa fa-info"></i></button>
+            </form>
+        </td>
+    </tr>

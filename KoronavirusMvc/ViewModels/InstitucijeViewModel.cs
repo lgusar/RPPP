@@ -9,7 +9,7 @@ namespace KoronavirusMvc.ViewModels
 {
     public class InstitucijeViewModel
     {
-        public IEnumerable<Institucija> Institucije { get; set; }
+        public IEnumerable<InstitucijaViewModel> Institucije { get; set; }
 
         public PagingInfo PagingInfo { get; set; }
     }

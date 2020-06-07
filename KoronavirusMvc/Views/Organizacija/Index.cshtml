@@ -3,72 +3,72 @@
     ViewData["Title"] = "Popis Organizacija";
 }
 
+<h2> Popis svih organizacija </h2>
+
+
 <a asp-action="Create"> Unos nove organizacije</a>
 
-<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
-       class="float-right">
+<pager page-info="@Model.PagingInfo" page-title="Unesite željenu stranicu"
+       page-action="Index" class="float-right">
+
 </pager>
 
-<table class="table table-sn table-striped table-hover" id="tableorganizacije">
+<table class="table table-sn table-striped table-hover">
     <thead>
         <tr>
-            <th class="text-center">
-                <a asp-route-sort="1" asp-route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
-                    Sifra Organizacije
-                </a>
-            </th>
-            <th class="text-center">
-                <a asp-route-sort="2" asp-route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@(Model.PagingInfo.Sort == 2 ? !Model.PagingInfo.Ascending : true)">Naziv</a>
-            </th>
-            <th class="text-center">
-                <a asp-route-sort="3" asp-route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-ascending="@(Model.PagingInfo.Sort == 3 ? !Model.PagingInfo.Ascending : true)">URL </a>
-            </th>
+            @{
+                string[] nazivi = { "Naziv organizacije", "Url" };
+                for (int i = 1; i <= nazivi.Length; i++)
+                {
+                    <th class="text-center">
+                        <a asp-route-sort="@i" asp-route-page="@Model.PagingInfo.CurrentPage"
+                           asp-route-ascending="@(Model.PagingInfo.Sort == 1 ? !Model.PagingInfo.Ascending : true)">
+                            @nazivi[i - 1]
+                        </a>
+                    </th>
+                }
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var organizacija in Model.Organizacije)
         {
             <tr>
-                <td class="text-center">@organizacija.SifraOrganizacije</td>
                 <td class="text-center">@organizacija.Naziv</td>
                 <td class="text-center">@organizacija.Url</td>
-                <td class="btn-group">
-
-                    <a asp-action="Edit"
-                       asp-route-id="@organizacija.SifraOrganizacije"
-                       asp-route-page="@Model.PagingInfo.CurrentPage"
-                       asp-route-sort="@Model.PagingInfo.Sort"
-                       asp-route-ascending="@Model.PagingInfo.Ascending"
-                       class="btn btn-sm" little="Ažuriraj">
-
-                        <i class="fas fa-edit"></i>
-                    </a>
-
-                    <form asp-action="Delete" method="POST"
-                          asp-route-page="@Model.PagingInfo.CurrentPage"
-                          asp-route-sort="@Model.PagingInfo.Sort"
-                          asp-route-ascending="@Model.PagingInfo.Ascending">
-
-                        <input type="hidden" name="SifraOrganizacije" value="@organizacija.SifraOrganizacije" />
-                        <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                <td>
+                    <a data-idorganizacije="@organizacija.SifraOrganizacije" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+                </td>
+                <td>
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" name="id" value="@organizacija.SifraOrganizacije" />
+                        <button data-idorganizacije="@organizacija.SifraOrganizacije" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
                     </form>
-
+                </td>
+                <td>
+                    <form asp-action="Detail" method="get">
+                        <input type="hidden" name="id" value="@organizacija.SifraOrganizacije" />
+                        <button class="btn btn-sm" title="Detalji"><i class="fa fa-info"></i></button>
+                    </form>
                 </td>
             </tr>
         }
-
     </tbody>
 </table>
+
+<a asp-action="ExportToExcel" class="btn btn-primary"><i class="fas fa-file-excel"></i> Generiraj Excel</a>
+
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
 
 @section styles{
 
 }
 
 @section scripts{
-
+    <script type="text/javascript">
+        $(function () {
+            SetEditAjax(".editajax", '@Url.Action("Edit")','idorganizacije');
+            SetDeleteAjax(".deleteajax", "@Url.Action("Delete")", "idorganizacije");
+        });
+    </script>
 }

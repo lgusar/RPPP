@@ -1,14 +1,14 @@
 ﻿@model KoronavirusMvc.ViewModels.StanjaViewModel
 
-@{
-    ViewData["Title"] = "Popis stanja";
-}
+@{ ViewData["Title"] = "Popis stanja"; }
 
-    <a asp-action="Create">Dodaj novo stanje</a>
+<a asp-action="Create" class="btn btn-primary">Dodaj novo stanje</a>
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+<a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Export Excel</a>
 
-    <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
-           class="float-right">
-    </pager>
+<pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
+       class="float-right">
+</pager>
 
 <table class="table table-sm table-striped table-hover" id="tablestanje">
     <thead>
@@ -23,34 +23,33 @@
                    asp.route-page="@Model.PagingInfo.CurrentPage"
                    asp-route-ascending="@( Model.PagingInfo.Sort ==2 ? !Model.PagingInfo.Ascending : true)">Naziv stanja</a>
             </th>
-            
+
         </tr>
     </thead>
     <tbody>
         @foreach (var stanje in Model.Stanja)
         {
-        <tr>
-            <td class="text-left">@stanje.SifraStanja</td>
-            <td class="text-left">@stanje.NazivStanja</td>
-            <td class="btn-group">
-                <a asp-action="Edit"
-                   asp-route-id="@stanje.SifraStanja"
-                   asp-route-page="@Model.PagingInfo.CurrentPage"
-                   asp-route-sort="@Model.PagingInfo.Sort"
-                   asp-route-ascending="@Model.PagingInfo.Ascending"
-                   class="btn btn-sm" title="Ažuriraj">
-                    <i class="fas fa-edit"></i>
-                </a>
-                <form asp-action="Delete" method="post"
-                      asp-route-page="@Model.PagingInfo.CurrentPage"
-                      asp-route-sort="@Model.PagingInfo.Sort"
-                      asp-route-ascending="@Model.PagingInfo.Ascending">
-                    <input type="hidden" name="SifraStanja" value="@stanje.SifraStanja" />
-                    <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
-                </form>
-            </td>
-        </tr>
-        }
+<tr>
+    <td class="text-left">@stanje.SifraStanja</td>
+    <td class="text-left">@stanje.NazivStanja</td>
+    <td class="btn-group">
+        <a asp-action="Edit"
+           asp-route-id="@stanje.SifraStanja"
+           asp-route-page="@Model.PagingInfo.CurrentPage"
+           asp-route-sort="@Model.PagingInfo.Sort"
+           asp-route-ascending="@Model.PagingInfo.Ascending"
+           class="btn btn-sm" title="Ažuriraj">
+            <i class="fas fa-edit"></i>
+        </a>
+        <form asp-action="Delete" method="post"
+              asp-route-page="@Model.PagingInfo.CurrentPage"
+              asp-route-sort="@Model.PagingInfo.Sort"
+              asp-route-ascending="@Model.PagingInfo.Ascending">
+            <input type="hidden" name="sifrastanja" value="@stanje.SifraStanja" />
+            <button type="submit" class="btn btn-sm btn-danger delete" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+        </form>
+    </td>
+</tr>}
     </tbody>
 </table>
 

@@ -7,15 +7,10 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="SifraOpreme"></label>
-        <div><span asp-validation-for="SifraOpreme" class="text-danger"></span></div>
-        <input asp-for="SifraOpreme" class="form-control" />
-    </div>
-    <div class="form-group">
         <label asp-for="SifraInstitucije"></label>
         <div><span asp-validation-for="SifraInstitucije" class="text-danger"></span></div>
         <select class="form-control" asp-for="SifraInstitucije" asp-items="ViewBag.Institucije">
-            <option selected value="" disabled>Odaberite šifru institucije</option>
+            <option selected value="" disabled>Odaberite instituciju</option>
         </select>
     </div>
     <div class="form-group">
