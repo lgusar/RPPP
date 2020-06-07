@@ -10,9 +10,9 @@
        page-action="Index" class="float-right">
 </pager>
 
+<a asp-action="exportToExcel" class ="btn btn-primary"><i class="fas fa-print"></i> Generiraj Excel</a>
 
-<a href="@Url.Action("ExportToExcel")">Export Excel</a>
-
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
 
 <table class="table table-sm table-striped table-hover" id="tablepregledi">
     <thead>
