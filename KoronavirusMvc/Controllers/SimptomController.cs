@@ -16,6 +16,9 @@ using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa simptomima
+    /// </summary>
     public class SimptomController : Controller
     {
         private readonly RPPP09Context ctx;
@@ -24,6 +27,12 @@ namespace KoronavirusMvc.Controllers
 
         private readonly ILogger<SimptomController> logger;
 
+        /// <summary>
+        /// Konstruktor razreda SimptomController
+        /// </summary>
+        /// <param name="ctx">kontekst baze</param>
+        /// <param name="optionsSnapshot">opcije</param>
+        /// <param name="logger">logger za ispis logova prilikom unosa, brisanja i ažuriranja u bazi podataka</param>
         public SimptomController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<SimptomController> logger)
         {
             this.ctx = ctx;
@@ -31,6 +40,13 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
+        /// <summary>
+        /// Metoda za tablični ispis svih simptoma
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -87,12 +103,21 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Create.cshtml za stvaranje novog simptoma
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda za stvaranje novog simptoma u bazi podataka
+        /// </summary>
+        /// <param name="simptom">Model simptom</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Simptom simptom)
@@ -126,6 +151,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za brisanje simptoma iz baze podataka
+        /// </summary>
+        /// <param name="SifraSimptoma">Šifra simptoma kojeg želimo izbrisati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraSimptoma, int page = 1, int sort = 1, bool ascending = true)
@@ -158,6 +191,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Edit.cshtml za uređivanje simptoma
+        /// </summary>
+        /// <param name="id">Šifra simptoma koji želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -179,6 +220,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za uređivanje simptoma u bazi podataka
+        /// </summary>
+        /// <param name="id">Šifra simptoma koji želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
@@ -236,6 +285,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim simptomima
+        /// </summary>
         public void ExportToExcel()
         {
             List<SimptomExcelViewModel> lista = ctx.Simptom.Select(s => new SimptomExcelViewModel
@@ -272,6 +324,10 @@ namespace KoronavirusMvc.Controllers
             Response.CompleteAsync();
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća u pdf formatu. Stvara se tablica sa svim simptomima
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis simptoma";
@@ -328,6 +384,11 @@ namespace KoronavirusMvc.Controllers
                 return NotFound();
             }
         }
+
+        /// <summary>
+        /// Pomoćna funkcija za generiranje nove šifre simptoma kad se stvara novi simptom. Novi simptom dobiva prvi najveći slobodan broj.
+        /// </summary>
+        /// <returns>Šifra novog simptoma</returns>
         private decimal NewId()
         {
             var maxId = ctx.Simptom

@@ -18,7 +18,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
-{
+{   
+    /// <summary>
+    /// Razred za backend rad s pregledima i tablicama vezanim tablicu pregled
+    /// </summary>
     public class PregledController : Controller
     {
         private readonly RPPP09Context ctx;
@@ -27,6 +30,12 @@ namespace KoronavirusMvc.Controllers
 
         private readonly ILogger<PregledController> logger;
 
+        /// <summary>
+        /// Konstruktor razreda PregledController
+        /// </summary>
+        /// <param name="ctx">kontekst baze</param>
+        /// <param name="optionsSnapshot">opcije</param>
+        /// <param name="logger">logger za ispis logova prilikom unosa, brisanja i ažuriranja u bazi podataka</param>
         public PregledController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<PregledController> logger)
         {
             this.ctx = ctx;
@@ -34,6 +43,14 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
+        /// <summary>
+        /// Metoda za brisanje pregleda iz baze podataka
+        /// </summary>
+        /// <param name="SifraPregleda">Šifra pregleda koji želimo izbrisati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string SifraPregleda, int page = 1, int sort = 1, bool ascending = true)
@@ -64,6 +81,10 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Create.cshtml za stvaranje novog pregleda
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -72,6 +93,11 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Metoda za stvaranje novog pregleda u bazi podataka
+        /// </summary>
+        /// <param name="pregledCreate">View model koji sadrži pregled i detalje pregleda; simptome i terapije</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(PregledCreateViewModel pregledCreate)
@@ -151,6 +177,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Edit.cshtml za uređivanje pregleda
+        /// </summary>
+        /// <param name="id">Šifra pregleda koji želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -181,6 +215,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za uređivanje pregleda u bazi podataka
+        /// </summary>
+        /// <param name="id">Šifra pregleda koji želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
@@ -249,6 +291,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za tablični ispis svih pregleda
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -311,6 +360,11 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda za ispis master details pregleda
+        /// </summary>
+        /// <param name="id">Šifra pregleda kojeg želimo otvoriti u MD</param>
+        /// <returns></returns>
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -362,6 +416,9 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda za dodavanje liste svih simptoma za kasnije ispisivanje prilikom Edit ili Create pregleda
+        /// </summary>
         private void prepareDropDownSimptomi()
         {
             var simptomi = ctx.Simptom.AsNoTracking().ToList();
@@ -373,6 +430,9 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Simptomi = new MultiSelectList(opisi);
         }
 
+        /// <summary>
+        /// Metoda za dodavanje liste svih terapija za kasnije ispisivanje prilikom Edit ili Create pregleda
+        /// </summary>
         private void prepareDropDownTerapije()
         {
             var terapije = ctx.Terapija.AsNoTracking().ToList();
@@ -384,6 +444,12 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Terapije = new MultiSelectList(opisi);
         }
 
+        /// <summary>
+        /// Metoda za uklanjanje simptoma iz detalja pregleda
+        /// </summary>
+        /// <param name="SifraPregleda">Šifra pregleda koji je master</param>
+        /// <param name="SifraSimptoma">Šifra simptoma kojeg želimo ukloniti iz detailsa</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RemoveSimptom(int SifraPregleda, int SifraSimptoma)
@@ -423,6 +489,12 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za uklanjanje terapija iz detalja pregleda
+        /// </summary>
+        /// <param name="SifraPregleda">Šifra pregleda koji je master</param>
+        /// <param name="SifraTerapije">Šifra terapije koju želimo ukloniti iz detailsa</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult RemoveTerapija(int SifraPregleda, int SifraTerapije)
@@ -466,6 +538,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja dohvaća stranicu EditDetail.cshtml za MD formu
+        /// </summary>
+        /// <param name="id">Šifra pregleda koji želimo otvoriti u MD formi</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> EditDetail(int id)
         {;
@@ -521,6 +598,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda koja uređuje pregled i sprema ažuriranu MD formu u bazu podataka
+        /// </summary>
+        /// <param name="id">Šifra pregleda</param>
+        /// <returns></returns>
         [HttpPost, ActionName("EditDetail")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateDetail(int id)
@@ -591,6 +673,12 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za dodavanje simptoma u detalje pregleda
+        /// </summary>
+        /// <param name="SifraPregleda">Šifra pregleda koji je master</param>
+        /// <param name="simptomi">Lista simptoma koje dodajemo u details</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DodajSimptome(int SifraPregleda, List<string> simptomi)
@@ -628,6 +716,11 @@ namespace KoronavirusMvc.Controllers
             return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
         }
 
+        /// <summary>
+        /// Metoda za dodavanje terapija u detalje pregleda
+        /// </summary>
+        /// <param name="SifraPregleda">Šifra pregleda koji je master</param>
+        /// <param name="terapije">Lista terapija koje dodajemo u details</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DodajTerapije(int SifraPregleda, List<string> terapije)
@@ -665,6 +758,9 @@ namespace KoronavirusMvc.Controllers
             return RedirectToAction(nameof(EditDetail), new { id = SifraPregleda });
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim pregledima
+        /// </summary>
         public void exportToExcel()
         {
             List<PregledExcelViewModel> lista = ctx.Pregled.Select(p => new PregledExcelViewModel
@@ -707,6 +803,10 @@ namespace KoronavirusMvc.Controllers
             Response.CompleteAsync();
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća u pdf formatu. Stvara se tablica sa svim pregledima
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis pregleda";
@@ -798,6 +898,10 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Pomoćna funkcija za generiranje nove šifre pregleda kad se stvara novi pregled. Novi pregled dobiva prvi najveći slobodan broj.
+        /// </summary>
+        /// <returns>Šifra novog pregleda</returns>
         private decimal NewId()
         {
             var maxId = ctx.Pregled

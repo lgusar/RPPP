@@ -16,6 +16,9 @@ using PdfRpt.FluentInterface;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Razred za backend rad sa terapijama
+    /// </summary>
     public class TerapijaController : Controller
     {
         private readonly RPPP09Context ctx;
@@ -24,6 +27,12 @@ namespace KoronavirusMvc.Controllers
 
         private readonly ILogger<TerapijaController> logger;
 
+        /// <summary>
+        /// Konstruktor razreda TerapijaController
+        /// </summary>
+        /// <param name="ctx">kontekst baze</param>
+        /// <param name="optionsSnapshot">opcije</param>
+        /// <param name="logger">logger za ispis logova prilikom unosa, brisanja i ažuriranja u bazi podataka</param>
         public TerapijaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<TerapijaController> logger)
         {
             this.ctx = ctx;
@@ -31,6 +40,13 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
+        /// <summary>
+        /// Metoda za tablični ispis svih terapija
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -87,12 +103,21 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Create.cshtml za stvaranje nove terapije
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        /// <summary>
+        /// Metoda za stvaranje nove terapije u bazi podataka
+        /// </summary>
+        /// <param name="terapija">Model terapija</param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Terapija terapija)
@@ -126,6 +151,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za brisanje terapije iz baze podataka
+        /// </summary>
+        /// <param name="SifraTerapije">Šifra terapije koju želimo izbrisati</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraTerapije, int page = 1, int sort = 1, bool ascending = true)
@@ -156,6 +189,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za dohvaćanje stranice Edit.cshtml za uređivanje terapije
+        /// </summary>
+        /// <param name="id">Šifra terapije koju želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -177,6 +218,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za uređivanje terapije u bazi podataka
+        /// </summary>
+        /// <param name="id">Šifra terapije koju želimo urediti</param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
@@ -233,6 +282,9 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim terapijama
+        /// </summary>
         public void exportToExcel()
         {
             List<TerapijaExcelViewModel> lista = ctx.Terapija.Select(t => new TerapijaExcelViewModel
@@ -269,6 +321,10 @@ namespace KoronavirusMvc.Controllers
             Response.CompleteAsync();
         }
 
+        /// <summary>
+        /// Metoda za generiranje izvješća u pdf formatu. Stvara se tablica sa svim simptomima
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis terapija";
@@ -326,6 +382,10 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Pomoćna funkcija za generiranje nove šifre terapije kad se stvara nova terapija. Novi terapija dobiva prvi najveći slobodan broj.
+        /// </summary>
+        /// <returns>Šifra nove terapije</returns>
         private decimal NewId()
         {
             var maxId = ctx.Terapija
