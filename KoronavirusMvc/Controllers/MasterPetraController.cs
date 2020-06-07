@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.Language.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OfficeOpenXml;
 
 namespace KoronavirusMvc.Controllers
 {
@@ -267,7 +268,7 @@ namespace KoronavirusMvc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveStatistika(bool isAdd, int sifraStat, int brojIzlj, int brojBol, int brojUmrl, int brojTot, int sifraOrg, int sifraGrada)
+        public async Task<IActionResult> SaveStatistika(bool isAdd, int sifraStat, int brojIzlj, int brojBol, int brojUmrl, int brojTot, int sifraOrg, int sifraGrada, DateTime datum)
         {
             var statistika = await _context.Statistika.FirstOrDefaultAsync(g => g.SifraObjave == sifraStat);
             if (isAdd)
@@ -288,6 +289,7 @@ namespace KoronavirusMvc.Controllers
             statistika.BrojUmrlih = brojUmrl;
             statistika.SifraGrada = sifraGrada;
             statistika.SifraOrganizacije = sifraOrg;
+            statistika.Datum = datum;
 
             if (isAdd)
             {
@@ -327,9 +329,9 @@ namespace KoronavirusMvc.Controllers
             return list;
         }
 
-        public void exportToExcelDetail(string sifraDrzave)
+        public async void exportToExcelDetail(string sifraDrzave)
         {
-            var drzava =  _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);
+            var drzava = await _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);
 
             List<Lokacija> lokacije = _context.Lokacija.Where( l => l.SifraDrzave == sifraDrzave).ToList();
 
@@ -346,10 +348,17 @@ namespace KoronavirusMvc.Controllers
             }
 
 
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            //ExcelPackage pck = new ExcelPackage();
-            //ExcelWorksheet ws = pck.Workbook.Worksheets.Add($"Pregled {pregled.SifraPregleda}");
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage pck = new ExcelPackage();
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add($"Drzava {drzava.SifraDrzave}");
 
+            ws.Cells["A3"].Value = string.Format("Gradovi povezani sa državom:");
+            int rowStart = 4;
+            foreach (var item in lokacije)
+            {
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.ImeGrada;
+                rowStart++;
+            }
             //ws.Cells["A1"].Value = $"Pregled {pregled.SifraPregleda}";
 
             //ws.Cells["A3"].Value = "Datum";
@@ -367,7 +376,7 @@ namespace KoronavirusMvc.Controllers
 
             //ws.Cells["A10"].Value = "Simptomi";
 
-            //int rowStart = 11;
+            //rowStart = 11;
             //foreach (Simptom s in simptomi)
             //{
             //    ws.Cells[string.Format("A{0}", rowStart)].Value = s.Opis;
@@ -381,6 +390,28 @@ namespace KoronavirusMvc.Controllers
             //{
             //    ws.Cells[string.Format("C{0}", rowStart)].Value = t.OpisTerapije;
             //    rowStart++;
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
+            //}
             //}
 
             //ws.Cells["A:AZ"].AutoFitColumns();

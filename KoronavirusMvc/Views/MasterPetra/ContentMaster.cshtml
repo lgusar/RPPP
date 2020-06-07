@@ -1,6 +1,13 @@
 ﻿@model (List<Statistika> Statistike, List<Putovanje> Putovanja)
 
-<h1>Putovanja</h1>
+
+<h2>Putovanja</h2>
+
+<div>
+    <button class="btn btn-sm btn-success putovanje-add" title="Dodaj novo putovanje">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
 <table class="table table-sm table-striped table-hover" id="tablePutovanja">
     <thead>
         <tr>
@@ -40,8 +47,13 @@
     </tbody>
 </table>
 
-<h1>Statistike</h1>
+<h2>Statistike</h2>
 
+<div>
+    <button class="btn btn-sm btn-success statistika-add"  title="Dodaj novu statistiku">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
 <table class="table table-sm table-striped table-hover" id="tableStatistike">
     <thead>
         <tr>
