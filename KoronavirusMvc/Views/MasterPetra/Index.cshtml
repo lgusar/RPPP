@@ -9,7 +9,7 @@
             <div class="form-group">
                 <div>
                     <label asp-for="OdabranaDrzava.SifraDrzave"><h1> Države</h1></label>
-                    <button class="btn btn-sm btn-success " title="DodajDrzavu">
+                    <button class="btn btn-sm btn-success drzava-add" title="DodajDrzavu">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
@@ -17,10 +17,10 @@
                     <select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
                         <option selected value="" disabled>Odaberite državu</option>
                     </select>
-                    <div class="btn btn-sm drzava-edit" drzava="OdabranaDrzava.SifraDrzave" title="Ažuriraj">
+                    <div class="btn btn-sm drzava-edit" title="Ažuriraj">
                         <i class="fas fa-edit"></i>
                     </div>
-                    <button class="btn btn-sm btn-danger drzava-delete" drzava="OdabranaDrzava.SifraDrzave" title="Obriši">
+                    <button class="btn btn-sm btn-danger drzava-delete" title="Obriši">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -68,7 +68,7 @@
             })
 
             $(".lokacija-edit, .lokacija-add").click(function () {
-                var isAdd = $(this).attr("sifra") == 0;
+                var isAdd = !$(this).attr("sifra");
                 $.get('@Url.Action("GetLokacijaAddEdit")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
                     $("#addEditBody").html(result);
 
@@ -83,7 +83,6 @@
                                 if (!!result.success) {
                                     closeAddEditModal();
                                     loadLocation();
-                                    $("#location-content").empty();
                                 } else {
                                     $("#addEditBody").html(result);
                                 }
@@ -204,5 +203,33 @@
         $("#selectedCountry").change(function () {
             loadLocation();
         });
+
+        $(".drzava-edit, .drzava-add").click(function () {
+            var sifra = $("#selectedCountry").val();
+            $.get('@Url.Action("GetDrzavaAddEdit")', { sifraDrzave: sifra }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SaveDrzava")',
+                            {
+                                isAdd: !sifra,
+                                sifraDrzave: $("#addEditBody").find("#SifraDrzave").val(),
+                                imeDrzave: $("#addEditBody").find("#ImeDrzave").val(),
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    $.get('@Url.Action("PrepareDropdownLists")');
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
+                    })
+                })
+
+            })
     </script>
 }

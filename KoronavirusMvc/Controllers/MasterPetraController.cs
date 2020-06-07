@@ -6,6 +6,7 @@ using KoronavirusMvc.Models;
 using KoronavirusMvc.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Razor.Language.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -29,7 +30,8 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
-        private async Task PrepareDropdownLists()
+        [HttpGet]
+        public async Task PrepareDropdownLists()
         {
             var drzava = await _context.Drzava.OrderBy(d => d.ImeDrzave).Select(d => new { d.ImeDrzave, d.SifraDrzave }).ToListAsync();
             ViewBag.Drzave = new SelectList(drzava, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave));
@@ -88,14 +90,42 @@ namespace KoronavirusMvc.Controllers
             Drzava drzava;
             if (!string.IsNullOrWhiteSpace(sifraDrzave))
             {
-                drzava = await _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);
+                drzava = await _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave.Trim());
             }
             else
             {
                 drzava = new Drzava();
             }
 
-            return PartialView("DrzaveMasterEdit", drzava);
+            return PartialView("DrzaveEditMaster", drzava);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveDrzava(bool isAdd, string sifraDrzave, string imeDrzave)
+        {
+            var drzava = await _context.Drzava.FirstOrDefaultAsync(g => g.SifraDrzave == sifraDrzave.Trim());
+            if (isAdd)
+            {
+                if (drzava != null)
+                {
+                    return await GetDrzavaAddEdit(null);
+                }
+                else drzava = new Drzava
+                {
+                    SifraDrzave = sifraDrzave.Trim()
+                };
+            }
+
+            drzava.ImeDrzave = imeDrzave;
+
+            if (isAdd)
+            {
+                _context.Add(drzava);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Success = true });
         }
 
         [HttpGet]
@@ -171,6 +201,45 @@ namespace KoronavirusMvc.Controllers
             return PartialView("PutovanjeEditMaster", viewModel);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SavePutovanje(bool isAdd, int sifraPutovanja, DateTime datumPolaska, DateTime datumVracanja, List<int> gradovi, string osoba)
+        {
+            var putovanje = await _context.Putovanje.FirstOrDefaultAsync(g => g.SifraPutovanja == sifraPutovanja);
+            if (isAdd)
+            {
+                if (putovanje != null)
+                {
+                    return await GetPutovanjeAddEdit(0);
+                }
+                else putovanje = new Putovanje
+                {
+                    SifraPutovanja = sifraPutovanja
+                };
+            }
+
+            putovanje.DatumPolaska = datumPolaska;
+            putovanje.DatumVracanja = datumVracanja;
+            putovanje.IdentifikacijskiBroj = osoba;
+
+            if (isAdd)
+            {
+                _context.Add(putovanje);
+            }
+
+            foreach (var grad in gradovi)
+            {
+                _context.Add(new PutovanjeLokacija
+                {
+                    SifraPutovanja = putovanje.SifraPutovanja,
+                    SifraGrada = grad
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Success = true });
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetStatistikaAddEdit(int sifraStatistike)
         {
@@ -195,6 +264,39 @@ namespace KoronavirusMvc.Controllers
             };
 
             return PartialView("StatistikaEditMaster", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveStatistika(bool isAdd, int sifraStat, int brojIzlj, int brojBol, int brojUmrl, int brojTot, int sifraOrg, int sifraGrada)
+        {
+            var statistika = await _context.Statistika.FirstOrDefaultAsync(g => g.SifraObjave == sifraStat);
+            if (isAdd)
+            {
+                if (statistika != null)
+                {
+                    return await GetStatistikaAddEdit(0);
+                }
+                else statistika = new Statistika
+                {
+                    SifraObjave = sifraStat
+                };
+            }
+
+            statistika.BrojIzlijecenih = brojIzlj;
+            statistika.BrojAktivnih = brojBol;
+            statistika.BrojSlucajeva = brojTot;
+            statistika.BrojUmrlih = brojUmrl;
+            statistika.SifraGrada = sifraGrada;
+            statistika.SifraOrganizacije = sifraOrg;
+
+            if (isAdd)
+            {
+                _context.Add(statistika);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Success = true });
         }
     }
 }
