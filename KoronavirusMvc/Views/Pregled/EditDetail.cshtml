@@ -1,0 +1,155 @@
+﻿@model KoronavirusMvc.ViewModels.PregledDetailViewModel
+
+@{
+    ViewBag.Title = "Ažuriranje pregleda";
+}
+
+<form asp-action="EditDetail" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="Pregled.Datum"></label>
+        <div><span asp-validation-for="Pregled.Datum" class="text-danger"></span></div>
+        <input asp-for="Pregled.Datum" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Pregled.Anamneza"></label>
+        <div><span asp-validation-for="Pregled.Anamneza" class="text-danger"></span></div>
+        <input asp-for="Pregled.Anamneza" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Pregled.Dijagnoza"></label>
+        <div><span asp-validation-for="Pregled.Dijagnoza" class="text-danger"></span></div>
+        <input asp-for="Pregled.Dijagnoza" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="OsobaPregled.IdentifikacijskiBroj"></label>
+        <div><span asp-validation-for="OsobaPregled.IdentifikacijskiBroj" class="text-danger"></span></div>
+        <input asp-for="OsobaPregled.IdentifikacijskiBroj" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Prihvati promjene</button>
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Vrati se na popis pregleda
+        </a>
+        <a asp-action="Details"
+           asp-route-id="@Model.Pregled.SifraPregleda"
+           class="btn btn-secondary">
+            Vrati se na detalje pregleda
+        </a>
+    </div>
+</form>
+
+<h4>Simptomi</h4>
+
+<form asp-action="DodajSimptome" method="post">
+    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+    <div class="form-group">
+        <label>Terapije</label>
+        <div><span asp-validation-for="Simptomi" class="text-danger"></span></div>
+        <select multiple class="form-control" asp-for="Simptomi" asp-items="ViewBag.Simptomi">
+            <option disabled selected value="">Odaberite simptome</option>
+        </select>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj simptome</button>
+    </div>
+</form>
+
+<p>
+
+
+
+
+</p>
+
+<table class="table table-sm table-striped table-hover" id="tablesimptomi">
+    <thead>
+        <tr>
+            <th>
+                Simptomi
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var simptom in @Model.Simptomi)
+        {
+            <tr>
+                <td class="text-left">@simptom.Opis</td>
+                <td class="btn-group" style="float: right;">
+                    <form asp-action="RemoveSimptom" method="post">
+                        <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+                        <input type="hidden" name="SifraSimptoma" value="@simptom.SifraSimptoma" />
+                        <button data-sifraSimptoma="@simptom.SifraSimptoma" data-sifraPregleda="@Model.Pregled.SifraPregleda" type="submit" class="btn btn-sm btn-danger deletesimptom" title="Ukloni">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Terapije</h4>
+<form asp-action="DodajTerapije" method="post">
+    <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+    <div class="form-group">
+        <label>Terapije</label>
+        <div><span asp-validation-for="Terapije" class="text-danger"></span></div>
+        <select multiple class="form-control" asp-for="Terapije" asp-items="ViewBag.Terapije">
+            <option disabled selected value="">Odaberite terapije</option>
+        </select>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Dodaj terapije</button>
+    </div>
+</form>
+
+<p>
+
+
+
+
+</p>
+
+<table class="table table-sm table-striped table-hover" id="tableterapije">
+    <thead>
+        <tr>
+            <th>
+                Terapije
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var terapija in @Model.Terapije)
+        {
+            <tr>
+                <td class="text-left">@terapija.OpisTerapije</td>
+                <td class="btn-group" style="float: right;">
+                    <form asp-action="RemoveTerapija" method="post">
+                        <input type="hidden" name="SifraPregleda" value="@Model.Pregled.SifraPregleda" />
+                        <input type="hidden" name="SifraTerapije" value="@terapija.SifraTerapije" />
+                        <button type="submit" data-sifraTerapije="@terapija.SifraTerapije" data-sifraPregleda="@Model.Pregled.SifraPregleda" class="btn btn-sm btn-danger deleteterapija" title="Ukloni">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Index">Natrag na listu pregleda</a>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+    $(function(){
+        SetDeleteSimptom(".deletesimptom", '@Url.Action("RemoveSimptom")', 'sifrasimptoma', 'sifrapregleda');
+    });
+    $(function(){
+        SetDeleteTerapija(".deleteterapija", '@Url.Action("RemoveTerapija")', 'sifraterapije', 'sifrapregleda');
+    });
+    </script>
+}

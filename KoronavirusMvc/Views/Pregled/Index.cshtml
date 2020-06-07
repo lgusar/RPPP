@@ -10,6 +10,10 @@
        page-action="Index" class="float-right">
 </pager>
 
+<a asp-action="exportToExcel" class ="btn btn-primary"><i class="fas fa-print"></i> Generiraj Excel</a>
+
+<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
+
 <table class="table table-sm table-striped table-hover" id="tablepregledi">
     <thead>
         <tr>
@@ -50,12 +54,11 @@
                 <td class="text-left">@pregled.Dijagnoza</td>
                 <td class="btn-group">
                     <a asp-action="Edit"
-                          asp-route-id="@pregled.SifraPregleda"
-                          asp-route-page="@Model.PagingInfo.CurrentPage"
-                          asp-route-sort="@Model.PagingInfo.Sort"
-                          asp-route-ascending="@Model.PagingInfo.Ascending"
-                          class="btn btn-sm" title="Ažuriraj"
-                    >
+                       asp-route-id="@pregled.SifraPregleda"
+                       asp-route-page="@Model.PagingInfo.CurrentPage"
+                       asp-route-sort="@Model.PagingInfo.Sort"
+                       asp-route-ascending="@Model.PagingInfo.Ascending"
+                       class="btn btn-sm" title="Ažuriraj">
                         <i class="fas fa-edit"></i>
                     </a>
 
@@ -68,6 +71,12 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </form>
+                    <a asp-action="Details"
+                       asp-route-id="@pregled.SifraPregleda"
+                       class="btn bt-sm more-info"
+                       title="Prikaži detalje pregleda">
+                        <i class="fas fa-info"></i>
+                    </a>
                 </td>
             </tr>
 

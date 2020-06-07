@@ -35,11 +35,11 @@ namespace KoronavirusMvc
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-               Host.CreateDefaultBuilder(args)
-                   .ConfigureWebHostDefaults(webBuilder =>
-                   {
-                       webBuilder.UseStartup<Startup>();
-                   })
-                   .UseNLog();
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                })
+                .UseNLog();
     }
 }

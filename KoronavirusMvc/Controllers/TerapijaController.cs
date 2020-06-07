@@ -17,24 +17,24 @@ using PdfRpt.FluentInterface;
 namespace KoronavirusMvc.Controllers
 {
     /// <summary>
-    /// Razred za backend rad sa simptomima
+    /// Razred za backend rad sa terapijama
     /// Napravio Lovre Gusar
     /// </summary>
-    public class SimptomController : Controller
+    public class TerapijaController : Controller
     {
         private readonly RPPP09Context ctx;
 
         private readonly AppSettings appSettings;
 
-        private readonly ILogger<SimptomController> logger;
+        private readonly ILogger<TerapijaController> logger;
 
         /// <summary>
-        /// Konstruktor razreda SimptomController
+        /// Konstruktor razreda TerapijaController
         /// </summary>
         /// <param name="ctx">kontekst baze</param>
         /// <param name="optionsSnapshot">opcije</param>
         /// <param name="logger">logger za ispis logova prilikom unosa, brisanja i ažuriranja u bazi podataka</param>
-        public SimptomController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<SimptomController> logger)
+        public TerapijaController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<TerapijaController> logger)
         {
             this.ctx = ctx;
             this.logger = logger;
@@ -42,7 +42,7 @@ namespace KoronavirusMvc.Controllers
         }
 
         /// <summary>
-        /// Metoda za tablični ispis svih simptoma
+        /// Metoda za tablični ispis svih terapija
         /// </summary>
         /// <param name="page"></param>
         /// <param name="sort"></param>
@@ -51,7 +51,7 @@ namespace KoronavirusMvc.Controllers
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
-            var query = ctx.Simptom.AsNoTracking();
+            var query = ctx.Terapija.AsNoTracking();
 
             int count = query.Count();
 
@@ -74,14 +74,14 @@ namespace KoronavirusMvc.Controllers
                 });
             }
 
-            System.Linq.Expressions.Expression<Func<Simptom, object>> orderSelector = null;
+            System.Linq.Expressions.Expression<Func<Terapija, object>> orderSelector = null;
             switch (sort)
             {
                 case 1:
-                    orderSelector = s => s.SifraSimptoma;
+                    orderSelector = s => s.SifraTerapije;
                     break;
                 case 2:
-                    orderSelector = s => s.Opis;
+                    orderSelector = s => s.OpisTerapije;
                     break;
             }
 
@@ -90,14 +90,14 @@ namespace KoronavirusMvc.Controllers
                 query = ascending ? query.OrderBy(orderSelector) : query.OrderByDescending(orderSelector);
             }
 
-            var simptomi = query
+            var terapije = query
                               .Skip((page - 1) * pagesize)
                               .Take(pagesize)
                               .ToList();
 
-            var model = new SimptomiViewModel
+            var model = new TerapijeViewModel
             {
-                Simptomi = simptomi,
+                Terapije = terapije,
                 PagingInfo = pagingInfo
             };
 
@@ -105,7 +105,7 @@ namespace KoronavirusMvc.Controllers
         }
 
         /// <summary>
-        /// Metoda za dohvaćanje stranice Create.cshtml za stvaranje novog simptoma
+        /// Metoda za dohvaćanje stranice Create.cshtml za stvaranje nove terapije
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -115,57 +115,57 @@ namespace KoronavirusMvc.Controllers
         }
 
         /// <summary>
-        /// Metoda za stvaranje novog simptoma u bazi podataka
+        /// Metoda za stvaranje nove terapije u bazi podataka
         /// </summary>
-        /// <param name="simptom">Model simptom</param>
+        /// <param name="terapija">Model terapija</param>
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Simptom simptom)
+        public IActionResult Create(Terapija terapija)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    simptom.SifraSimptoma = (int)NewId();
-                    ctx.Add(simptom);
+                    terapija.SifraTerapije = (int)NewId();
+                    ctx.Add(terapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Simptom {simptom.SifraSimptoma} uspješno dodan.";
+                    TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno dodana.";
                     TempData[Constants.ErrorOccurred] = false;
 
-                    logger.LogInformation($"Simptom {simptom.SifraSimptoma} uspješno dodan.");
+                    logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno dodana.");
 
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception exc)
                 {
                     ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                    logger.LogError($"Pogreška prilikom dodavanja novog simptoma {exc.CompleteExceptionMessage()}");
-                    return View(simptom);
+                    logger.LogError($"Pogreška prilikom dodavanja nove terapije {exc.CompleteExceptionMessage()}");
+                    return View(terapija);
                 }
             }
             else
             {
-                logger.LogError($"Pogreška prilikom dodavanja novog simptoma");
-                return View(simptom);
+                logger.LogError($"Pogreška prilikom dodavanja nove terapije");
+                return View(terapija);
             }
         }
 
         /// <summary>
-        /// Metoda za brisanje simptoma iz baze podataka
+        /// Metoda za brisanje terapije iz baze podataka
         /// </summary>
-        /// <param name="SifraSimptoma">Šifra simptoma kojeg želimo izbrisati</param>
+        /// <param name="SifraTerapije">Šifra terapije koju želimo izbrisati</param>
         /// <param name="page"></param>
         /// <param name="sort"></param>
         /// <param name="ascending"></param>
         /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int SifraSimptoma, int page = 1, int sort = 1, bool ascending = true)
+        public IActionResult Delete(int SifraTerapije, int page = 1, int sort = 1, bool ascending = true)
         {
-            var simptom = ctx.Simptom.Find(SifraSimptoma);
-            if (simptom == null)
+            var terapija = ctx.Terapija.Find(SifraTerapije);
+            if (terapija == null)
             {
                 return NotFound();
             }
@@ -173,29 +173,27 @@ namespace KoronavirusMvc.Controllers
             {
                 try
                 {
-                    ctx.Remove(simptom);
+                    ctx.Remove(terapija);
                     ctx.SaveChanges();
 
-                    TempData[Constants.Message] = $"Simptom {simptom.SifraSimptoma} uspješno obrisan.";
+                    TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno obrisana.";
+                    logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno obrisana.");
                     TempData[Constants.ErrorOccurred] = false;
-
-                    logger.LogInformation($"Simptom {simptom.SifraSimptoma} uspješno obrisan.");
                 }
                 catch (Exception exc)
                 {
-                    TempData[Constants.Message] = $"Pogreška prilikom brisanja simptoma." + exc.CompleteExceptionMessage();
+                    TempData[Constants.Message] = $"Pogreška prilikom brisanja terapije." + exc.CompleteExceptionMessage();
+                    logger.LogError($"Pogreška prilikom brisanja terapije." + exc.CompleteExceptionMessage());
                     TempData[Constants.ErrorOccurred] = true;
-
-                    logger.LogError($"Pogreška prilikom brisanja simptoma. {exc.CompleteExceptionMessage()}");
                 }
                 return RedirectToAction(nameof(Index), new { page, sort, ascending });
             }
         }
 
         /// <summary>
-        /// Metoda za dohvaćanje stranice Edit.cshtml za uređivanje simptoma
+        /// Metoda za dohvaćanje stranice Edit.cshtml za uređivanje terapije
         /// </summary>
-        /// <param name="id">Šifra simptoma koji želimo urediti</param>
+        /// <param name="id">Šifra terapije koju želimo urediti</param>
         /// <param name="page"></param>
         /// <param name="sort"></param>
         /// <param name="ascending"></param>
@@ -203,28 +201,28 @@ namespace KoronavirusMvc.Controllers
         [HttpGet]
         public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
-            var simptom = ctx.Simptom
+            var terapija = ctx.Terapija
                              .AsNoTracking()
-                             .Where(p => p.SifraSimptoma == id)
+                             .Where(p => p.SifraTerapije == id)
                              .FirstOrDefault();
 
-            if (simptom == null)
-            { 
-                return NotFound($"Ne postoji simptom s tom šifrom: {id}");
+            if (terapija == null)
+            {
+                return NotFound($"Ne postoji terapija s tom šifrom: {id}");
             }
             else
             {
                 ViewBag.Page = page;
                 ViewBag.Sort = sort;
                 ViewBag.ascending = ascending;
-                return View(simptom);
+                return View(terapija);
             }
         }
 
         /// <summary>
-        /// Metoda za uređivanje simptoma u bazi podataka
+        /// Metoda za uređivanje terapije u bazi podataka
         /// </summary>
-        /// <param name="id">Šifra simptoma koji želimo urediti</param>
+        /// <param name="id">Šifra terapije koju želimo urediti</param>
         /// <param name="page"></param>
         /// <param name="sort"></param>
         /// <param name="ascending"></param>
@@ -235,92 +233,91 @@ namespace KoronavirusMvc.Controllers
         {
             try
             {
-                Simptom simptom = await ctx.Simptom.FindAsync(id);
+                Terapija terapija = await ctx.Terapija.FindAsync(id);
 
-                if (simptom == null)
+                if (terapija == null)
                 {
-                    logger.LogError($"Pogreška prilikom ažuriranja simptoma. Ne postoji simptom s tom šifrom: {id}");
-                    return NotFound($"Ne postoji simptom s tom šifrom {id}");
+                    logger.LogError($"Pogreška prilikom ažuriranja terapije. Ne postoji terapija s tom šifrom: {id}");
+                    return NotFound($"Ne postoji terapija s tom šifrom {id}");
                 }
 
                 ViewBag.page = page;
                 ViewBag.sort = sort;
                 ViewBag.ascending = ascending;
-                bool ok = await TryUpdateModelAsync<Simptom>(simptom, "", p => p.Opis);
+                bool ok = await TryUpdateModelAsync<Terapija>(terapija, "", p => p.OpisTerapije);
 
                 if (ok)
                 {
                     try
                     {
-                        TempData[Constants.Message] = $"Simptom {simptom.SifraSimptoma} uspješno ažuriran.";
+                        TempData[Constants.Message] = $"Terapija {terapija.SifraTerapije} uspješno ažurirana.";
                         TempData[Constants.ErrorOccurred] = false;
 
-                        await ctx.SaveChangesAsync();
+                        logger.LogInformation($"Terapija {terapija.SifraTerapije} uspješno ažurirana.");
 
-                        logger.LogInformation($"Simptom {simptom.SifraSimptoma} uspješno ažuriran.");
+                        await ctx.SaveChangesAsync();
 
                         return RedirectToAction(nameof(Index), new { page, sort, ascending });
                     }
                     catch (Exception exc)
                     {
                         ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-                        logger.LogError($"Pogreška prilikom ažuriranja simptoma. {exc.CompleteExceptionMessage()}");
-                        return View(simptom);
+                        logger.LogError($"Pogreška prilikom ažuriranja terapije. {exc.CompleteExceptionMessage()}");
+                        return View(terapija);
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Podatke o simptomu nije moguće povezati s forme.");
-                    logger.LogError($"Pogreška prilikom ažuriranja simptoma. Podatke o simptomu nije moguće povezati s forme.");
-                    return View(simptom);
+                    ModelState.AddModelError(string.Empty, "Podatke o terapiji nije moguće povezati s forme.");
+                    logger.LogError($"Pogreška prilikom ažuriranja terapije. Podatke o terapiji nije moguće povezati s forme.");
+                    return View(terapija);
                 }
             }
             catch (Exception exc)
             {
                 TempData[Constants.Message] = exc.CompleteExceptionMessage();
+                logger.LogError($"Pogreška prilikom ažuriranja terapije. {exc.CompleteExceptionMessage()}");
                 TempData[Constants.ErrorOccurred] = true;
-
-                logger.LogError($"Pogreška prilikom ažuriranja simptoma. {exc.CompleteExceptionMessage()}");
 
                 return RedirectToAction(nameof(Edit), new { page, sort, ascending });
             }
         }
 
         /// <summary>
-        /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim simptomima
+        /// Metoda za generiranje izvješća za Excel. Stvara se excel tablica sa svim terapijama
         /// </summary>
-        public void ExportToExcel()
+        public void exportToExcel()
         {
-            List<SimptomExcelViewModel> lista = ctx.Simptom.Select(s => new SimptomExcelViewModel
+            List<TerapijaExcelViewModel> lista = ctx.Terapija.Select(t => new TerapijaExcelViewModel
             {
-                SifraSimptoma = s.SifraSimptoma,
-                Opis = s.Opis
+                SifraTerapije = t.SifraTerapije,
+                OpisTerapije = t.OpisTerapije
             }).ToList();
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             ExcelPackage pck = new ExcelPackage();
-            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Simptomi");
+            ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Terapije");
 
-            ws.Cells["A1"].Value = "Simptomi";
+            ws.Cells["A1"].Value = "Terapije";
 
             ws.Cells["A3"].Value = "Datum";
             ws.Cells["B3"].Value = string.Format("{0:dd MMMM yyyy} at {0:H: mm tt}", DateTimeOffset.Now);
 
-            ws.Cells["A6"].Value = "Sifra simptoma";
-            ws.Cells["B6"].Value = "Opis";
+            ws.Cells["A6"].Value = "Sifra terapije";
+            ws.Cells["B6"].Value = "Opis terapije";
 
             int rowStart = 7;
             foreach (var item in lista)
             {
-                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraSimptoma;
-                ws.Cells[string.Format("B{0}", rowStart)].Value = item.Opis;
+                ws.Cells[string.Format("A{0}", rowStart)].Value = item.SifraTerapije;
+                ws.Cells[string.Format("B{0}", rowStart)].Value = item.OpisTerapije;
                 rowStart++;
             }
 
             ws.Cells["A:AZ"].AutoFitColumns();
             Response.Clear();
             Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            Response.Headers.Add("content-disposition", "attachment; filename=simptomi.xlsx");
+            Response.Headers.Add("content-disposition", "attachment; filename=terapije.xlsx");
             Response.Body.WriteAsync(pck.GetAsByteArray());
             Response.CompleteAsync();
         }
@@ -331,8 +328,8 @@ namespace KoronavirusMvc.Controllers
         /// <returns></returns>
         public async Task<IActionResult> PDFReport()
         {
-            string naslov = "Popis simptoma";
-            var simptomi = await ctx.Simptom
+            string naslov = "Popis terapija";
+            var terapije = await ctx.Terapija
                 .AsNoTracking()
                 .ToListAsync();
             PdfReport report = Constants.CreateBasicReport(naslov);
@@ -348,27 +345,27 @@ namespace KoronavirusMvc.Controllers
                     defaultHeader.Message(naslov);
                 });
             });
-            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(simptomi));
+            report.MainTableDataSource(dataSource => dataSource.StronglyTypedList(terapije));
 
             report.MainTableColumns(columns =>
             {
                 columns.AddColumn(column =>
                 {
-                    column.PropertyName<Simptom>(o => o.SifraSimptoma);
+                    column.PropertyName<Terapija>(o => o.SifraTerapije);
                     column.CellsHorizontalAlignment(HorizontalAlignment.Center);
                     column.IsVisible(true);
                     column.Order(0);
                     column.Width(4);
-                    column.HeaderCell("Sifra simptoma", horizontalAlignment: HorizontalAlignment.Center);
+                    column.HeaderCell("Sifra terapije", horizontalAlignment: HorizontalAlignment.Center);
                 });
                 columns.AddColumn(column =>
                 {
-                    column.PropertyName<Simptom>(o => o.Opis);
+                    column.PropertyName<Terapija>(o => o.OpisTerapije);
                     column.CellsHorizontalAlignment(HorizontalAlignment.Left);
                     column.IsVisible(true);
                     column.Order(1);
                     column.Width(4);
-                    column.HeaderCell("Opis", horizontalAlignment: HorizontalAlignment.Left);
+                    column.HeaderCell("Opis terapije", horizontalAlignment: HorizontalAlignment.Left);
                 });
             });
 
@@ -377,7 +374,7 @@ namespace KoronavirusMvc.Controllers
 
             if (pdf != null)
             {
-                Response.Headers.Add("content-disposition", "inline; filename=simptomi.pdf");
+                Response.Headers.Add("content-disposition", "inline; filename=terapije.pdf");
                 return File(pdf, "application/pdf");
             }
             else
@@ -387,13 +384,13 @@ namespace KoronavirusMvc.Controllers
         }
 
         /// <summary>
-        /// Pomoćna funkcija za generiranje nove šifre simptoma kad se stvara novi simptom. Novi simptom dobiva prvi najveći slobodan broj.
+        /// Pomoćna funkcija za generiranje nove šifre terapije kad se stvara nova terapija. Novi terapija dobiva prvi najveći slobodan broj.
         /// </summary>
-        /// <returns>Šifra novog simptoma</returns>
+        /// <returns>Šifra nove terapije</returns>
         private decimal NewId()
         {
-            var maxId = ctx.Simptom
-                      .Select(o => o.SifraSimptoma)
+            var maxId = ctx.Terapija
+                      .Select(o => o.SifraTerapije)
                       .ToList()
                       .Max();
 

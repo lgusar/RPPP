@@ -1,15 +1,15 @@
-﻿@model Simptom
+﻿@model Terapija
 
 @{ 
-    ViewBag.Title = "Novi simptom";
+    ViewBag.Title = "Nova terapija";
 }
 
 <form asp-action="Create" method="post">
     <div asp-validation-summary="All"></div>
     <div class="form-group">
-        <label asp-for="Opis"></label>
-        <div><span asp-validation-for="Opis" class="text-danger"></span></div>
-        <input asp-for="Opis" class="form-control" />
+        <label asp-for="OpisTerapije"></label>
+        <div><span asp-validation-for="OpisTerapije" class="text-danger"></span></div>
+        <input asp-for="OpisTerapije" class="form-control" />
     </div>
     <div class="text-center">
         <button class="btn btn-primary" type="submit">Dodaj</button>
