@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,6 +44,7 @@ namespace KoronavirusMvc
             app.UseStaticFiles();
             app.UseRouting();
 
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("Stozeri i sastanci",
@@ -53,6 +55,12 @@ namespace KoronavirusMvc
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
+
+                endpoints.MapControllerRoute(
+                    name: "AutoCompleteRoute",
+                    pattern: "autocomplete/{controller}/{action=Get}",
+                    new { area = "AutoComplete" }
+                    );
             });
         }
     }

@@ -14,8 +14,6 @@ namespace KoronavirusMvc
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
-
             // NLog: setup the logger first to catch all errors      
             var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
             try
@@ -42,7 +40,6 @@ namespace KoronavirusMvc
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureLogging(loggingBuilder => loggingBuilder.ClearProviders())
                 .UseNLog();
     }
 }

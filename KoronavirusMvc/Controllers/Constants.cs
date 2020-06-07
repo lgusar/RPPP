@@ -39,8 +39,7 @@ namespace KoronavirusMvc.Controllers
                 });
             })
             .MainTableTemplate(template => { template.BasicTemplate(BasicTemplate.ProfessionalTemplate); })
-            .MainTablePreferences(table =>
-            {
+            .MainTablePreferences(table => {
                 table.ColumnsWidthsType(TableColumnWidthType.Relative);
                 //table.NumberOfDataRowsPerPage(20);
                 table.GroupsPreferences(new GroupsPreferences

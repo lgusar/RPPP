@@ -26,11 +26,76 @@ $(function () {
 });
 
 function clearOldMessage() {
-    $("#tempmessage").siblings().remove();
-    $("#tempmessage").removeClass("alert-success");
-    $("#tempmessage").removeClass("alert-danger");
-    $("#tempmessage").html('');
+    $('#tempmessage').siblings().remove();
+    $('#tempmessage').removeClass("alert-success");
+    $('#tempmessage').removeClass("alert-danger");
+    $('#tempmessage').html('');
 }
+
+function SetDeleteSimptom(selector, url, sifraSimptoma, sifraPregleda) {
+    $(document).on('click', selector, function (event) {
+        event.preventDefault();
+        var sifraSimptomaval = $(this).data(sifraSimptoma);
+        var sifraPregledaval = $(this).data(sifraPregleda);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data("aktivan");
+        if (aktivan !== true) {
+            $(tr).data("aktivan", true);
+
+            if (confirm("Ukloniti zapis?")) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { SifraPregleda: sifraPregledaval, SifraSimptoma: sifraSimptomaval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $('#tempmessage').addClass(data.successful ? "alert-success" : "alert-danger");
+                    $('#tempmessage').html(data.message);
+
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data("aktivan", false);
+                })
+            }
+            else {
+                $(tr).data("aktivan", false);
+            }
+        }
+    });
+}
+
+function SetDeleteTerapija(selector, url, sifraTerapije, sifraPregleda) {
+    $(document).on('click', selector, function (event) {
+        event.preventDefault();
+        var sifraTerapijeval = $(this).data(sifraTerapije);
+        var sifraPregledaval = $(this).data(sifraPregleda);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data("aktivan");
+        if (aktivan !== true) {
+            $(tr).data("aktivan", true);
+
+            if (confirm("Ukloniti zapis?")) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { SifraPregleda: sifraPregledaval, SifraTerapije: sifraTerapijeval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $('#tempmessage').addClass(data.successful ? "alert-success" : "alert-danger");
+                    $('#tempmessage').html(data.message);
+
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data("aktivan", false);
+                })
+            }
+            else {
+                $(tr).data("aktivan", false);
+            }
+        }
+    });
+}
+
 
 function SetDeleteAjax(selector, url, paramname) {
     $(document).on('click', selector, function (event) {
@@ -62,12 +127,6 @@ function SetDeleteAjax(selector, url, paramname) {
     });
 }
 
-
-//Svim elementima koji zadovoljavaju selector definirat će se ponašanje na klik na način
-//da se redak u kojem se nalazi element sakrije te se pozove url sa servera koji vrati novi redak 
-//u kojem se može ažurirati element
-//url na serveru ovisi o parametru nekog data attributa (paramname)
-//Parametar će na server biti poslan kao id
 function SetEditAjax(selector, url, paramname) {
     $(document).on('click', selector, function (event) {
         event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno        
@@ -154,3 +213,33 @@ function SetCancelAndSaveBehaviour(hiddenRow, insertedData, url) {
     });
 }
 
+function DeleteKontakt(selector, url, idosobe, idkontakt) {
+    $(document).on('click', selector, function (event) {
+
+        event.preventDefault(); //u slučaju da se radi o nekom submit buttonu, inače nije nužno        
+        var osobaval = $(this).data(idosobe);
+        var kontaktval = $(this).data(idkontakt);
+        var tr = $(this).parents("tr");
+        var aktivan = $(tr).data('aktivan');
+        if (aktivan != true) { //da spriječimo dva brza klika...
+            $(tr).data('aktivan', true);
+            if (confirm('Obrisati zapis?')) {
+                var token = $('input[name="__RequestVerificationToken"]').first().val();
+                clearOldMessage();
+                $.post(url, { idosobe: osobaval, idkontakt: kontaktval, __RequestVerificationToken: token }, function (data) {
+                    if (data.successful) {
+                        $(tr).remove();
+                    }
+                    $("#tempmessage").addClass(data.successful ? "alert-success" : "alert-danger");
+                    $("#tempmessage").html(data.message);
+                }).fail(function (jqXHR) {
+                    alert(jqXHR.status + " : " + jqXHR.responseText);
+                    $(tr).data('aktivan', false);
+                });
+            }
+            else {
+                $(tr).data('aktivan', false);
+            }
+        }
+    });
+}

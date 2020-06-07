@@ -27,15 +27,15 @@
     <main>
         <div>
             <div id="tempmessage" class="alert"></div>
-            @if (TempData[Constants.Message] != null)
+            @if (TempData[KoronavirusMvc.Controllers.Constants.Message] != null)
             {
                 bool error = false;
-                var obj = TempData[Constants.ErrorOccurred];
+                var obj = TempData[KoronavirusMvc.Controllers.Constants.ErrorOccurred];
                 if (obj != null)
                 {
                     error = (bool)obj;
                 }
-                <div class="alert @(error ? "alert-danger" : "alert-success")">@TempData[Constants.Message]</div>
+                <div class="alert @(error ? "alert-danger" : "alert-success")">@TempData[KoronavirusMvc.Controllers.Constants.Message]</div>
             }
         </div>
         @RenderBody()

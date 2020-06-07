@@ -1,0 +1,26 @@
+﻿@model Terapija
+
+@{ 
+    ViewBag.Title = "Ažuriranje terapije";
+}
+
+<form 
+      asp-route-page="@ViewBag.page"
+      asp-route-sort="@ViewBag.sort"
+      asp-route-ascending="@ViewBag.ascending"
+      asp-action="Edit" method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="form-group">
+        <label asp-for="OpisTerapije"></label>
+        <div><span asp-validation-for="OpisTerapije" class="text-danger"></span></div>
+        <input asp-for="OpisTerapije" class="form-control" />
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary" type="submit">Prihvati promjene</button>
+        <a asp-action="Index"
+           asp-route-page="@ViewBag.page"
+           asp-route-sort="@ViewBag.sort"
+           asp-route-ascending="@ViewBag.ascending"
+           class="btn btn-secondary">Odustani</a>
+    </div>
+</form>

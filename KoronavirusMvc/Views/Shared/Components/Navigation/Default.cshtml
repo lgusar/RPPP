@@ -14,6 +14,7 @@
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" asp-action="Index" asp-controller="Pregled">Pregledi</a>
                 <a class="dropdown-item" asp-action="Index" asp-controller="Simptom">Simptomi</a>
+                <a class="dropdown-item" asp-action="Index" asp-controller="Terapija">Terapije</a>
             </div>
         </div>
         <div class="btn-group">
@@ -59,5 +60,11 @@
                 <a class="dropdown-item" asp-action="Index" asp-controller="Kontakt">Osobe s kojima su bile u kontaktu</a>
             </div>
         </div>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link"
+        asp-action="Index" asp-controller="ViewLog">
+        Pregled log datoteka
+        </a>
     </li>
 </ul>

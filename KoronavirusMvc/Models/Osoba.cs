@@ -6,6 +6,10 @@ namespace KoronavirusMvc.Models
 {
     public partial class Osoba
     {
+        public Osoba()
+        {
+            KontaktIdKontaktNavigation = new HashSet<Kontakt>();
+        }
         
         [Display(Name = "Identifikacijski broj", Prompt="Unesite identifikacijski broj osobe")]
         [Required(ErrorMessage ="Identifikacijski broj je obavezno polje")]
