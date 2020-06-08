@@ -18,12 +18,21 @@ using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Kontroler za stozer
+    /// </summary>
     public class StozerController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<StozerController> logger;
 
+        /// <summary>
+        /// Izrada kontrolera za stozer
+        /// </summary>
+        /// <param name="ctx">Postavljanje baze</param>
+        /// <param name="optionsSnapshot">Postavljanje postavki baze</param>
+        /// <param name="logger">Postavljanje logera</param>
         public StozerController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<StozerController> logger)
         {
             this.ctx = ctx;
@@ -31,7 +40,10 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
-
+        /// <summary>
+        /// Stvaranje novog pogleda i DropDownListe
+        /// </summary>
+        /// <returns>Stvoreni pogled</returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -39,9 +51,6 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private void PrepareDropDownLists()
         {
             var osobe = ctx.Osoba
@@ -55,7 +64,11 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Osobe = new SelectList(osobe, nameof(Osoba.IdentifikacijskiBroj), nameof(Osoba.imePrezime));
         }
 
-
+        /// <summary>
+        /// Metoda koja sprema novi stozer u bazu podataka
+        /// </summary>
+        /// <param name="stozer">Model koji sadrži sve atribute tablice Stozer za dodavanje u bazu podataka</param>
+        /// <returns>Pogled</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Stozer stozer)
@@ -88,26 +101,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
-        //[HttpGet]
-        //public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var stozer = ctx.Stozer.AsNoTracking().Where(d => d.SifraStozera == id).SingleOrDefault();
-        //    if (stozer == null)
-        //    {
-        //        return NotFound("Ne postoji stožer s oznakom: " + id);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Page = page;
-        //        ViewBag.Sort = sort;
-        //        ViewBag.Ascending = ascending;
-        //        PrepareDropDownLists();
-        //        return View(stozer);
-        //    }
-        //}
-
-
+        /// <summary>
+        /// Azuriranje zeljenog stozera
+        /// </summary>
+        /// <param name="id">ID stozera kojeg zelimo azurirati</param>
+        /// <returns>novi pogled ilil pogreska ako stozer nije pronadjen</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -126,57 +124,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
-        //[HttpPost, ActionName("Edit")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    try
-        //    {
-        //        Stozer stozer = await ctx.Stozer
-        //                          .Where(d => d.SifraStozera == id)
-        //                          .FirstOrDefaultAsync();
-        //        if (stozer == null)
-        //        {
-        //            return NotFound("Neispravna šifra stožera: " + id);
-        //        }
-
-        //        if (await TryUpdateModelAsync<Stozer>(stozer, "",
-        //            d => d.Naziv, d => d.IdPredsjednika
-        //        ))
-        //        {
-        //            ViewBag.Page = page;
-        //            ViewBag.Sort = sort;
-        //            ViewBag.Ascending = ascending;
-        //            try
-        //            {
-        //                await ctx.SaveChangesAsync();
-        //                TempData[Constants.Message] = "Stožer ažuriran.";
-        //                TempData[Constants.ErrorOccurred] = false;
-        //                return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //            }
-        //            catch (Exception exc)
-        //            {
-        //                ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-        //                PrepareDropDownLists();
-        //                return View(stozer);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "Podatke o stožeru nije moguće povezati s forme");
-        //            PrepareDropDownLists();
-        //            return View(stozer);
-        //        }
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        TempData[Constants.Message] = exc.CompleteExceptionMessage();
-        //        TempData[Constants.ErrorOccurred] = true;
-        //        return RedirectToAction(nameof(Edit), id);
-        //    }
-        //}
-
+        /// <summary>
+        /// Azuriranje zeljenog stozera
+        /// </summary>
+        /// <param name="stozer">Stozer kojeg zelimo azurirati</param>
+        /// <returns>novi pogled ili pogreska ako se stozer ne moze pronaci</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Stozer stozer)
@@ -212,6 +164,74 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za azuriranje zeljenog sastanka
+        /// </summary>
+        /// <param name="id">ID zeljenog sastanka</param>
+        /// <returns>novi pogled ili pogreska ako sastanak nije pronadjen</returns>
+        [HttpGet]
+        public IActionResult EditSastanak(int id)
+        {
+            var sastanak = ctx.Sastanak
+                             .AsNoTracking()
+                             .Where(m => m.SifraSastanka == id)
+                             .SingleOrDefault();
+            if (sastanak != null)
+            {
+                PrepareDropDownLists();
+                return PartialView(sastanak);
+            }
+            else
+            {
+                return NotFound($"Neispravna šifra sastanka: {id}");
+            }
+        }
+
+        /// <summary>
+        /// Metoda za azuriranje zeljenog sastanka
+        /// </summary>
+        /// <param name="sastanak">Sastanak kojeg zelimo azurirati</param>
+        /// <returns>novi pogled ili pogreska</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditSastanak(Sastanak sastanak)
+        {
+            if (sastanak == null)
+            {
+                return NotFound("Nema poslanih podataka");
+            }
+            bool checkId = ctx.Sastanak.Any(m => m.SifraSastanka == sastanak.SifraSastanka);
+            if (!checkId)
+            {
+                return NotFound($"Neispravna šifra sastanka: {sastanak?.SifraSastanka}");
+            }
+
+            PrepareDropDownLists();
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    ctx.Update(sastanak);
+                    ctx.SaveChanges();
+                    return StatusCode(302, Url.Action(nameof(RowSastanak), new { id = sastanak.SifraSastanka }));
+                }
+                catch (Exception exc)
+                {
+                    ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
+                    return PartialView(sastanak);
+                }
+            }
+            else
+            {
+                return PartialView(sastanak);
+            }
+        }
+
+        /// <summary>
+        /// Metoda za ispis jednog retka tablice stozer
+        /// </summary>
+        /// <param name="id">ID retka kojeg zelimo ispisati</param>
+        /// <returns>novi pogled</returns>
         public PartialViewResult Row(int id)
         {
             var stozer = ctx.Stozer
@@ -229,12 +249,41 @@ namespace KoronavirusMvc.Controllers
             }
             else
             {
-                //vratiti prazan sadržaj?
                 return PartialView("ErrorMessageRow", $"Neispravan id stozera: {id}");
             }
         }
 
+        /// <summary>
+        /// Metoda za ispis jednog retka tablice Sastanak
+        /// </summary>
+        /// <param name="id">ID retka kojeg zelimo ispisati</param>
+        /// <returns>novi pogled</returns>
+        public PartialViewResult RowSastanak(int id)
+        {
+            var sastanak = ctx.Sastanak
+                             .Where(m => m.SifraSastanka == id)
+                             .Select(m => new SastanakViewModel
+                             {
+                                 SifraSastanka = m.SifraSastanka,
+                                 Datum = m.Datum,
+                                 NazivStozera = m.SifraStozeraNavigation.Naziv
+                             })
+                             .SingleOrDefault();
+            if (sastanak != null)
+            {
+                return PartialView(sastanak);
+            }
+            else
+            {
+                return PartialView("ErrorMessageRow", $"Neispravan id sastanka: {id}");
+            }
+        }
 
+        /// <summary>
+        /// Brisanje zeljenog stozera
+        /// </summary>
+        /// <param name="id">ID stozera kojeg zelimo obrisati</param>
+        /// <returns>JSON rezultat</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -273,34 +322,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Delete(int SifraStozera, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var stozer = ctx.Stozer.Find(SifraStozera);
-        //    if (stozer == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            string naziv = stozer.Naziv;
-        //            ctx.Remove(stozer);
-        //            ctx.SaveChanges();
-        //            TempData[Constants.Message] = $"Stožer {naziv} uspješno obrisan";
-        //            TempData[Constants.ErrorOccurred] = false;
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            TempData[Constants.Message] = "Pogreška prilikom brisanja stožera: " + exc.CompleteExceptionMessage();
-        //            TempData[Constants.ErrorOccurred] = true;
-        //        }
-        //        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //    }
-        //}
-
+        /// <summary>
+        /// Prikaz zeljene stranice tablice
+        /// </summary>
+        /// <param name="page">Redni broj stranice</param>
+        /// <param name="sort">Redni broj stupca po kojem se sortira</param>
+        /// <param name="ascending">Smjer sortiranje (true za uzlazno)</param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -360,6 +388,103 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Stvaranje MD pogleda
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>MD pogled</returns>
+        public async Task<IActionResult> Detail(int id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+
+            List<SastanakViewModel> sastanci = new List<SastanakViewModel>();
+            var sastanak = ctx.Sastanak
+                             .Where(k => k.SifraStozera == id)
+                             .Select(k => new SastanakViewModel
+                             {
+                                 NazivStozera = k.SifraStozeraNavigation.Naziv,
+                                 Datum = k.Datum,
+                                 SifraSastanka = k.SifraSastanka
+                             })
+                             .ToList();
+
+            if (sastanak.Count != 0)
+            {
+                foreach (SastanakViewModel k in sastanak)
+                {
+                    sastanci.Add(k);
+                }
+            }
+
+            var stozer = await ctx.Stozer
+                            .Where(z => z.SifraStozera == id)
+                            .Select(z => new StozerDetailsViewModel
+                            {
+                                SifraStozera = z.SifraStozera,
+                                Naziv = z.Naziv,
+                                ImePredsjednika = z.IdPredsjednikaNavigation.Prezime + z.IdPredsjednikaNavigation.Ime,
+                                Sastanci = sastanci,
+                            })
+                            .SingleOrDefaultAsync();
+
+            if (stozer == null)
+            {
+                return NotFound();
+            }
+
+
+            return View(stozer);
+        }
+
+        /// <summary>
+        /// Brisanje sastanka U MD
+        /// </summary>
+        /// <param name="id">ID sastanka kojeg zelimo obrisati</param>
+        /// <returns>JSON rezultat</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteSastanak(int id)
+        {
+            var sastanak = ctx.Sastanak
+                             .AsNoTracking() //ima utjecaj samo za Update, za brisanje možemo staviti AsNoTracking
+                             .Where(m => m.SifraSastanka == id)
+                             .SingleOrDefault();
+            if (sastanak != null)
+            {
+                try
+                {
+                    ctx.Remove(sastanak);
+                    ctx.SaveChanges();
+                    var result = new
+                    {
+                        message = $"Sastanak sa šifrom {id} obrisan.",
+                        successful = true
+                    };
+                    return Json(result);
+                }
+                catch (Exception exc)
+                {
+                    var result = new
+                    {
+                        message = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage(),
+                        successful = false
+                    };
+                    return Json(result);
+                }
+            }
+            else
+            {
+                return NotFound($"Sastanak sa šifrom {id} ne postoji");
+            }
+        }
+
+        /// <summary>
+        /// Izvoz tablice za Excel
+        /// </summary>
         public void ExportToExcel()
         {
             List<StozerViewModel> emplist = ctx.Stozer.Select(x => new StozerViewModel
@@ -401,6 +526,10 @@ namespace KoronavirusMvc.Controllers
 
         }
 
+        /// <summary>
+        /// Izrada PDF izvjestaja
+        /// </summary>
+        /// <returns>izvjestaj u PDF formatu</returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis stozera";

@@ -1,0 +1,16 @@
+﻿@model KoronavirusMvc.ViewModels.SastanakViewModel
+
+
+<tr>
+    <td class="text-center">@Model.SifraSastanka</td>
+    <td class="text-center">@Model.Datum</td>
+    <td>
+        <a data-sifrasastanka="@Model.SifraSastanka" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+    </td>
+    <td>
+        <form asp-action="DeleteSastanak" method="post">
+            <input type="hidden" name="id" value="@Model.SifraSastanka" />
+            <button data-sifrasastanka="@Model.SifraSastanka" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+        </form>
+    </td>
+</tr>

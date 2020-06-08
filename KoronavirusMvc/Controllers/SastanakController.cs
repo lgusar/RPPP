@@ -18,13 +18,21 @@ using Microsoft.AspNetCore.Http;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Kontroler za sastanak
+    /// </summary>
     public class SastanakController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<SastanakController> logger;
 
-
+        /// <summary>
+        /// Kreiranje kontrolera za sastanak
+        /// </summary>
+        /// <param name="ctx">Postavljanje baze</param>
+        /// <param name="optionsSnapshot">Postavljanje postavki baze</param>
+        /// <param name="logger">Postavljanje logera</param>
         public SastanakController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<SastanakController> logger)
         {
             this.ctx = ctx;
@@ -32,7 +40,10 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
-
+        /// <summary>
+        /// Stvaranje novog pogleda i DropDownListe
+        /// </summary>
+        /// <returns>Stvoreni pogled</returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -50,6 +61,11 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Stozeri = new SelectList(stozeri, nameof(Stozer.SifraStozera), nameof(Stozer.Naziv));
         }
 
+        /// <summary>
+        /// Metoda koja sprema novi sastanak u bazu podataka
+        /// </summary>
+        /// <param name="sastanak">Model koji sadrži sve atribute tablice Sastanak za dodavanje u bazu podataka</param>
+        /// <returns>Pogled</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Sastanak sastanak)
@@ -82,24 +98,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-        //[HttpGet]
-        //public IActionResult Edit(int id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var sastanak = ctx.Sastanak.AsNoTracking().Where(d => d.SifraSastanka == id).SingleOrDefault();
-        //    if (sastanak == null)
-        //    {
-        //        return NotFound("Ne postoji sastanak s oznakom: " + id);
-        //    }
-        //    else
-        //    {
-        //        ViewBag.Page = page;
-        //        ViewBag.Sort = sort;
-        //        ViewBag.Ascending = ascending;
-        //        PrepareDropDownLists();
-        //        return View(sastanak);
-        //    }
-        //}
-
+        /// <summary>
+        /// Azuriranje zeljenog sastanka
+        /// </summary>
+        /// <param name="id">ID sastanka kojeg zelimo azurirati</param>
+        /// <returns>pogled ili pogresku ako sastanak nije pronadjen</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -118,57 +121,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
-        //[HttpPost, ActionName("Edit")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    try
-        //    {
-        //        Sastanak sastanak = await ctx.Sastanak
-        //                          .Where(d => d.SifraSastanka == id)
-        //                          .FirstOrDefaultAsync();
-        //        if (sastanak == null)
-        //        {
-        //            return NotFound("Neispravna šifra sastanka: " + id);
-        //        }
-
-        //        if (await TryUpdateModelAsync<Sastanak>(sastanak, "",
-        //            d => d.SifraStozera, d => d.Datum
-        //        ))
-        //        {
-        //            ViewBag.Page = page;
-        //            ViewBag.Sort = sort;
-        //            ViewBag.Ascending = ascending;
-        //            try
-        //            {
-        //                await ctx.SaveChangesAsync();
-        //                TempData[Constants.Message] = "Sastanak ažuriran.";
-        //                TempData[Constants.ErrorOccurred] = false;
-        //                return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //            }
-        //            catch (Exception exc)
-        //            {
-        //                ModelState.AddModelError(string.Empty, exc.CompleteExceptionMessage());
-        //                PrepareDropDownLists();
-        //                return View(sastanak);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "Podatke o sastanku nije moguće povezati s forme");
-        //            PrepareDropDownLists();
-        //            return View(sastanak);
-        //        }
-        //    }
-        //    catch (Exception exc)
-        //    {
-        //        TempData[Constants.Message] = exc.CompleteExceptionMessage();
-        //        TempData[Constants.ErrorOccurred] = true;
-        //        return RedirectToAction(nameof(Edit), id);
-        //    }
-        //}
-
+        /// <summary>
+        /// Azuriranje zeljenog sastanka
+        /// </summary>
+        /// <param name="sastanak">Zeljeni sastanak za azuriranje</param>
+        /// <returns>pogled ili pogreska ako sastanak nije pronadjen</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Sastanak sastanak)
@@ -204,6 +161,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za ispis jednog retka tablice Sastanak
+        /// </summary>
+        /// <param name="id">ID retka kojeg zelimo ispisati</param>
+        /// <returns>novi pogled</returns>
         public PartialViewResult Row(int id)
         {
             var sastanak = ctx.Sastanak
@@ -221,39 +183,15 @@ namespace KoronavirusMvc.Controllers
             }
             else
             {
-                //vratiti prazan sadržaj?
                 return PartialView("ErrorMessageRow", $"Neispravan id sastanka: {id}");
             }
         }
 
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public IActionResult Delete(int SifraSastanka, int page = 1, int sort = 1, bool ascending = true)
-        //{
-        //    var sastanak = ctx.Sastanak.Find(SifraSastanka);
-        //    if (sastanak == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    else
-        //    {
-        //        try
-        //        {
-        //            ctx.Remove(sastanak);
-        //            ctx.SaveChanges();
-        //            TempData[Constants.Message] = $"Sastanak {sastanak.SifraSastanka} uspješno obrisan";
-        //            TempData[Constants.ErrorOccurred] = false;
-        //        }
-        //        catch (Exception exc)
-        //        {
-        //            TempData[Constants.Message] = "Pogreška prilikom brisanja sastanka: " + exc.CompleteExceptionMessage();
-        //            TempData[Constants.ErrorOccurred] = true;
-        //        }
-        //        return RedirectToAction(nameof(Index), new { page, sort, ascending });
-        //    }
-        //}
-
+        /// <summary>
+        ///  Metoda za brisanje sastanka u bazi 
+        /// </summary>
+        /// <param name="id">ID sastanka kojeg zelimo obrisati</param>
+        /// <returns>JSON rezultat</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -291,6 +229,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Tablicni prikaz sastanaka
+        /// </summary>
+        /// <param name="page">Stranica koju zelimo prikazati</param>
+        /// <param name="sort">Index stupca po kojem sortiramo</param>
+        /// <param name="ascending">Smjer sortiranja (true za uzlazno)</param>
+        /// <returns>novi pogled</returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -350,6 +295,9 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Excel izvoz
+        /// </summary>
         public void ExportToExcel()
         {
             List<SastanakViewModel> emplist = ctx.Sastanak.Select(x => new SastanakViewModel
@@ -391,6 +339,10 @@ namespace KoronavirusMvc.Controllers
 
         }
 
+        /// <summary>
+        /// Kreiranje PDF izvjestaja
+        /// </summary>
+        /// <returns>izvjestaj u PDF formatu</returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis sastanaka";

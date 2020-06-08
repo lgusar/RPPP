@@ -18,12 +18,21 @@ using System.Threading.Tasks;
 
 namespace KoronavirusMvc.Controllers
 {
+    /// <summary>
+    /// Kontroler za mjeru
+    /// </summary>
     public class MjeraController : Controller
     {
         private readonly RPPP09Context ctx;
         private readonly AppSettings appSettings;
         private readonly ILogger<MjeraController> logger;
 
+        /// <summary>
+        /// Kreiranje kontrolera za mjeru
+        /// </summary>
+        /// <param name="ctx">Postavljanje baze</param>
+        /// <param name="optionsSnapshot">Postavljanje postavki baze</param>
+        /// <param name="logger">Postavljanje logera</param>
         public MjeraController(RPPP09Context ctx, IOptionsSnapshot<AppSettings> optionsSnapshot, ILogger<MjeraController> logger)
         {
             this.ctx = ctx;
@@ -31,7 +40,10 @@ namespace KoronavirusMvc.Controllers
             appSettings = optionsSnapshot.Value;
         }
 
-
+        /// <summary>
+        /// Stvaranje novog pogleda i DropDownListe
+        /// </summary>
+        /// <returns>Stvoreni pogled</returns>
         [HttpGet]
         public IActionResult Create()
         {
@@ -60,7 +72,11 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Mjere = new SelectList(mjere, nameof(Mjera.SifraMjere), nameof(Mjera.SifraMjere));
         }
 
-
+        /// <summary>
+        /// Metoda koja sprema novu mjeru u bazi podataka
+        /// </summary>
+        /// <param name="mjera">Model koji sadrži sve atribute tablice Mjera za dodavanje u bazu podataka</param>
+        /// <returns>Pogled</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Mjera mjera)
@@ -93,7 +109,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Azuriranje zeljene mjere
+        /// </summary>
+        /// <param name="id">ID mjere koju zelimo promijeniti</param>
+        /// <returns>pogled ili greska ako mjera nije nadjena</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -120,7 +140,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Azuriranje zeljene mjere
+        /// </summary>
+        /// <param name="mjera">Mjera koju zelimo azurirati</param>
+        /// <returns>pogled ili gresku ako mjera nije nadjena</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Mjera mjera)
@@ -156,6 +180,11 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+        /// <summary>
+        /// Metoda za ispis jednog retka tablice Mjera
+        /// </summary>
+        /// <param name="id">ID retka koji zelimo ispisati</param>
+        /// <returns>novi pogled</returns>
         public PartialViewResult Row(int id)
         {
             var mjera = ctx.Mjera
@@ -181,6 +210,11 @@ namespace KoronavirusMvc.Controllers
         }
 
 
+        /// <summary>
+        /// Metoda za brisanje mjere u bazi podataka
+        /// </summary>
+        /// <param name="id">ID mjere koju zelimo obrisati</param>
+        /// <returns>JSON status</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
@@ -218,7 +252,13 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// Prikaz zeljene stranice tablice
+        /// </summary>
+        /// <param name="page">Redni broj stranice</param>
+        /// <param name="sort">Redni broj stupca po kojem se sortira</param>
+        /// <param name="ascending">Smjer sortiranje (true za uzlazno)</param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = appSettings.PageSize;
@@ -293,6 +333,9 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Izrada excel izvoza
+        /// </summary>
         public void ExportToExcel()
         {
             List<MjeraViewModel> emplist = ctx.Mjera.Select(x => new MjeraViewModel
@@ -343,6 +386,10 @@ namespace KoronavirusMvc.Controllers
             Response.CompleteAsync();
         }
 
+        /// <summary>
+        /// Izrada izvjestaja u PDF formatu
+        /// </summary>
+        /// <returns>PDF dokument</returns>
         public async Task<IActionResult> PDFReport()
         {
             string naslov = "Popis mjera";

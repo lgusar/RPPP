@@ -1,18 +1,24 @@
 ﻿@model KoronavirusMvc.ViewModels.StozerViewModel
 
-<tr>
-    <td class="text-left">@Model.Naziv</td>
-    <td class="text-left">@Model.ImePredsjednika</td>
-    <td>
-        <a data-sifrastozera="@Model.SifraStozera" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
-    </td>
-    <td>
-        <form asp-action="Delete" method="post">
-            @*Neće se koristiti direktni submit, ali treba zbog anti forgery tokena*@
-            @*Jednako tako nije potreban ni ovaj input type=hidden ako skripta ispravno radi*@
-            <input type="hidden" name="id" value="@Model.SifraStozera" />
-            <button data-sifrastozera="@Model.SifraStozera" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
-        </form>
-    </td>
-</tr>
+    <tr>
+        <td class="text-left">@Model.Naziv</td>
+        <td class="text-left">@Model.ImePredsjednika</td>
+        <td>
+            <a data-sifrastozera="@Model.SifraStozera" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+        </td>
+        <td>
+            <form asp-action="Delete" method="post">
+                @*Neće se koristiti direktni submit, ali treba zbog anti forgery tokena*@
+                @*Jednako tako nije potreban ni ovaj input type=hidden ako skripta ispravno radi*@
+                <input type="hidden" name="id" value="@Model.SifraStozera" />
+                <button data-sifrastozera="@Model.SifraStozera" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+            </form>
+        <td>
+            <form asp-action="Detail" method="get">
+                <input type="hidden" name="id" value="@Model.SifraStozera" />
+                <button class="btn btn-sm" title="Detalji"><i class="fa fa-info"></i></button>
+            </form>
+        </td>
+        </td>
+    </tr>
 

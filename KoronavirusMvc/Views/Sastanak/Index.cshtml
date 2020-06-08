@@ -7,7 +7,7 @@
 <h2>Popis sastanaka</h2>
 
 <a asp-action="Create" class="btn btn-primary">Dodaj novi sastanak</a>
-<a asp-action="PDFReport" class="btn btn-primary"><i class="fas fa-print"></i> Izvoz u PDF</a>
+<a asp-action="PDFReport" class="btn btn-primary">Izvoz u PDF</a>
 <a class="btn btn-primary" href="@Url.Action("ExportToExcel")">Izvještaj u Excel</a>
 
 <pager page-info="@Model.PagingInfo" page-action="Index" page-title="Unesite željenu stranicu"
@@ -18,7 +18,7 @@
     <thead>
         <tr>
             @{
-                string[] nazivi = { "Naziv stožera", "Datum sastanka" };
+                string[] nazivi = { "Šifra sastanka", "Naziv stožera", "Datum sastanka" };
                 for (int i = 1; i <= nazivi.Length; i++)
                 {
                     <th>
@@ -48,7 +48,7 @@
 @section scripts{
     <script type="text/javascript">
         $(function () {
-            SetEditAjax(".editajax", '@Url.Action("Edit")','sifrastozera');
+            SetEditAjax(".editajax", '@Url.Action("Edit")',' sifrastozera');
             SetDeleteAjax(".deleteajax", '@Url.Action("Delete")', 'sifrastozera');
         });
     </script>

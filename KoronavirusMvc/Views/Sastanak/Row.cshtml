@@ -1,18 +1,17 @@
 ﻿@model KoronavirusMvc.ViewModels.SastanakViewModel
 
 
-<tr>
-    <td class="text-left">@Model.NazivStozera</td>
-    <td class="text-left">@Model.Datum</td>
-    <td>
-        <a data-sifrastozera="@Model.SifraSastanka" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
-    </td>
-    <td>
-        <form asp-action="Delete" method="post">
-            @*Neće se koristiti direktni submit, ali treba zbog anti forgery tokena*@
-            @*Jednako tako nije potreban ni ovaj input type=hidden ako skripta ispravno radi*@
-            <input type="hidden" name="id" value="@Model.SifraSastanka" />
-            <button data-sifrastozera="@Model.SifraSastanka" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
-        </form>
-    </td>
-</tr>
+    <tr>
+        <td class="text-left">@Model.SifraSastanka</td>
+        <td class="text-left">@Model.NazivStozera</td>
+        <td class="text-left">@Model.Datum</td>
+        <td>
+            <a data-sifrastozera="@Model.SifraSastanka" class="btn btn-sm editajax" title="Ažuriraj"><i class="fas fa-edit"></i></a>
+        </td>
+        <td>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" name="id" value="@Model.SifraSastanka" />
+                <button data-sifrastozeraa="@Model.SifraSastanka" class="btn btn-sm btn-danger deleteajax" title="Obriši"><i class="fas fa-trash-alt"></i></button>
+            </form>
+        </td>
+    </tr>
