@@ -1,0 +1,32 @@
+2020-06-07 13:18:04.5626|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 13:20:21.6778|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:09:10.4466|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:09:55.5843|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:15:42.2319|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:16:38.3281|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:22:37.0070|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 14:48:42.3349|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:06:50.3540|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:09:27.5429|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:12:45.5335|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:13:38.8933|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:20:41.9931|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:21:12.4342|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:40:15.5016|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:41:05.3857|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:43:56.4684|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:44:29.2141|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 9 dodan. |url: https://localhost/Pregled/Create?|action: Create
+2020-06-07 16:58:09.2375|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 16:58:25.3004|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 10 dodan. |url: https://localhost/Pregled/Create?|action: Create
+2020-06-07 16:58:40.6840|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 10 obrisan. |url: https://localhost/Pregled/Delete?page=1,sort=1,ascending=True|action: Delete
+2020-06-07 17:44:52.6298|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 17:45:43.3076|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 10 dodan. |url: https://localhost/Pregled/Create?|action: Create
+2020-06-07 17:50:39.4688|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 17:56:16.6858|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 17:57:04.2426|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 21:07:59.3576|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 21:08:26.3428|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 12 dodan. |url: https://localhost/Pregled/Create?|action: Create
+2020-06-07 21:10:13.9452|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 21:22:25.2521|0|KoronavirusMvc.Program|DEBUG|  init main |url: ?|action: 
+2020-06-07 21:22:41.2462|0|KoronavirusMvc.Controllers.PregledController|INFO|  Simptomi uspješno dodani. |url: https://localhost/Pregled/DodajSimptome?|action: DodajSimptome
+2020-06-07 21:22:49.8883|0|KoronavirusMvc.Controllers.PregledController|INFO|  Pregled 3 uspješno ažuriran. |url: https://localhost/Pregled/EditDetail/3?|action: EditDetail

@@ -8,7 +8,7 @@
 <br />
 
 <a asp-action="PDFReportOsoba" name="id" value="@Model.IdentifikacijskiBroj" class="btn btn-primary"><i class="fas fa-print"></i> Generiraj PDF</a>
-<a class="btn btn-primary" href="@Url.Action("ExportToExcelOsoba")">Export Excel</a>
+<a asp-action="ExportToExcelOsoba" asp-route-id="@Model.IdentifikacijskiBroj" class="btn btn-primary"> Generiraj Excel</a>
 
 <hr />
 
