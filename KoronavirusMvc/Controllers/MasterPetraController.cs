@@ -19,11 +19,21 @@ namespace KoronavirusMvc.Controllers
         private readonly AppSettings _appSettings;
 
 
+        /// <summary>
+        /// stvaranje konteksta apliakcije
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="appSettings"></param>
         public MasterPetraController(RPPP09Context context, IOptionsSnapshot<AppSettings> appSettings)
         {
             _context = context;
             _appSettings = appSettings.Value;
         }
+
+        /// <summary>
+        /// funkcija se ne poziva, prije se koristila za stranicenje
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> Index()
         {
             var model = new MasterPetraViewModel();
@@ -31,6 +41,10 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// stvaranje i dobivanje padajuce liste stranih kljuceva
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task PrepareDropdownLists()
         {
@@ -38,6 +52,11 @@ namespace KoronavirusMvc.Controllers
             ViewBag.Drzave = new SelectList(drzava, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave));
         }
 
+        /// <summary>
+        /// dobivanje lsvih lokacija od neke odabrane drzave
+        /// </summary>
+        /// <param name="sifraDrzave"></param>
+        /// <returns></returns>
         [HttpGet]
         public  async Task<IActionResult> GetLocationForCountry(string sifraDrzave) {
             var lokacije = await _context.Lokacija.Where(l => l.SifraDrzave == sifraDrzave.Trim()).ToListAsync();
@@ -45,6 +64,11 @@ namespace KoronavirusMvc.Controllers
             return PartialView("LokacijaMaster", lokacije);
         }
 
+        /// <summary>
+        /// vracanje svih statistika iz odabranog grada kao i putovanja koja su se tamo odvila
+        /// </summary>
+        /// <param name="sifraGrada"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetContentForLocation(int sifraGrada)
         {
@@ -57,6 +81,12 @@ namespace KoronavirusMvc.Controllers
             return PartialView("ContentMaster", (Statistike: statistike, Putovanja: putovanja ));
         }
 
+        /// <summary>
+        /// brisanje odabranog putovanja iz master detail forme
+        /// </summary>
+        /// <param name="sifraPutovanja"></param>
+        /// <param name="sifraGrada"></param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<IActionResult> DeletePutovanje(int sifraPutovanja, int sifraGrada)
         {
@@ -67,6 +97,12 @@ namespace KoronavirusMvc.Controllers
             return await GetContentForLocation(sifraGrada);
         }
 
+        /// <summary>
+        /// brisanje statistika iz master detail forme
+        /// </summary>
+        /// <param name="sifraStatistike"></param>
+        /// <param name="sifraGrada"></param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<IActionResult> DeleteStatistika(int sifraStatistike, int sifraGrada)
         {
@@ -77,6 +113,12 @@ namespace KoronavirusMvc.Controllers
             return await GetContentForLocation(sifraGrada);
         }
 
+        /// <summary>
+        /// brisanje gradova iz master detail forme
+        /// </summary>
+        /// <param name="sifraGrada"></param>
+        /// <param name="sifraDrzave"></param>
+        /// <returns></returns>
         [HttpDelete]
         public async Task<IActionResult> DeleteLocation(int sifraGrada, string sifraDrzave)
         {
@@ -87,6 +129,11 @@ namespace KoronavirusMvc.Controllers
             return await GetLocationForCountry(sifraDrzave);
         }
 
+        /// <summary>
+        /// dodavanje i editiranje drzava iz mastera
+        /// </summary>
+        /// <param name="sifraDrzave"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetDrzavaAddEdit(string sifraDrzave)
         {
@@ -103,6 +150,13 @@ namespace KoronavirusMvc.Controllers
             return PartialView("DrzaveEditMaster", drzava);
         }
 
+        /// <summary>
+        /// spremanje drzave iz mastera
+        /// </summary>
+        /// <param name="isAdd"></param>
+        /// <param name="sifraDrzave"></param>
+        /// <param name="imeDrzave"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SaveDrzava(bool isAdd, string sifraDrzave, string imeDrzave)
         {
@@ -131,6 +185,11 @@ namespace KoronavirusMvc.Controllers
             return Ok(new { Success = true });
         }
 
+        /// <summary>
+        /// dodavanje i editiranje gradova iz mastera
+        /// </summary>
+        /// <param name="sifraGrada"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetLokacijaAddEdit(int sifraGrada)
         {
@@ -149,6 +208,14 @@ namespace KoronavirusMvc.Controllers
             return PartialView("LocationEditMaster", (Lokacija: lokacija, drzave: new SelectList(drzave, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave))));
         }
 
+        /// <summary>
+        /// spremanje gradova
+        /// </summary>
+        /// <param name="isAdd"></param>
+        /// <param name="sifraGrada"></param>
+        /// <param name="imeGrada"></param>
+        /// <param name="sifraDrzave"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult>SaveLokacija(bool isAdd, int sifraGrada, string imeGrada, string sifraDrzave)
         {
@@ -178,6 +245,11 @@ namespace KoronavirusMvc.Controllers
            return Ok(new { Success = true });
         }
 
+        /// <summary>
+        /// dodavanje i editiranje putovanja iz mastera
+        /// </summary>
+        /// <param name="sifraPutovanja"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetPutovanjeAddEdit(int sifraPutovanja)
         {
@@ -204,6 +276,17 @@ namespace KoronavirusMvc.Controllers
             return PartialView("PutovanjeEditMaster", viewModel);
         }
 
+
+        /// <summary>
+        /// spremanje putovanja
+        /// </summary>
+        /// <param name="isAdd"></param>
+        /// <param name="sifraPutovanja"></param>
+        /// <param name="datumPolaska"></param>
+        /// <param name="datumVracanja"></param>
+        /// <param name="gradovi"></param>
+        /// <param name="osoba"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SavePutovanje(bool isAdd, int sifraPutovanja, DateTime datumPolaska, DateTime datumVracanja, List<int> gradovi, string osoba)
         {
@@ -243,6 +326,11 @@ namespace KoronavirusMvc.Controllers
             return Ok(new { Success = true });
         }
 
+        /// <summary>
+        /// dodavanje i editiranje statistika iz mastera
+        /// </summary>
+        /// <param name="sifraStatistike"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetStatistikaAddEdit(int sifraStatistike)
         {
@@ -269,6 +357,19 @@ namespace KoronavirusMvc.Controllers
             return PartialView("StatistikaEditMaster", viewModel);
         }
 
+        /// <summary>
+        /// spreamnje statistike
+        /// </summary>
+        /// <param name="isAdd"></param>
+        /// <param name="sifraStat"></param>
+        /// <param name="brojIzlj"></param>
+        /// <param name="brojBol"></param>
+        /// <param name="brojUmrl"></param>
+        /// <param name="brojTot"></param>
+        /// <param name="sifraOrg"></param>
+        /// <param name="sifraGrada"></param>
+        /// <param name="datum"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> SaveStatistika(bool isAdd, int sifraStat, int brojIzlj, int brojBol, int brojUmrl, int brojTot, int sifraOrg, int sifraGrada, DateTime datum)
         {
@@ -303,6 +404,12 @@ namespace KoronavirusMvc.Controllers
             return Ok(new { Success = true });
         }
 
+        /// <summary>
+        /// dohvacanje drzava koje koje pocinju nekim stringom (term)
+        /// za autocomplete
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
         [HttpGet]
         public IEnumerable<object> Get(string term)
         {
@@ -317,6 +424,11 @@ namespace KoronavirusMvc.Controllers
             return list;
         }
 
+        /// <summary>
+        /// dohvacanje drzava
+        /// </summary>
+        /// <param name="term"></param>
+        /// <returns></returns>
         [HttpGet]
         public IEnumerable<object> GetDrzava(string term)
         {
@@ -331,6 +443,10 @@ namespace KoronavirusMvc.Controllers
             return list;
         }
 
+        /// <summary>
+        /// generiranje excela od mastera
+        /// </summary>
+        /// <param name="sifraDrzave"></param>
         public async void exportToExcelDetail(string sifraDrzave)
         {
             var drzava = await _context.Drzava.FirstAsync(d => d.SifraDrzave == sifraDrzave);

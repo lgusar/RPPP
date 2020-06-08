@@ -17,7 +17,11 @@ namespace KoronavirusMvc.Controllers
         private readonly RPPP09Context _context;
         private readonly AppSettings _appSettings;
 
-
+        /// <summary>
+        /// namjestanje konteksta i stranicenja za apliakciju
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="appSettings"></param>
         public LokacijaController(RPPP09Context context, IOptionsSnapshot<AppSettings> appSettings)
         {
             _context = context;
@@ -30,13 +34,21 @@ namespace KoronavirusMvc.Controllers
             return View();
         }
 
+        /// <summary>
+        /// dodavanje pdajuce liste vrijednosti stranog kljuca
+        /// </summary>
+        /// <returns></returns>
         private async Task PrepareDropdownLists()
         {
             var drzava = await _context.Drzava.OrderBy(d => d.ImeDrzave).Select(d => new { d.ImeDrzave, d.SifraDrzave }).ToListAsync();
             ViewBag.Drzave = new SelectList(drzava, nameof(Drzava.SifraDrzave), nameof(Drzava.ImeDrzave));
         }
 
-
+        /// <summary>
+        /// stvaranje nove lokacije odnosno grada
+        /// </summary>
+        /// <param name="lokacija"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Lokacija lokacija)
@@ -66,6 +78,13 @@ namespace KoronavirusMvc.Controllers
                 return View(lokacija);
             }
         }
+        /// <summary>
+        /// omogucava stranicenje i razmjesta ssadrzaj u tablici na osnovu parametra koji se zada
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = _appSettings.PageSize;
@@ -116,6 +135,14 @@ namespace KoronavirusMvc.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// dobivanje parametara koji se mogu promjenitit u aplikaciji
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> Edit(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -138,6 +165,15 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
+
+        /// <summary>
+        /// promjena parametara od lokacije 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         public async Task<IActionResult> Update(int id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -185,7 +221,14 @@ namespace KoronavirusMvc.Controllers
         }
 
 
-
+        /// <summary>
+        /// brisanje lokacije iz baze podataka
+        /// </summary>
+        /// <param name="SifraGrada"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int SifraGrada, int page = 1, int sort = 1, bool ascending = true)
