@@ -15,10 +15,10 @@
                 </div>
                 <div style="display: flex;">
                     @*<select class="form-control" id="selectedCountry" asp-for="OdabranaDrzava.SifraDrzave" asp-items="ViewBag.Drzave" asp->
-                        <option selected value="" disabled>Odaberite državu</option>
-                    </select>*@
+                            <option selected value="" disabled>Odaberite državu</option>
+                        </select>*@
                     <div class="form-group ui-widget">
-                        <input id="selectedCountry"/>
+                        <input id="selectedCountry" />
                     </div>
                     <div class="btn btn-sm drzava-edit" title="Ažuriraj">
                         <i class="fas fa-edit"></i>
@@ -40,7 +40,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         @*<div class="modal-header" id="addEditHeader">
-                        </div>*@
+                            </div>*@
                         <div class="modal-body" id="addEditBody">
                         </div>
                         <div class="modal-footer">
@@ -127,13 +127,46 @@
             })
         };
 
+
+
         var registerContentButtons = function () {
-             $(".putovanje-edit").click(function () {
+            @*$(".putovanje-edit").click(function () {
                  $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
                      $("#location-content").html(result);
 
                  });
-             });
+             });*@
+
+             // TODO
+            $(".putovanje-edit, .putovanje-add").click(function () {
+                var sifra = $("#putovanje").val();
+                $.get('@Url.Action("GetPutovanjeAddEdit")', { sifraPutovanja: sifra }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SavePutovanje")',
+                            {
+                                isAdd: !sifra,
+                                sifraPutovanja: $("#addEditBody").find("#Putovanje_SifraPutovanja").val(),
+                                datumPolaska: $("#addEditBody").find("#Putovanje_DatumPolaska").val(),
+                                datumVracanja: $("#addEditBody").find("#Putovanje_DatumVracanja").val(),
+                                gradovi: $("#addEditBody").find("#Putovanje_Lokacije").find("option:selected").map(function () { return this.value }).get(),
+                                osoba: $("#addEditBody").find("#Putovanje_IdentifikacijskiBroj").val()
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    loadContent();
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
+                    })
+                })
+            })
 
              $(".putovanje-delete").click(function () {
                  if (confirm("Obrisati zapis?")) {
@@ -154,12 +187,46 @@
                  }
              });
 
-             $(".statistika-edit").click(function () {
+            $(".statistika-edit, .statistika-add").click(function () {
+                var sifra = $("#statistika").val();
+                $.get('@Url.Action("GetStatistikaAddEdit")', { sifraObjave: sifra }).then(function (result) {
+                    $("#addEditBody").html(result);
+
+                    $("#saveModal").on("click", function () {
+                        $.post('@Url.Action("SaveStatistika")',
+                            {
+                                isAdd: !sifra,
+                                sifraStat: $("#addEditBody").find("#Statistika_SifraObjave").val(),
+                                brojIzlj: $("#addEditBody").find("#Statistika_BrojIzlijecenih").val(),
+                                brojBol: $("#addEditBody").find("#Statistika_BrojAktivnih").val(),
+                                brojUmrl: $("#addEditBody").find("#Statistika_BrojUmrlih").val(),
+                                brojTot: $("#addEditBody").find("#Statistika_BrojSlucajeva").val(),
+                                sifraOrg: $("#addEditBody").find("#Statistika_SifraOrganizacije").val(),
+                                sifraGrada: $("#addEditBody").find("#Statistika_SifraGrada").val(),
+                                datum: $("#addEditBody").find("#Statistika_Datum").val()
+                            }).then(function (result) {
+                                if (!!result.success) {
+                                    closeAddEditModal();
+                                    loadContent();
+                                } else {
+                                    $("#addEditBody").html(result);
+                                }
+                            })
+                    })
+
+                    setTimeout(function () {
+                        openAddEditModal();
+                    })
+                })
+            })
+
+             @*$(".statistika-edit").click(function () {
                  $.get('@Url.Action("GetContentForLocation")', { sifraGrada: $(this).attr("sifra") }).then(function (result) {
                      $("#location-content").html(result);
 
                  });
-             });
+             });*@
+
              $(".statistika-delete").click(function () {
                  if (confirm("Obrisati zapis?")) {
                      $.ajax({
@@ -205,8 +272,19 @@
             })
         }
 
+        var loadContent = function() {
+            $.get('@Url.Action("GetContentForLocation")', { sifraGrada: selectedCity }).then(function (result) {
+                    $("#location-content").html(result);
+
+                    setTimeout(function () {
+                        registerContentButtons();
+                    })
+                })
+        }
+
         $("#selectedCountry").autocomplete({
-            source: "/MasterPetra/GetDrzava",
+            //source: "/MasterPetra/GetDrzava",
+            source: '@Url.Action("GetDrzava")',
             select: function (event, ui) {
                 event.preventDefault();
                 $("#selectedCountry").val(ui.item.label);
@@ -259,7 +337,6 @@
                         openAddEditModal();
                     })
                 })
-
-            })
+        })
     </script>
 }

@@ -30,7 +30,7 @@ namespace KoronavirusMvc.Models
         [Display(Name = "Zanimanje", Prompt = "Unesite zanimanje osobe")]
         public string Zanimanje { get; set; }
 
-        public virtual Putovanje Putovanje { get; set; }
+        public virtual ICollection<Putovanje> Putovanja { get; set; }
         public virtual StozerOsoba StozerOsoba { get; set; }
         public virtual ZarazenaOsoba ZarazenaOsoba { get; set; }
         public virtual ICollection<Kontakt> KontaktIdKontaktNavigation { get; set; }

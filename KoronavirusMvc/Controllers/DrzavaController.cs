@@ -17,12 +17,21 @@ namespace KoronavirusMvc.Controllers
         private readonly RPPP09Context _context;
         private readonly AppSettings _appSettings;
 
+        /// <summary>
+        /// ovdje se definiraju konteksti apliakcije s kojima se radi i postavke stranicenja
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="appSettings"></param>
         public DrzavaController(RPPP09Context context, IOptionsSnapshot<AppSettings> appSettings)
         {
             _context = context;
             _appSettings = appSettings.Value;
         }
 
+        /// <summary>
+        /// stvaranje, odnosni primitak drzava, ne koristimo
+        /// </summary>
+        /// <returns></returns>
         // GET: Drzava/Create
         [HttpGet]
         public ActionResult Create()
@@ -31,7 +40,11 @@ namespace KoronavirusMvc.Controllers
         }
 
         // POST: Drzava/Create
-
+        /// <summary>
+        /// stvaranje nove drzave
+        /// </summary>
+        /// <param name="drzava"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Drzava drzava)
@@ -62,6 +75,14 @@ namespace KoronavirusMvc.Controllers
 
 
         // GET: Drzava/Edit/5
+        /// <summary>
+        ///primanje podataka za urediti od drzave
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult Edit(string id, int page = 1, int sort = 1, bool ascending = true)
         {
@@ -83,7 +104,14 @@ namespace KoronavirusMvc.Controllers
             }
         }
 
-
+        /// <summary>
+        /// promjena danih podataka o drzavi 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(string id, int page = 1, int sort = 1, bool ascending = true)
@@ -137,6 +165,14 @@ namespace KoronavirusMvc.Controllers
         }
 
         // POST: Drzava/Delete/5
+        /// <summary>
+        /// brisanje neke drzave
+        /// </summary>
+        /// <param name="SifraDrzave"></param>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(string SifraDrzave, int page = 1, int sort = 1, bool ascending = true)
@@ -166,6 +202,13 @@ namespace KoronavirusMvc.Controllers
 
         }
 
+        /// <summary>
+        /// pomocu ove funkcije omogucavamo stranicenje i tablicu sa vise mogučnosti organizacije podataka, 
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="sort"></param>
+        /// <param name="ascending"></param>
+        /// <returns></returns>
         public IActionResult Index(int page = 1, int sort = 1, bool ascending = true)
         {
             int pagesize = _appSettings.PageSize;

@@ -5,7 +5,7 @@
 
     <div class="form-group @(Model.Putovanje.SifraPutovanja > 0 ? "d-none" : "")">
         <label asp-for="Putovanje.SifraPutovanja"> Šifra Putovanja</label>
-        <input asp-for="Putovanje.SifraPutovanja" class="form-control" id="id" />
+        <input asp-for="Putovanje.SifraPutovanja" class="form-control" />
     </div>
 <div class="form-group">
     <label asp-for="Putovanje.DatumPolaska"></label>
@@ -28,12 +28,5 @@
     <label asp-for="Putovanje.Lokacije">Gradovi</label>
     <div><span asp-validation-for="Putovanje.Lokacije" class="text-danger"></span></div>
     <select class="form-control" asp-for="Putovanje.Lokacije" asp-items="Model.Lokacije">
-    </select>
-</div>
-<div class="form-group">
-    <label asp-for="Putovanje.IdentifikacijskiBroj"></label>
-    <div><span asp-validation-for="Putovanje.IdentifikacijskiBroj" class="text-danger"></span></div>
-    <select class="form-control" asp-for="Putovanje.IdentifikacijskiBroj" asp-items="Model.Osobe">
-        <option selected value="" disabled>Odaberite osobu</option>
     </select>
 </div>

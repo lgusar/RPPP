@@ -107,13 +107,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.IdKontaktNavigation)
                     .WithMany(p => p.KontaktIdKontaktNavigation)
                     .HasForeignKey(d => d.IdKontakt)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__KONTAKT__id_kont__3A81B327");
 
                 entity.HasOne(d => d.IdOsobaNavigation)
                     .WithMany(p => p.KontaktIdOsobaNavigation)
                     .HasForeignKey(d => d.IdOsoba)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK__KONTAKT__id_osob__398D8EEE");
             });
 
@@ -444,9 +444,9 @@ namespace KoronavirusMvc.Models
                     .IsFixedLength();
 
                 entity.HasOne(d => d.IdentifikacijskiBrojNavigation)
-                    .WithOne(p => p.Putovanje)
-                    .HasForeignKey<Putovanje>(d => d.IdentifikacijskiBroj)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .WithMany(p => p.Putovanja)
+                    .HasForeignKey(d => d.IdentifikacijskiBroj)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_PUTOVANJE_OSOBA");
 
                 entity.Ignore(d => d.Lokacije);
@@ -669,13 +669,13 @@ namespace KoronavirusMvc.Models
                 entity.HasOne(d => d.IdentifikacijskiBrojNavigation)
                     .WithOne(p => p.ZarazenaOsoba)
                     .HasForeignKey<ZarazenaOsoba>(d => d.IdentifikacijskiBroj)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_ZARAZENA_OSOBA_OSOBA");
 
                 entity.HasOne(d => d.SifraStanjaNavigation)
                     .WithMany(p => p.ZarazenaOsoba)
                     .HasForeignKey(d => d.SifraStanja)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("FK_ZARAZENA_OSOBA_STANJE");
             });
 
