@@ -2,3 +2,7 @@
 2020-06-08 00:29:49.0606|0|Microsoft.Hosting.Lifetime|INFO|Application started. Press Ctrl+C to shut down. 
 2020-06-08 00:29:49.0606|0|Microsoft.Hosting.Lifetime|INFO|Hosting environment: Development 
 2020-06-08 00:29:49.0810|0|Microsoft.Hosting.Lifetime|INFO|Content root path: D:\Faks\RPPP\Projekt\KoronavirusMvc 
+2020-06-08 02:03:31.7726|0|KoronavirusMvc.Program|DEBUG|init main 
+2020-06-08 02:03:35.7629|0|Microsoft.Hosting.Lifetime|INFO|Application started. Press Ctrl+C to shut down. 
+2020-06-08 02:03:35.7629|0|Microsoft.Hosting.Lifetime|INFO|Hosting environment: Development 
+2020-06-08 02:03:35.7890|0|Microsoft.Hosting.Lifetime|INFO|Content root path: C:\Users\petra\Faks\RPPP\09-projekt\09\KoronavirusMvc 
