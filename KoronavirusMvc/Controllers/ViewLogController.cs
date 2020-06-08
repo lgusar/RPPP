@@ -6,7 +6,7 @@ using System.IO;
 using KoronavirusMvc.ViewModels;
 using System.Collections.Generic;
 
-namespace Firma.Mvc.Controllers
+namespace KoronavirusMvc.Controllers
 {
     public class ViewLogController : Controller
     {
